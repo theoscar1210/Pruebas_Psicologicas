@@ -6,6 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Panel Admin') — {{ config('app.name') }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>[x-cloak]{display:none!important}</style>
 </head>
 <body class="bg-gray-100 font-sans antialiased">
 
