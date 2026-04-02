@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\CandidateController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PositionController;
 use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\TestController;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', fn () => redirect()->route('login'));
 
 // ── Dashboard del administrador ───────────────────────────────────────────────
-Route::get('/dashboard', fn () => view('dashboard'))
+Route::get('/dashboard', DashboardController::class)
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
