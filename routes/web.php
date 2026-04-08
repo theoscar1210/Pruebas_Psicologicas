@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\CandidateController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PositionController;
 use App\Http\Controllers\Admin\QuestionController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\TestController;
 use App\Http\Controllers\Candidate\TestTakingController;
 use App\Http\Controllers\ProfileController;
@@ -41,6 +42,15 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::resource('candidates', CandidateController::class);
     Route::post('candidates/{candidate}/assign-test', [CandidateController::class, 'assignTest'])
         ->name('candidates.assign-test');
+
+    // Reportes
+    Route::prefix('reportes')->name('reports.')->group(function () {
+        Route::get('/', [ReportController::class, 'index'])->name('index');
+        Route::get('candidato/{candidate}/pdf', [ReportController::class, 'candidatePdf'])->name('candidate.pdf');
+        Route::get('ranking/pdf', [ReportController::class, 'rankingPdf'])->name('ranking.pdf');
+        Route::get('exportar/excel', [ReportController::class, 'exportExcel'])->name('export.excel');
+        Route::get('ranking/excel', [ReportController::class, 'exportRankingExcel'])->name('ranking.excel');
+    });
 });
 
 // ── Portal de candidatos (acceso por código único) ────────────────────────────
