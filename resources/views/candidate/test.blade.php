@@ -1,5 +1,4 @@
 @extends('layouts.candidate')
-
 @section('title', $assignment->test->name)
 
 @section('content')
@@ -9,7 +8,6 @@
     x-data="testApp({
         assignmentId: {{ $assignment->id }},
         saveUrl: '{{ route('candidate.answer', $assignment) }}',
-        finishUrl: '{{ route('candidate.finish', $assignment) }}',
         timeRemaining: {{ $assignment->time_remaining ?? 'null' }},
         totalQuestions: {{ $assignment->test->questions->count() }},
         savedAnswers: {!! json_encode(
@@ -22,110 +20,150 @@
 >
 
     {{-- ── Topbar fija ─────────────────────────────────────────────────── --}}
-    <div class="sticky top-0 z-30 bg-white border-b border-gray-100 shadow-sm">
-        <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+    <div class="sticky top-0 z-30 bg-white border-b border-slate-100 shadow-sm">
+        <div class="max-w-2xl mx-auto px-4 py-3">
+            <div class="flex items-center gap-4">
 
-            {{-- Nombre de la prueba --}}
-            <div class="flex-1 min-w-0">
-                <p class="font-semibold text-gray-900 text-sm truncate">{{ $assignment->test->name }}</p>
-                <p class="text-xs text-gray-400">{{ $assignment->candidate->name }}</p>
+                {{-- Info prueba --}}
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-slate-900 truncate">
+                        {{ $assignment->test->name }}
+                    </p>
+                    <p class="text-xs text-slate-400">{{ $assignment->candidate->name }}</p>
+                </div>
+
+                {{-- Progreso compacto --}}
+                <div class="hidden sm:flex items-center gap-2 text-xs text-slate-500">
+                    <span>
+                        <span x-text="answeredCount" class="font-semibold text-slate-700"></span>
+                        / {{ $assignment->test->questions->count() }}
+                    </span>
+                    <div class="progress-track w-20 h-1.5">
+                        <div class="progress-bar bg-brand-500"
+                             :style="`width:${Math.round((answeredCount/{{ $assignment->test->questions->count() }})*100)}%`">
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Timer --}}
+                @if($assignment->test->time_limit)
+                <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-mono font-semibold transition-all"
+                     :class="{
+                         'bg-amber-50 text-amber-600': timeRemaining <= 300 && timeRemaining > 60,
+                         'bg-red-50 text-red-600 animate-pulse': timeRemaining <= 60,
+                         'bg-slate-100 text-slate-600': timeRemaining > 300
+                     }">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span x-text="formatTime(timeRemaining)"></span>
+                </div>
+                @endif
+
+                {{-- Autoguardado --}}
+                <div class="hidden sm:flex items-center gap-1 text-xs transition-all"
+                     :class="saving ? 'text-amber-500' : 'text-emerald-500'">
+                    <svg x-show="!saving" class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    <svg x-show="saving" x-cloak class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                    </svg>
+                    <span x-text="saving ? 'Guardando…' : 'Guardado'" x-cloak class="hidden sm:inline"></span>
+                </div>
+
             </div>
 
-            {{-- Progreso --}}
-            <div class="hidden sm:flex items-center gap-2 text-xs text-gray-500">
-                <span x-text="answeredCount"></span>/<span>{{ $assignment->test->questions->count() }}</span>
-                <div class="w-24 bg-gray-100 rounded-full h-1.5">
-                    <div class="bg-indigo-500 h-1.5 rounded-full transition-all"
-                         :style="`width:${(answeredCount/{{ $assignment->test->questions->count() }})*100}%`"></div>
+            {{-- Barra de progreso total --}}
+            <div class="progress-track h-1 mt-2.5 -mx-4 px-0 rounded-none">
+                <div class="progress-bar bg-brand-500 h-1 rounded-none"
+                     :style="`width:${Math.round((answeredCount/{{ $assignment->test->questions->count() }})*100)}%`">
                 </div>
             </div>
-
-            {{-- Timer --}}
-            @if($assignment->test->time_limit)
-            <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-mono font-bold text-sm transition"
-                 :class="timeRemaining <= 300 ? 'bg-red-100 text-red-600' : 'bg-slate-100 text-slate-700'">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <span x-text="formatTime(timeRemaining)">--:--</span>
-            </div>
-            @endif
-
-            {{-- Autoguardado --}}
-            <div class="flex items-center gap-1 text-xs" :class="saving ? 'text-yellow-500' : 'text-green-500'">
-                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                </svg>
-                <span x-text="saving ? 'Guardando…' : 'Guardado'" x-cloak></span>
-            </div>
-
         </div>
     </div>
 
     {{-- ── Instrucciones ───────────────────────────────────────────────── --}}
     @if($assignment->test->instructions)
-    <div class="max-w-3xl mx-auto px-4 mt-6">
-        <div class="bg-indigo-50 border border-indigo-100 rounded-xl px-5 py-4 text-sm text-indigo-800">
-            <p class="font-semibold mb-1 flex items-center gap-2">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+    <div class="max-w-2xl mx-auto px-4 mt-6">
+        <div class="card-info p-4">
+            <div class="flex items-start gap-3">
+                <svg class="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
                 </svg>
-                Instrucciones
-            </p>
-            {{ $assignment->test->instructions }}
+                <div>
+                    <p class="text-xs font-semibold text-brand-700 mb-1">Instrucciones</p>
+                    <p class="text-sm text-brand-800/80 leading-relaxed">{{ $assignment->test->instructions }}</p>
+                </div>
+            </div>
         </div>
     </div>
     @endif
 
     {{-- ── Preguntas ───────────────────────────────────────────────────── --}}
-    <div class="max-w-3xl mx-auto px-4 py-6 space-y-6 pb-32">
+    <div class="max-w-2xl mx-auto px-4 py-6 space-y-5 pb-32">
 
         @foreach($assignment->test->questions as $question)
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6"
-             id="q-{{ $question->id }}">
+        <div class="card p-6 animate-fade-in" id="q-{{ $question->id }}">
 
-            {{-- Cabecera de pregunta --}}
+            {{-- Encabezado de pregunta --}}
             <div class="flex items-start gap-3 mb-5">
-                <span class="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold">
+                <span class="w-7 h-7 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center
+                             text-xs font-bold flex-shrink-0 mt-0.5">
                     {{ $question->order }}
                 </span>
                 <div class="flex-1">
-                    <p class="text-gray-900 font-medium leading-relaxed">{{ $question->text }}</p>
+                    <p class="text-[15px] font-medium text-slate-800 leading-relaxed">
+                        {{ $question->text }}
+                    </p>
                     @if($question->is_required)
-                        <span class="text-xs text-red-400">* Obligatoria</span>
+                        <p class="text-[11px] text-slate-400 mt-1">Obligatoria</p>
                     @endif
                 </div>
             </div>
 
-            {{-- Opciones múltiple --}}
+            {{-- ── OPCIÓN MÚLTIPLE ─────────────────────────────────────── --}}
             @if($question->type === 'multiple_choice')
-            <div class="space-y-2 ml-11">
+            <div class="space-y-2 ml-10">
                 @foreach($question->options as $option)
                 <label
-                    class="flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition
-                           hover:border-indigo-300 hover:bg-indigo-50"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl border-[1.5px] cursor-pointer transition-all duration-150"
                     :class="answers[{{ $question->id }}] == {{ $option->id }}
-                        ? 'border-indigo-500 bg-indigo-50'
-                        : 'border-gray-100 bg-gray-50'">
+                        ? 'border-brand-500 bg-brand-50 shadow-sm'
+                        : 'border-slate-200 bg-slate-50/50 hover:border-brand-300 hover:bg-brand-50/40'">
                     <input
                         type="radio"
                         name="q{{ $question->id }}"
                         value="{{ $option->id }}"
-                        class="w-4 h-4 text-indigo-600 flex-shrink-0"
+                        class="sr-only"
                         :checked="answers[{{ $question->id }}] == {{ $option->id }}"
                         @change="saveAnswer({{ $question->id }}, {{ $option->id }}, null)">
-                    <span class="text-sm text-gray-700">{{ $option->text }}</span>
+
+                    {{-- Círculo radio personalizado --}}
+                    <div class="w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all"
+                         :class="answers[{{ $question->id }}] == {{ $option->id }}
+                            ? 'border-brand-500 bg-brand-500'
+                            : 'border-slate-300'">
+                        <div class="w-1.5 h-1.5 rounded-full bg-white transition-all"
+                             :class="answers[{{ $question->id }}] == {{ $option->id }} ? 'opacity-100' : 'opacity-0'">
+                        </div>
+                    </div>
+
+                    <span class="text-sm text-slate-700 leading-relaxed">{{ $option->text }}</span>
                 </label>
                 @endforeach
             </div>
 
-            {{-- Escala Likert --}}
+            {{-- ── ESCALA LIKERT ───────────────────────────────────────── --}}
             @elseif($question->type === 'likert')
-            <div class="ml-11">
-                <div class="flex items-center justify-between gap-2">
+            <div class="ml-10">
+                <div class="likert-group">
                     @foreach($question->options as $option)
-                    <label class="flex-1 text-center cursor-pointer group">
+                    <label
+                        class="likert-option"
+                        :class="answers[{{ $question->id }}] == {{ $option->id }} ? 'likert-{{ $option->value }}' : ''">
                         <input
                             type="radio"
                             name="q{{ $question->id }}"
@@ -133,47 +171,47 @@
                             class="sr-only"
                             :checked="answers[{{ $question->id }}] == {{ $option->id }}"
                             @change="saveAnswer({{ $question->id }}, {{ $option->id }}, null)">
-                        <div class="flex flex-col items-center gap-1">
-                            <div class="w-10 h-10 rounded-full border-2 flex items-center justify-center font-bold text-sm transition
-                                        group-hover:border-indigo-400 group-hover:bg-indigo-50"
-                                 :class="answers[{{ $question->id }}] == {{ $option->id }}
-                                    ? 'border-indigo-500 bg-indigo-500 text-white'
-                                    : 'border-gray-200 text-gray-500'">
-                                {{ $option->value }}
-                            </div>
-                            <span class="text-xs text-gray-400 leading-tight text-center hidden sm:block">
-                                {{ $option->text }}
-                            </span>
+
+                        <div class="likert-card">
+                            <div class="likert-circle">{{ $option->value }}</div>
+                            <span class="likert-label">{{ $option->text }}</span>
                         </div>
                     </label>
                     @endforeach
                 </div>
-                <div class="flex justify-between text-xs text-gray-400 mt-2 sm:hidden">
-                    <span>{{ $question->options->first()->text }}</span>
-                    <span>{{ $question->options->last()->text }}</span>
+
+                {{-- Leyenda extremos en móvil --}}
+                <div class="flex justify-between text-[10px] text-slate-400 mt-2 px-1 sm:hidden">
+                    <span>← {{ $question->options->first()->text }}</span>
+                    <span>{{ $question->options->last()->text }} →</span>
                 </div>
             </div>
 
-            {{-- Pregunta abierta --}}
+            {{-- ── PREGUNTA ABIERTA ────────────────────────────────────── --}}
             @elseif($question->type === 'open')
-            <div class="ml-11">
+            <div class="ml-10">
                 <textarea
                     name="q{{ $question->id }}_text"
                     rows="4"
                     placeholder="Escribe tu respuesta aquí…"
-                    class="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-400 transition resize-none"
                     x-model="textAnswers[{{ $question->id }}]"
-                    @input.debounce.800ms="saveAnswer({{ $question->id }}, null, textAnswers[{{ $question->id }}])">{{ $assignment->answers->firstWhere('question_id', $question->id)?->text_answer }}</textarea>
+                    @input.debounce.800ms="saveAnswer({{ $question->id }}, null, textAnswers[{{ $question->id }}])"
+                    class="textarea">{{ $assignment->answers->firstWhere('question_id', $question->id)?->text_answer }}</textarea>
             </div>
             @endif
 
             {{-- Indicador respondida --}}
-            <div class="flex justify-end mt-3">
-                <span class="text-xs transition"
+            <div class="flex justify-end mt-4 ml-10">
+                <span class="text-xs font-medium transition-colors"
                       :class="answers[{{ $question->id }}] || textAnswers[{{ $question->id }}]
-                        ? 'text-green-500' : 'text-gray-300'">
+                        ? 'text-emerald-500' : 'text-slate-300'">
                     <template x-if="answers[{{ $question->id }}] || textAnswers[{{ $question->id }}]">
-                        <span>✓ Respondida</span>
+                        <span class="flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            Respondida
+                        </span>
                     </template>
                     <template x-if="!answers[{{ $question->id }}] && !textAnswers[{{ $question->id }}]">
                         <span>Sin responder</span>
@@ -183,24 +221,18 @@
 
         </div>
         @endforeach
-
     </div>
 
-    {{-- ── Barra inferior fija: Finalizar ─────────────────────────────── --}}
-    <div class="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-gray-100 shadow-lg">
-        <div class="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
-
-            <div class="text-sm text-gray-500">
-                <span x-text="answeredCount" class="font-bold text-gray-800"></span>
-                de {{ $assignment->test->questions->count() }} preguntas respondidas
-                <template x-if="{{ $assignment->test->questions->where('is_required', true)->count() }} > answeredCount">
-                    <span class="text-yellow-500 ml-2 text-xs">— Hay preguntas obligatorias sin responder</span>
-                </template>
+    {{-- ── Barra inferior fija ─────────────────────────────────────────── --}}
+    <div class="fixed bottom-0 inset-x-0 z-30 bg-white border-t border-slate-100 shadow-card-lg">
+        <div class="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+            <div class="text-sm text-slate-500">
+                <span class="font-semibold text-slate-800" x-text="answeredCount"></span>
+                de {{ $assignment->test->questions->count() }} respondidas
             </div>
-
             <button
-                @click="confirmFinish()"
-                class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold text-sm px-6 py-2.5 rounded-xl transition shadow-sm">
+                @click="showModal = true"
+                class="btn-primary">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                 </svg>
@@ -209,31 +241,43 @@
         </div>
     </div>
 
-    {{-- Modal confirmación finalizar --}}
+    {{-- ── Modal de confirmación ───────────────────────────────────────── --}}
     <div x-show="showModal" x-cloak
-         class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-        <div class="bg-white rounded-2xl shadow-xl p-8 max-w-sm w-full text-center"
-             @click.stop>
-            <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+         class="fixed inset-0 z-50 flex items-end sm:items-center justify-center px-4 pb-4 sm:pb-0"
+         @keydown.escape.window="showModal = false">
+
+        {{-- Overlay --}}
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+             @click="showModal = false"
+             x-transition:enter="transition duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100">
+        </div>
+
+        {{-- Dialog --}}
+        <div class="relative bg-white rounded-modal shadow-modal w-full max-w-sm p-7 text-center animate-slide-up">
+            <div class="w-14 h-14 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-7 h-7 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                 </svg>
             </div>
-            <h3 class="text-lg font-bold text-gray-900 mb-2">¿Finalizar la prueba?</h3>
-            <p class="text-sm text-gray-500 mb-6">
-                Has respondido <strong x-text="answeredCount"></strong> de
-                <strong>{{ $assignment->test->questions->count() }}</strong> preguntas.
-                Esta acción no se puede deshacer.
+
+            <h3 class="text-lg font-bold text-slate-900 mb-2">¿Finalizar la prueba?</h3>
+            <p class="text-sm text-slate-500 mb-1">
+                Has respondido <strong x-text="answeredCount" class="text-slate-800"></strong>
+                de <strong class="text-slate-800">{{ $assignment->test->questions->count() }}</strong> preguntas.
             </p>
+            <p class="text-xs text-slate-400 mb-6">Esta acción no se puede deshacer.</p>
+
             <div class="flex gap-3">
-                <button @click="showModal = false"
-                        class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition">
-                    Continuar revisando
+                <button @click="showModal = false" class="btn-secondary flex-1">
+                    Seguir revisando
                 </button>
-                <form method="POST" action="{{ route('candidate.finish', $assignment) }}" class="flex-1">
+                <form method="POST"
+                      action="{{ route('candidate.finish', $assignment) }}"
+                      class="flex-1">
                     @csrf
-                    <button type="submit"
-                            class="w-full py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-semibold transition">
+                    <button type="submit" class="btn-primary w-full justify-center">
                         Sí, finalizar
                     </button>
                 </form>
@@ -243,105 +287,90 @@
 
 </div>
 
+{{-- ── Alpine.js component ────────────────────────────────────────────── --}}
 <script>
-function testApp({ assignmentId, saveUrl, finishUrl, timeRemaining, totalQuestions, savedAnswers }) {
+function testApp({ assignmentId, saveUrl, timeRemaining, totalQuestions, savedAnswers }) {
     return {
-        answers: {},         // question_id → option_id
-        textAnswers: {},     // question_id → text
-        saving: false,
-        showModal: false,
+        answers:      {},
+        textAnswers:  {},
+        saving:       false,
+        showModal:    false,
         timeRemaining,
         timerInterval: null,
-        saveTimeout: null,
+        saveTimeout:   null,
 
         get answeredCount() {
-            const optionAnswered = Object.values(this.answers).filter(v => v !== null && v !== undefined).length;
-            const textAnswered = Object.values(this.textAnswers).filter(v => v && v.trim() !== '').length;
-            return optionAnswered + textAnswered;
+            const opts  = Object.values(this.answers).filter(v => v !== null && v !== undefined).length;
+            const texts = Object.values(this.textAnswers).filter(v => v?.trim()).length;
+            return opts + texts;
         },
 
         init() {
-            // Cargar respuestas guardadas
+            // Cargar respuestas previas
             for (const [qId, val] of Object.entries(savedAnswers)) {
-                if (typeof val === 'number') {
-                    this.answers[qId] = val;
-                } else if (val) {
-                    this.textAnswers[qId] = val;
-                }
+                if (typeof val === 'number') this.answers[qId] = val;
+                else if (val)               this.textAnswers[qId] = val;
             }
 
-            // Iniciar timer si aplica
-            if (this.timeRemaining !== null) {
+            // Timer countdown
+            if (this.timeRemaining !== null && this.timeRemaining > 0) {
                 this.timerInterval = setInterval(() => {
-                    if (this.timeRemaining > 0) {
-                        this.timeRemaining--;
-                        // Guardar tiempo cada 30 segundos
-                        if (this.timeRemaining % 30 === 0) {
-                            this.persistTime();
-                        }
-                        // Tiempo agotado → envío automático
-                        if (this.timeRemaining === 0) {
-                            clearInterval(this.timerInterval);
-                            document.querySelector('form[action="{{ route('candidate.finish', $assignment) }}"]').submit();
-                        }
+                    this.timeRemaining--;
+                    if (this.timeRemaining % 30 === 0) this.syncTime();
+                    if (this.timeRemaining <= 0) {
+                        clearInterval(this.timerInterval);
+                        document.querySelector('form[action="{{ route('candidate.finish', $assignment) }}"]')?.submit();
                     }
                 }, 1000);
             }
         },
 
-        formatTime(seconds) {
-            if (seconds === null) return '';
-            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-            const s = (seconds % 60).toString().padStart(2, '0');
-            return `${m}:${s}`;
+        formatTime(s) {
+            if (s === null || s === undefined) return '';
+            const m = Math.floor(s / 60).toString().padStart(2, '0');
+            const sec = (s % 60).toString().padStart(2, '0');
+            return `${m}:${sec}`;
         },
 
         saveAnswer(questionId, optionId, textAnswer) {
-            // Actualizar estado local
-            if (optionId !== null) {
-                this.answers[questionId] = optionId;
-            } else {
-                this.textAnswers[questionId] = textAnswer;
-            }
+            if (optionId !== null)    this.answers[questionId]     = optionId;
+            else if (textAnswer !== null) this.textAnswers[questionId] = textAnswer;
 
             this.saving = true;
-
-            // Debounce: espera 600ms antes de enviar
             clearTimeout(this.saveTimeout);
-            this.saveTimeout = setTimeout(() => {
-                const body = {
-                    _token: document.querySelector('meta[name="csrf-token"]').content,
-                    question_id: questionId,
-                    question_option_id: optionId,
-                    text_answer: textAnswer,
-                    time_remaining: this.timeRemaining,
-                };
 
+            this.saveTimeout = setTimeout(() => {
                 fetch(saveUrl, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                    body: JSON.stringify(body),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept':       'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    },
+                    body: JSON.stringify({
+                        question_id:        questionId,
+                        question_option_id: optionId,
+                        text_answer:        textAnswer,
+                        time_remaining:     this.timeRemaining,
+                    }),
                 })
                 .then(r => r.json())
-                .then(() => { this.saving = false; })
-                .catch(() => { this.saving = false; });
-            }, 600);
+                .finally(() => { this.saving = false; });
+            }, 500);
         },
 
-        persistTime() {
+        syncTime() {
+            const firstQ = Object.keys(this.answers)[0];
+            if (!firstQ) return;
             fetch(saveUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                body: JSON.stringify({
-                    _token: document.querySelector('meta[name="csrf-token"]').content,
-                    question_id: Object.keys(this.answers)[0] ?? null,
-                    time_remaining: this.timeRemaining,
-                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: JSON.stringify({ question_id: firstQ, time_remaining: this.timeRemaining }),
             }).catch(() => {});
-        },
-
-        confirmFinish() {
-            this.showModal = true;
         },
     };
 }
