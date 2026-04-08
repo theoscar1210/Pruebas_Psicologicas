@@ -3,102 +3,111 @@
 @section('title', 'Dashboard')
 @section('header', 'Dashboard')
 
+@section('header-actions')
+    <a href="{{ route('admin.candidates.create') }}" class="btn-primary btn-sm">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Nuevo candidato
+    </a>
+@endsection
+
 @section('content')
 
-{{-- Tarjetas de estadísticas --}}
+{{-- KPIs --}}
 <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
 
-    <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-indigo-500">
-        <p class="text-xs text-gray-500 uppercase tracking-wide">Cargos activos</p>
-        <p class="text-3xl font-bold text-indigo-700 mt-1">{{ $stats['positions'] }}</p>
+    <div class="kpi-card border-l-4 border-l-brand-500">
+        <span class="kpi-label">Cargos activos</span>
+        <span class="kpi-value text-brand-700">{{ $stats['positions'] }}</span>
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-violet-500">
-        <p class="text-xs text-gray-500 uppercase tracking-wide">Pruebas activas</p>
-        <p class="text-3xl font-bold text-violet-700 mt-1">{{ $stats['tests'] }}</p>
+    <div class="kpi-card border-l-4 border-l-violet-500">
+        <span class="kpi-label">Pruebas activas</span>
+        <span class="kpi-value text-violet-700">{{ $stats['tests'] }}</span>
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-blue-500">
-        <p class="text-xs text-gray-500 uppercase tracking-wide">Candidatos</p>
-        <p class="text-3xl font-bold text-blue-700 mt-1">{{ $stats['candidates'] }}</p>
+    <div class="kpi-card border-l-4 border-l-slate-400">
+        <span class="kpi-label">Candidatos</span>
+        <span class="kpi-value">{{ $stats['candidates'] }}</span>
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-green-500">
-        <p class="text-xs text-gray-500 uppercase tracking-wide">Completadas</p>
-        <p class="text-3xl font-bold text-green-700 mt-1">{{ $stats['completed'] }}</p>
+    <div class="kpi-card border-l-4 border-l-emerald-500">
+        <span class="kpi-label">Completadas</span>
+        <span class="kpi-value text-emerald-700">{{ $stats['completed'] }}</span>
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-yellow-500">
-        <p class="text-xs text-gray-500 uppercase tracking-wide">En progreso</p>
-        <p class="text-3xl font-bold text-yellow-700 mt-1">{{ $stats['in_progress'] }}</p>
+    <div class="kpi-card border-l-4 border-l-amber-400">
+        <span class="kpi-label">En progreso</span>
+        <span class="kpi-value text-amber-600">{{ $stats['in_progress'] }}</span>
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-gray-400">
-        <p class="text-xs text-gray-500 uppercase tracking-wide">Pendientes</p>
-        <p class="text-3xl font-bold text-gray-700 mt-1">{{ $stats['pending'] }}</p>
+    <div class="kpi-card border-l-4 border-l-slate-200">
+        <span class="kpi-label">Pendientes</span>
+        <span class="kpi-value text-slate-500">{{ $stats['pending'] }}</span>
     </div>
 
 </div>
 
 {{-- Actividad reciente --}}
-<div class="bg-white rounded-xl shadow-sm">
-    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-        <h2 class="font-semibold text-gray-700">Actividad Reciente</h2>
-        <a href="{{ route('admin.candidates.index') }}"
-           class="text-sm text-indigo-600 hover:text-indigo-800">Ver todos →</a>
+<div class="table-wrapper">
+    <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+        <h2 class="font-semibold text-slate-800 text-sm">Actividad reciente</h2>
+        <a href="{{ route('admin.candidates.index') }}" class="btn-ghost btn-sm text-xs">
+            Ver todos →
+        </a>
     </div>
 
     @if($recentAssignments->isEmpty())
-        <div class="px-6 py-12 text-center text-gray-400 text-sm">
-            Aún no hay actividad registrada.
+        <div class="px-5 py-14 text-center">
+            <p class="text-slate-400 text-sm">Aún no hay actividad registrada.</p>
         </div>
     @else
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-                <thead>
-                    <tr class="text-xs text-gray-500 uppercase tracking-wide border-b border-gray-100">
-                        <th class="px-6 py-3 text-left">Candidato</th>
-                        <th class="px-6 py-3 text-left">Prueba</th>
-                        <th class="px-6 py-3 text-left">Estado</th>
-                        <th class="px-6 py-3 text-left">Resultado</th>
-                        <th class="px-6 py-3 text-left">Fecha</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-50">
-                    @foreach($recentAssignments as $assignment)
-                    <tr class="hover:bg-gray-50 transition">
-                        <td class="px-6 py-3 font-medium text-gray-800">
-                            <a href="{{ route('admin.candidates.show', $assignment->candidate) }}"
-                               class="hover:text-indigo-600">
-                                {{ $assignment->candidate->name }}
-                            </a>
-                        </td>
-                        <td class="px-6 py-3 text-gray-600">{{ $assignment->test->name }}</td>
-                        <td class="px-6 py-3">
-                            @if($assignment->status === 'completed')
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Completada</span>
-                            @elseif($assignment->status === 'in_progress')
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">En progreso</span>
-                            @else
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">Pendiente</span>
-                            @endif
-                        </td>
-                        <td class="px-6 py-3">
-                            @if($assignment->result)
-                                <span class="font-semibold {{ $assignment->result->passed ? 'text-green-600' : 'text-red-500' }}">
-                                    {{ $assignment->result->percentage }}%
-                                    {{ $assignment->result->passed ? '✓' : '✗' }}
-                                </span>
-                            @else
-                                <span class="text-gray-400">—</span>
-                            @endif
-                        </td>
-                        <td class="px-6 py-3 text-gray-400">{{ $assignment->updated_at->format('d/m/Y H:i') }}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+        <table class="table-base">
+            <thead>
+                <tr>
+                    <th>Candidato</th>
+                    <th>Prueba</th>
+                    <th class="text-center">Estado</th>
+                    <th class="text-center">Resultado</th>
+                    <th class="text-right">Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($recentAssignments as $assignment)
+                <tr>
+                    <td>
+                        <a href="{{ route('admin.candidates.show', $assignment->candidate) }}"
+                           class="font-medium text-slate-900 hover:text-brand-700 transition-colors">
+                            {{ $assignment->candidate->name }}
+                        </a>
+                    </td>
+                    <td class="text-slate-500">{{ $assignment->test->name }}</td>
+                    <td class="text-center">
+                        @if($assignment->status === 'completed')
+                            <span class="badge-success">Completada</span>
+                        @elseif($assignment->status === 'in_progress')
+                            <span class="badge-warning">En progreso</span>
+                        @else
+                            <span class="badge-neutral">Pendiente</span>
+                        @endif
+                    </td>
+                    <td class="text-center">
+                        @if($assignment->result)
+                            <span class="font-semibold text-sm {{ $assignment->result->passed ? 'text-emerald-600' : 'text-red-500' }}">
+                                {{ $assignment->result->percentage }}%
+                            </span>
+                        @else
+                            <span class="text-slate-300">—</span>
+                        @endif
+                    </td>
+                    <td class="text-right text-slate-400 text-xs">
+                        {{ $assignment->updated_at->format('d/m/Y H:i') }}
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
     @endif
 </div>
 
