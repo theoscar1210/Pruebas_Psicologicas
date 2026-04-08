@@ -126,7 +126,7 @@
 
             {{-- ── OPCIÓN MÚLTIPLE ─────────────────────────────────────── --}}
             @if($question->type === 'multiple_choice')
-            <div class="space-y-2 ml-10">
+            <div class="space-y-2 sm:ml-10">
                 @foreach($question->options as $option)
                 <label
                     class="flex items-center gap-3 px-4 py-3 rounded-xl border-[1.5px] cursor-pointer transition-all duration-150"
@@ -158,7 +158,7 @@
 
             {{-- ── ESCALA LIKERT ───────────────────────────────────────── --}}
             @elseif($question->type === 'likert')
-            <div class="ml-10">
+            <div class="sm:ml-10">
                 <div class="likert-group">
                     @foreach($question->options as $option)
                     <label
@@ -180,16 +180,16 @@
                     @endforeach
                 </div>
 
-                {{-- Leyenda extremos en móvil --}}
-                <div class="flex justify-between text-[10px] text-slate-400 mt-2 px-1 sm:hidden">
-                    <span>← {{ $question->options->first()->text }}</span>
-                    <span>{{ $question->options->last()->text }} →</span>
+                {{-- Leyenda extremos (solo en pantallas grandes donde el Likert es horizontal) --}}
+                <div class="hidden sm:flex justify-between text-[10px] text-slate-400 mt-1 px-1">
+                    <span>← Menos</span>
+                    <span>Más →</span>
                 </div>
             </div>
 
             {{-- ── PREGUNTA ABIERTA ────────────────────────────────────── --}}
             @elseif($question->type === 'open')
-            <div class="ml-10">
+            <div class="sm:ml-10">
                 <textarea
                     name="q{{ $question->id }}_text"
                     rows="4"
@@ -201,7 +201,7 @@
             @endif
 
             {{-- Indicador respondida --}}
-            <div class="flex justify-end mt-4 ml-10">
+            <div class="flex justify-end mt-4 sm:ml-10">
                 <span class="text-xs font-medium transition-colors"
                       :class="answers[{{ $question->id }}] || textAnswers[{{ $question->id }}]
                         ? 'text-emerald-500' : 'text-slate-300'">

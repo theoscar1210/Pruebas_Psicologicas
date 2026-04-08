@@ -9,14 +9,36 @@
 </head>
 <body class="h-full bg-slate-50 font-sans antialiased">
 
-<div class="flex h-screen overflow-hidden">
+<div class="flex h-screen overflow-hidden" x-data="{ sidebarOpen: false }">
+
+    {{-- ════════════════════════════════════════════════════════════════
+         OVERLAY móvil (aparece detrás del sidebar cuando está abierto)
+    ════════════════════════════════════════════════════════════════ --}}
+    <div
+        x-show="sidebarOpen"
+        x-cloak
+        @click="sidebarOpen = false"
+        x-transition:enter="transition-opacity duration-200"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition-opacity duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        class="fixed inset-0 bg-black/50 z-40 lg:hidden">
+    </div>
 
     {{-- ════════════════════════════════════════════════════════════════
          SIDEBAR
+         - Móvil: fixed, oculto por defecto, aparece como drawer
+         - Desktop (lg+): estático, siempre visible
     ════════════════════════════════════════════════════════════════ --}}
-    <aside class="w-64 flex flex-col flex-shrink-0 bg-brand-950 select-none">
+    <aside
+        class="fixed inset-y-0 left-0 z-50 w-64 flex flex-col flex-shrink-0 bg-brand-950 select-none
+               transition-transform duration-200 ease-in-out
+               lg:static lg:translate-x-0 lg:z-auto"
+        :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
 
-        {{-- Logo --}}
+        {{-- Logo + botón cerrar (móvil) --}}
         <div class="flex items-center gap-3 px-5 py-5 border-b border-white/5">
             <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -24,17 +46,24 @@
                           d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                 </svg>
             </div>
-            <div class="leading-tight overflow-hidden">
+            <div class="leading-tight overflow-hidden flex-1">
                 <p class="text-white text-[13px] font-semibold truncate">Pruebas Psicológicas</p>
                 <p class="text-brand-400 text-[11px]">RRHH</p>
             </div>
+            {{-- Cerrar en móvil --}}
+            <button @click="sidebarOpen = false"
+                    class="lg:hidden text-brand-400 hover:text-white transition-colors p-1 ml-auto flex-shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
         </div>
 
         {{-- Navegación --}}
         <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto scrollbar-none">
 
-            {{-- Dashboard --}}
             <a href="{{ route('dashboard') }}"
+               @click="sidebarOpen = false"
                class="sidebar-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                 <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -43,10 +72,10 @@
                 Dashboard
             </a>
 
-            {{-- Gestión --}}
             <p class="sidebar-section">Gestión</p>
 
             <a href="{{ route('admin.positions.index') }}"
+               @click="sidebarOpen = false"
                class="sidebar-link {{ request()->routeIs('admin.positions.*') ? 'active' : '' }}">
                 <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -56,6 +85,7 @@
             </a>
 
             <a href="{{ route('admin.tests.index') }}"
+               @click="sidebarOpen = false"
                class="sidebar-link {{ request()->routeIs('admin.tests.*') ? 'active' : '' }}">
                 <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -65,6 +95,7 @@
             </a>
 
             <a href="{{ route('admin.candidates.index') }}"
+               @click="sidebarOpen = false"
                class="sidebar-link {{ request()->routeIs('admin.candidates.*') ? 'active' : '' }}">
                 <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -73,10 +104,10 @@
                 Candidatos
             </a>
 
-            {{-- Reportes --}}
             <p class="sidebar-section">Reportes</p>
 
             <a href="{{ route('admin.reports.index') }}"
+               @click="sidebarOpen = false"
                class="sidebar-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
                 <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -90,7 +121,6 @@
         {{-- Usuario autenticado --}}
         <div class="px-3 py-3 border-t border-white/5">
             <div class="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-white/5 transition-colors">
-                {{-- Avatar inicial --}}
                 <div class="w-8 h-8 rounded-full bg-brand-700 flex items-center justify-center
                             text-white text-xs font-bold flex-shrink-0">
                     {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
@@ -99,7 +129,6 @@
                     <p class="text-white text-xs font-medium truncate">{{ auth()->user()->name }}</p>
                     <p class="text-brand-400 text-[10px] capitalize">{{ auth()->user()->role }}</p>
                 </div>
-                {{-- Logout --}}
                 <form method="POST" action="{{ route('logout') }}" class="flex-shrink-0">
                     @csrf
                     <button type="submit" title="Cerrar sesión"
@@ -121,8 +150,16 @@
     <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
 
         {{-- Topbar --}}
-        <header class="bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between gap-4 flex-shrink-0">
-            <h1 class="text-[15px] font-semibold text-slate-900 truncate">
+        <header class="bg-white border-b border-slate-100 px-4 lg:px-6 py-4 flex items-center gap-3 flex-shrink-0">
+            {{-- Hamburger (solo en móvil) --}}
+            <button @click="sidebarOpen = true"
+                    class="lg:hidden p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors flex-shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+
+            <h1 class="flex-1 text-[15px] font-semibold text-slate-900 truncate">
                 @yield('header', 'Panel de Administración')
             </h1>
             <div class="flex items-center gap-2 flex-shrink-0">
@@ -132,7 +169,7 @@
 
         {{-- Flash messages --}}
         @if(session()->hasAny(['success', 'error', 'info', 'warning']))
-        <div class="px-6 pt-4 space-y-2 flex-shrink-0">
+        <div class="px-4 lg:px-6 pt-4 space-y-2 flex-shrink-0">
             @if(session('success'))
                 <div class="alert-success animate-fade-in">
                     <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -169,7 +206,7 @@
         @endif
 
         {{-- Main content --}}
-        <main class="flex-1 overflow-y-auto px-6 py-5">
+        <main class="flex-1 overflow-y-auto px-4 lg:px-6 py-5">
             @yield('content')
         </main>
 

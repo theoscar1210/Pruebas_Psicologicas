@@ -75,6 +75,14 @@
                focus:ring-red-400;
     }
 
+    /* Advertencia: acción en estado intermedio */
+    .btn-warning {
+        @apply btn
+               bg-amber-500 hover:bg-amber-600 active:bg-amber-700
+               text-white shadow-sm
+               focus:ring-amber-400;
+    }
+
     /* Ghost: acción discreta, sin fondo */
     .btn-ghost {
         @apply btn
@@ -207,11 +215,11 @@
     /* ── TABLAS ──────────────────────────────────────────────────────────── */
 
     .table-wrapper {
-        @apply card overflow-hidden;
+        @apply bg-white rounded-card border border-slate-100 shadow-card overflow-x-auto;
     }
 
     .table-base {
-        @apply w-full text-sm;
+        @apply w-full text-sm min-w-full;
     }
 
     .table-base thead tr {
@@ -220,7 +228,7 @@
 
     .table-base thead th {
         @apply px-5 py-3 text-left text-[11px] font-semibold
-               text-slate-500 uppercase tracking-wider;
+               text-slate-500 uppercase tracking-wider whitespace-nowrap;
     }
 
     .table-base tbody tr {
@@ -230,26 +238,25 @@
     .table-base tbody tr:last-child { @apply border-b-0; }
 
     .table-base tbody td {
-        @apply px-5 py-3.5 text-slate-700;
+        @apply px-5 py-3.5 text-slate-700 whitespace-nowrap;
     }
 
     /* ── ESCALA LIKERT ───────────────────────────────────────────────────── */
 
-    /* Contenedor de opciones Likert */
+    /* Contenedor: vertical en móvil, horizontal en sm+ */
     .likert-group {
-        @apply flex gap-2;
+        @apply flex flex-col sm:flex-row gap-2;
     }
 
-    /* Cada opción individual */
+    /* Cada opción */
     .likert-option {
-        @apply flex-1 cursor-pointer;
+        @apply cursor-pointer sm:flex-1;
     }
 
-    /* La "tarjeta" visual de cada opción */
+    /* Tarjeta: fila en móvil (círculo + label lado a lado), columna en sm+ */
     .likert-card {
-        @apply flex flex-col items-center gap-2 p-3
-               rounded-card border border-slate-200
-               bg-slate-50
+        @apply flex flex-row sm:flex-col items-center gap-3 sm:gap-2
+               p-3 rounded-card border border-slate-200 bg-slate-50
                transition-all duration-150
                hover:border-brand-300 hover:bg-brand-50 hover:shadow-sm;
     }
@@ -257,17 +264,18 @@
     /* Círculo numerado */
     .likert-circle {
         @apply w-9 h-9 rounded-full border-2 border-slate-200 bg-white
-               flex items-center justify-center
+               flex items-center justify-center flex-shrink-0
                text-sm font-bold text-slate-500
                transition-all duration-150;
     }
 
-    /* Etiqueta de texto */
+    /* Etiqueta: alineada a la izquierda en móvil, centrada en sm+ */
     .likert-label {
-        @apply text-[10px] text-center text-slate-400 leading-tight font-medium;
+        @apply text-[11px] sm:text-[10px] text-left sm:text-center
+               text-slate-400 leading-tight font-medium;
     }
 
-    /* Estados por escala de color (usados con JS/Alpine) */
+    /* Estados por escala de color (usados con Alpine :class) */
     .likert-1 .likert-circle  { @apply border-red-400    bg-red-400    text-white; }
     .likert-1 .likert-card    { @apply border-red-200    bg-red-50; }
     .likert-2 .likert-circle  { @apply border-orange-400 bg-orange-400 text-white; }

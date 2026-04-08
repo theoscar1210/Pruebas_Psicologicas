@@ -16,7 +16,7 @@
 
 @section('content')
 
-<div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
     {{-- ── Datos del candidato ──────────────────────────────────────────── --}}
     <div class="space-y-4">
@@ -95,7 +95,7 @@
     </div>
 
     {{-- ── Pruebas asignadas ────────────────────────────────────────────── --}}
-    <div class="xl:col-span-2 space-y-3">
+    <div class="lg:col-span-2 space-y-3">
         <h3 class="font-semibold text-slate-700 text-sm">
             Pruebas asignadas ({{ $candidate->assignments->count() }})
         </h3>

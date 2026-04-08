@@ -9,7 +9,7 @@
 
 @section('content')
 
-<div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
     {{-- ── Columna izquierda: lista de preguntas ───────────────────────── --}}
     <div class="space-y-3">
