@@ -185,7 +185,7 @@
     </div>
 
     {{-- ── Pruebas asignadas ────────────────────────────────────────────── --}}
-    <div class="lg:col-span-2 space-y-3">
+    <div class="lg:col-span-2 space-y-3 lg:order-last">
         <h3 class="font-semibold text-slate-700 text-sm">
             Pruebas asignadas ({{ $candidate->assignments->count() }})
         </h3>

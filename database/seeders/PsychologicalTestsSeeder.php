@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Question;
 use App\Models\QuestionOption;
 use App\Models\Test;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 /**
@@ -19,8 +20,12 @@ use Illuminate\Database\Seeder;
  */
 class PsychologicalTestsSeeder extends Seeder
 {
+    private int $adminId;
+
     public function run(): void
     {
+        $this->adminId = User::first()->id;
+
         $this->seedBigFive();
         $this->seedSixteenPF();
         $this->seedRaven();
@@ -47,6 +52,7 @@ class PsychologicalTestsSeeder extends Seeder
                 'time_limit'     => 20,
                 'passing_score'  => 0,
                 'is_active'      => true,
+                'created_by'     => $this->adminId,
             ]
         );
 
@@ -161,6 +167,7 @@ class PsychologicalTestsSeeder extends Seeder
                 'time_limit'     => 25,
                 'passing_score'  => 0,
                 'is_active'      => true,
+                'created_by'     => $this->adminId,
             ]
         );
 
@@ -334,6 +341,7 @@ class PsychologicalTestsSeeder extends Seeder
                 'time_limit'     => 45,
                 'passing_score'  => 50,
                 'is_active'      => true,
+                'created_by'     => $this->adminId,
             ]
         );
 
@@ -434,6 +442,7 @@ class PsychologicalTestsSeeder extends Seeder
                 'time_limit'     => 60,
                 'passing_score'  => 60,
                 'is_active'      => true,
+                'created_by'     => $this->adminId,
             ]
         );
 
@@ -493,6 +502,7 @@ class PsychologicalTestsSeeder extends Seeder
                 'time_limit'     => null,
                 'passing_score'  => 0,
                 'is_active'      => true,
+                'created_by'     => $this->adminId,
             ]
         );
         // El Wartegg no tiene preguntas en el sistema (es evaluación del psicólogo)
@@ -516,6 +526,7 @@ class PsychologicalTestsSeeder extends Seeder
                 'time_limit'     => null,
                 'passing_score'  => 60,
                 'is_active'      => true,
+                'created_by'     => $this->adminId,
             ]
         );
         // La entrevista STAR tampoco tiene preguntas en el sistema de candidatos

@@ -60,7 +60,7 @@ class CandidateController extends Controller
 
     public function show(Candidate $candidate): View
     {
-        $candidate->load(['position', 'assignments.test', 'assignments.result', 'createdBy']);
+        $candidate->load(['position', 'assignments.test', 'assignments.result', 'createdBy', 'evaluatorAssessments']);
         return view('admin.candidates.show', compact('candidate'));
     }
 
