@@ -9,9 +9,14 @@ use Illuminate\Support\Carbon;
 
 class TestScoringService
 {
+    public function __construct(
+        private readonly BigFiveScoringService $bigFiveService,
+        private readonly RavenScoringService   $ravenService,
+    ) {}
+
     /**
      * Calcula y persiste el resultado de una asignación de prueba.
-     * Se llama cuando el candidato termina la prueba.
+     * Si la prueba usa puntuación dimensional, despacha al servicio correspondiente.
      */
     public function calculate(TestAssignment $assignment): TestResult
     {
@@ -54,11 +59,29 @@ class TestScoringService
         );
 
         $assignment->update([
-            'status' => 'completed',
+            'status'       => 'completed',
             'completed_at' => Carbon::now(),
         ]);
 
+        // Puntuación dimensional post-calificación
+        $this->runDimensionalScoring($assignment);
+
         return $result;
+    }
+
+    /**
+     * Delega la puntuación dimensional al servicio especializado según test_type.
+     */
+    private function runDimensionalScoring(TestAssignment $assignment): void
+    {
+        $testType = $assignment->test?->test_type;
+
+        match ($testType) {
+            'big_five' => $this->bigFiveService->calculate($assignment),
+            '16pf'     => $this->bigFiveService->calculate($assignment), // 16PF usa misma lógica dimensional
+            'raven'    => $this->ravenService->calculate($assignment),
+            default    => null,
+        };
     }
 
     private function scoreOptionAnswer(Answer $answer, $question): float

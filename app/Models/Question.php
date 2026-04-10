@@ -12,18 +12,15 @@ class Question extends Model
     use HasFactory;
 
     protected $fillable = [
-        'test_id',
-        'text',
-        'type',
-        'points',
-        'order',
-        'is_required',
+        'test_id', 'text', 'type', 'points', 'order', 'is_required',
+        'dimension', 'reverse_scored', 'image_path', 'category',
     ];
 
     protected $casts = [
-        'is_required' => 'boolean',
-        'points' => 'integer',
-        'order' => 'integer',
+        'is_required'    => 'boolean',
+        'reverse_scored' => 'boolean',
+        'points'         => 'integer',
+        'order'          => 'integer',
     ];
 
     public function test(): BelongsTo

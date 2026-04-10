@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+// DimensionScore is autoloaded via namespace
 
 class TestAssignment extends Model
 {
@@ -59,6 +60,11 @@ class TestAssignment extends Model
     public function result(): HasOne
     {
         return $this->hasOne(TestResult::class);
+    }
+
+    public function dimensionScores(): HasMany
+    {
+        return $this->hasMany(DimensionScore::class);
     }
 
     public function isPending(): bool

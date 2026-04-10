@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 
 class Candidate extends Model
@@ -53,5 +54,20 @@ class Candidate extends Model
     public function completedAssignments(): HasMany
     {
         return $this->hasMany(TestAssignment::class)->where('status', 'completed');
+    }
+
+    public function evaluatorAssessments(): HasMany
+    {
+        return $this->hasMany(EvaluatorAssessment::class);
+    }
+
+    public function psychologicalReports(): HasMany
+    {
+        return $this->hasMany(PsychologicalReport::class);
+    }
+
+    public function latestReport(): HasOne
+    {
+        return $this->hasOne(PsychologicalReport::class)->latestOfMany();
     }
 }

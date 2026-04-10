@@ -13,20 +13,51 @@ class Test extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'description',
-        'instructions',
-        'time_limit',
-        'passing_score',
-        'is_active',
-        'created_by',
+        'name', 'description', 'instructions',
+        'time_limit', 'passing_score', 'is_active', 'created_by',
+        'module', 'test_type', 'evaluator_scored', 'scoring_method',
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
-        'time_limit' => 'integer',
-        'passing_score' => 'integer',
+        'is_active'       => 'boolean',
+        'evaluator_scored'=> 'boolean',
+        'time_limit'      => 'integer',
+        'passing_score'   => 'integer',
     ];
+
+    public function moduleLabel(): string
+    {
+        return match ($this->module) {
+            'personalidad'  => 'Personalidad',
+            'cognitivo'     => 'Cognitivo',
+            'competencias'  => 'Competencias',
+            'proyectivo'    => 'Proyectivo',
+            'entrevista'    => 'Entrevista',
+            default         => 'General',
+        };
+    }
+
+    public function moduleBadgeClass(): string
+    {
+        return match ($this->module) {
+            'personalidad'  => 'badge-purple',
+            'cognitivo'     => 'badge-info',
+            'competencias'  => 'badge-warning',
+            'proyectivo'    => 'badge-neutral',
+            'entrevista'    => 'badge-success',
+            default         => 'badge-neutral',
+        };
+    }
+
+    public function isDimensional(): bool
+    {
+        return $this->scoring_method === 'dimensional';
+    }
+
+    public function isEvaluatorScored(): bool
+    {
+        return (bool) $this->evaluator_scored;
+    }
 
     public function createdBy(): BelongsTo
     {
