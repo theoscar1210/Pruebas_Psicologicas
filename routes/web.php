@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\Admin\CandidateController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\EvaluatorAssessmentController;
 use App\Http\Controllers\Admin\PositionController;
+use App\Http\Controllers\Admin\PsychologicalReportController;
 use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\TestController;
