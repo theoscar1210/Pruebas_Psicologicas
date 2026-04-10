@@ -45,6 +45,18 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('candidates/{candidate}/assign-test', [CandidateController::class, 'assignTest'])
         ->name('candidates.assign-test');
 
+    // Evaluaciones clínicas del evaluador
+    Route::get('candidates/{candidate}/evaluacion', [EvaluatorAssessmentController::class, 'create'])->name('assessments.create');
+    Route::post('candidates/{candidate}/evaluacion', [EvaluatorAssessmentController::class, 'store'])->name('assessments.store');
+    Route::get('evaluaciones/{assessment}/editar', [EvaluatorAssessmentController::class, 'edit'])->name('assessments.edit');
+    Route::put('evaluaciones/{assessment}', [EvaluatorAssessmentController::class, 'update'])->name('assessments.update');
+
+    // Perfil psicológico
+    Route::get('candidates/{candidate}/perfil', [PsychologicalReportController::class, 'show'])->name('profile.show');
+    Route::post('candidates/{candidate}/perfil/generar', [PsychologicalReportController::class, 'generate'])->name('profile.generate');
+    Route::post('candidates/{candidate}/perfil/completar', [PsychologicalReportController::class, 'complete'])->name('profile.complete');
+    Route::get('candidates/{candidate}/perfil/pdf', [PsychologicalReportController::class, 'pdf'])->name('profile.pdf');
+
     // Reportes
     Route::prefix('reportes')->name('reports.')->group(function () {
         Route::get('/', [ReportController::class, 'index'])->name('index');

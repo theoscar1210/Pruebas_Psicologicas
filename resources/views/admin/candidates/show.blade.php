@@ -4,6 +4,12 @@
 @section('header', $candidate->name)
 
 @section('header-actions')
+    <a href="{{ route('admin.profile.show', $candidate) }}" class="btn-primary btn-sm">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+        </svg>
+        Perfil Psicológico
+    </a>
     <a href="{{ route('admin.reports.candidate.pdf', $candidate) }}" class="btn-danger btn-sm">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
@@ -16,7 +22,7 @@
 
 @section('content')
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
 
     {{-- ── Datos del candidato ──────────────────────────────────────────── --}}
     <div class="space-y-4">
@@ -92,6 +98,90 @@
                 </form>
             </div>
         </div>
+    </div>
+
+    {{-- ── Evaluaciones clínicas + Perfil ─────────────────────────────── --}}
+    <div class="space-y-4">
+
+        {{-- Perfil psicológico --}}
+        <div class="card bg-gradient-to-br from-brand-50 to-teal-50 border-brand-200">
+            <div class="card-body">
+                <h3 class="text-xs font-semibold text-brand-700 uppercase tracking-wider mb-3">Perfil Psicológico</h3>
+                <p class="text-xs text-slate-500 mb-4">Genera el perfil unificando todos los resultados del candidato.</p>
+                <a href="{{ route('admin.profile.show', $candidate) }}" class="btn-primary w-full justify-center text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                    Ver / Generar Perfil
+                </a>
+            </div>
+        </div>
+
+        {{-- Evaluaciones clínicas --}}
+        <div class="card">
+            <div class="card-body">
+                <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Evaluaciones clínicas</h3>
+                <div class="space-y-2">
+                    <a href="{{ route('admin.assessments.create', ['candidate' => $candidate, 'type' => 'wartegg']) }}"
+                       class="flex items-center gap-3 p-3 rounded-lg border border-slate-100 hover:border-brand-300 hover:bg-brand-50/50 transition-all group">
+                        <div class="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-slate-800 group-hover:text-brand-700">Wartegg</p>
+                            <p class="text-xs text-slate-400">Test proyectivo — 8 cajas</p>
+                        </div>
+                        @php $wartegg = $candidate->evaluatorAssessments->firstWhere('assessment_type', 'wartegg'); @endphp
+                        @if($wartegg)
+                            <span class="badge-success text-xs">Evaluado</span>
+                        @else
+                            <span class="badge-neutral text-xs">Pendiente</span>
+                        @endif
+                    </a>
+
+                    <a href="{{ route('admin.assessments.create', ['candidate' => $candidate, 'type' => 'star_interview']) }}"
+                       class="flex items-center gap-3 p-3 rounded-lg border border-slate-100 hover:border-brand-300 hover:bg-brand-50/50 transition-all group">
+                        <div class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-slate-800 group-hover:text-brand-700">Entrevista STAR</p>
+                            <p class="text-xs text-slate-400">10 competencias conductuales</p>
+                        </div>
+                        @php $star = $candidate->evaluatorAssessments->firstWhere('assessment_type', 'star_interview'); @endphp
+                        @if($star)
+                            <span class="badge-success text-xs">Evaluado</span>
+                        @else
+                            <span class="badge-neutral text-xs">Pendiente</span>
+                        @endif
+                    </a>
+
+                    <a href="{{ route('admin.assessments.create', ['candidate' => $candidate, 'type' => 'assessment_center']) }}"
+                       class="flex items-center gap-3 p-3 rounded-lg border border-slate-100 hover:border-brand-300 hover:bg-brand-50/50 transition-all group">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-slate-800 group-hover:text-brand-700">Assessment Center</p>
+                            <p class="text-xs text-slate-400">5 escenarios escritos</p>
+                        </div>
+                        @php $ac = $candidate->evaluatorAssessments->firstWhere('assessment_type', 'assessment_center'); @endphp
+                        @if($ac)
+                            <span class="badge-success text-xs">Evaluado</span>
+                        @else
+                            <span class="badge-neutral text-xs">Pendiente</span>
+                        @endif
+                    </a>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     {{-- ── Pruebas asignadas ────────────────────────────────────────────── --}}
