@@ -7,17 +7,32 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'DejaVu Sans', sans-serif; font-size: 11px; color: #1f2937; }
 
-        .header { background: #4338ca; color: #fff; padding: 20px 28px; margin-bottom: 24px; }
-        .header h1 { font-size: 20px; font-weight: bold; margin-bottom: 3px; }
-        .header p  { font-size: 11px; opacity: .85; }
-        .header-meta { font-size: 10px; margin-top: 8px; opacity: .7; }
+        .header { background: #0D3330; color: #fff; padding: 0; margin-bottom: 24px; }
+        .header-inner { display: table; width: 100%; padding: 16px 28px; }
+        .header-logo-cell { display: table-cell; vertical-align: middle; width: 200px; }
+        .header-info-cell { display: table-cell; vertical-align: middle; text-align: right; }
+        .logo-circle {
+            display: inline-block; width: 30px; height: 30px;
+            border: 2px solid #14B8A6; border-radius: 15px;
+            background: rgba(20,184,166,0.15);
+            text-align: center; padding-top: 4px;
+            font-size: 10px; font-weight: 700; color: #14B8A6;
+            letter-spacing: -0.5px; vertical-align: middle;
+        }
+        .logo-wordmark { display: inline-block; vertical-align: middle; margin-left: 8px; }
+        .logo-name { font-size: 15px; font-weight: 700; color: #fff; letter-spacing: -0.3px; line-height: 1; }
+        .logo-by   { font-size: 8px; color: #5EEAD4; letter-spacing: 0.5px; margin-top: 2px; }
+        .header-title { font-size: 13px; font-weight: 700; color: #fff; }
+        .header-sub   { font-size: 9px; color: #99F6E4; margin-top: 3px; }
+        .header-date  { font-size: 9px; color: #5EEAD4; margin-top: 4px; }
+        .header-strip { height: 3px; background: #14B8A6; }
 
         .section { margin: 0 28px 20px; }
-        .section-title { font-size: 13px; font-weight: bold; color: #4338ca;
-                         border-bottom: 2px solid #4338ca; padding-bottom: 5px; margin-bottom: 14px; }
+        .section-title { font-size: 13px; font-weight: bold; color: #0F766E;
+                         border-bottom: 2px solid #0F766E; padding-bottom: 5px; margin-bottom: 14px; }
 
         table { width: 100%; border-collapse: collapse; font-size: 10px; }
-        th { background: #4338ca; color: #fff; padding: 8px 10px; text-align: left;
+        th { background: #0F766E; color: #fff; padding: 8px 10px; text-align: left;
              font-size: 9px; text-transform: uppercase; letter-spacing: .04em; }
         td { padding: 8px 10px; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
         tr:nth-child(even) td { background: #f9fafb; }
@@ -44,7 +59,8 @@
         .summary { display: table; width: 100%; border-collapse: collapse; margin-bottom: 20px; }
         .summary-box { display: table-cell; text-align: center; border: 1px solid #e5e7eb; padding: 12px; }
         .summary-box + .summary-box { border-left: none; }
-        .summary-num { font-size: 22px; font-weight: bold; color: #4338ca; }
+        .summary-num { font-size: 22px; font-weight: bold; color: #0F766E; }
+        .summary-num-default { color: #0F766E; }
         .summary-lbl { font-size: 9px; color: #6b7280; margin-top: 2px; text-transform: uppercase; }
 
         .footer { margin: 20px 28px 0; padding-top: 10px; border-top: 1px solid #e5e7eb;
@@ -56,9 +72,21 @@
 <body>
 
     <div class="header">
-        <h1>Ranking de Candidatos</h1>
-        <p>Cargo: {{ $position->name }}</p>
-        <p class="header-meta">Generado: {{ now()->format('d/m/Y H:i') }}</p>
+        <div class="header-inner">
+            <div class="header-logo-cell">
+                <span class="logo-circle">MC</span>
+                <span class="logo-wordmark">
+                    <div class="logo-name">MenteClara</div>
+                    <div class="logo-by">by Emma Naranjo</div>
+                </span>
+            </div>
+            <div class="header-info-cell">
+                <div class="header-title">Ranking de Candidatos</div>
+                <div class="header-sub">Cargo: {{ $position->name }}</div>
+                <div class="header-date">Generado: {{ now()->format('d/m/Y H:i') }}</div>
+            </div>
+        </div>
+        <div class="header-strip"></div>
     </div>
 
     {{-- Resumen estadístico --}}
@@ -166,7 +194,7 @@
     </div>
 
     <div class="footer">
-        <div class="footer-left">{{ config('app.name') }} — Documento confidencial</div>
+        <div class="footer-left">MenteClara · <em>Donde el talento encuentra su medida</em> — Documento confidencial</div>
         <div class="footer-right">{{ now()->format('d/m/Y') }}</div>
     </div>
 

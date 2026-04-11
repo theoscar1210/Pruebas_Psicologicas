@@ -8,10 +8,28 @@
     .page { padding: 28px 30px; }
 
     /* Header */
-    .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #0F766E; padding-bottom: 14px; margin-bottom: 18px; }
-    .header-left h1 { font-size: 15px; font-weight: 700; color: #0D3330; }
-    .header-left p  { font-size: 9px; color: #64748b; margin-top: 2px; }
-    .header-right   { text-align: right; font-size: 9px; color: #94a3b8; }
+    .header { display: table; width: 100%; border-bottom: 2px solid #0F766E; padding-bottom: 14px; margin-bottom: 18px; }
+    .header-left  { display: table-cell; vertical-align: middle; }
+    .header-right { display: table-cell; vertical-align: top; text-align: right; font-size: 9px; color: #94a3b8; width: 160px; }
+
+    /* Logo mark */
+    .logo-wrap  { display: table; }
+    .logo-mark  { display: table-cell; vertical-align: middle; width: 36px; }
+    .logo-circle {
+        width: 32px; height: 32px;
+        border: 2px solid #14B8A6;
+        border-radius: 16px;
+        background: #F0FDFA;
+        text-align: center;
+        padding-top: 5px;
+        font-size: 10px; font-weight: 700;
+        color: #0F766E;
+        letter-spacing: -0.5px;
+    }
+    .logo-text  { display: table-cell; vertical-align: middle; padding-left: 8px; }
+    .logo-name  { font-size: 16px; font-weight: 700; color: #0D3330; letter-spacing: -0.3px; line-height: 1; }
+    .logo-by    { font-size: 8px; color: #0D9488; margin-top: 2px; letter-spacing: 0.5px; }
+    .logo-tagline { font-size: 8px; color: #94a3b8; font-style: italic; margin-top: 1px; }
 
     /* Candidate block */
     .candidate-block { background: #f0fdfa; border: 1px solid #99f6e4; border-radius: 8px; padding: 12px 14px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
@@ -73,20 +91,16 @@
     {{-- Header --}}
     <div class="header">
         <div class="header-left">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-                <svg width="28" height="28" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="23" cy="23" r="21" fill="#14B8A6" fill-opacity="0.12"/>
-                    <circle cx="23" cy="23" r="21" stroke="#0F766E" stroke-width="1.5"/>
-                    <line x1="9" y1="31" x2="9" y2="15" stroke="#1E293B" stroke-width="2.4" stroke-linecap="round"/>
-                    <line x1="9" y1="15" x2="17" y2="24" stroke="#1E293B" stroke-width="2.4" stroke-linecap="round"/>
-                    <line x1="17" y1="24" x2="25" y2="15" stroke="#1E293B" stroke-width="2.4" stroke-linecap="round"/>
-                    <line x1="25" y1="15" x2="25" y2="31" stroke="#1E293B" stroke-width="2.4" stroke-linecap="round"/>
-                    <path d="M39 17 C36 13 28 13 28 23 C28 33 36 33 39 29" stroke="#0F766E" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-                    <circle cx="40" cy="10" r="3" fill="#14B8A6"/>
-                </svg>
-                <h1>MenteClara</h1>
+            <div class="logo-wrap">
+                <div class="logo-mark">
+                    <div class="logo-circle">MC</div>
+                </div>
+                <div class="logo-text">
+                    <div class="logo-name">MenteClara</div>
+                    <div class="logo-by">by Emma Naranjo</div>
+                    <div class="logo-tagline">Donde el talento encuentra su medida</div>
+                </div>
             </div>
-            <p>Perfil Psicológico del Candidato — by Emma Naranjo</p>
         </div>
         <div class="header-right">
             Fecha: {{ now()->format('d/m/Y') }}<br>
