@@ -1,0 +1,198 @@
+/* ============================================================
+   MENTECLARA — Estilos compartidos por los PDFs de Reportes
+   Aplica a: candidate-pdf.blade.php y ranking-pdf.blade.php
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   SECCIÓN — Bloque de contenido con margen lateral
+   ------------------------------------------------------------ */
+.seccion {
+    margin: 0 28px 22px;
+}
+
+.seccion-titulo {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0F766E;
+    border-bottom: 2px solid #0F766E;
+    padding-bottom: 5px;
+    margin-bottom: 12px;
+}
+
+
+/* ------------------------------------------------------------
+   TABLAS DE DATOS — Preguntas, respuestas y puntajes
+   ------------------------------------------------------------ */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10px;
+}
+
+th {
+    background: #f1f5f9;
+    padding: 7px 10px;
+    text-align: left;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #475569;
+    border-bottom: 2px solid #0F766E;
+}
+
+td {
+    padding: 7px 10px;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: top;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+/* Columnas específicas de tabla de preguntas */
+.col-num    { width: 24px; color: #9ca3af; font-weight: 700; text-align: center; }
+.col-texto  { color: #374151; line-height: 1.4; }
+.col-resp   { color: #1e293b; }
+.col-puntos { width: 50px; text-align: center; font-weight: 700; }
+
+.puntos-ok { color: #16a34a; }
+.puntos-no { color: #dc2626; }
+
+
+/* ------------------------------------------------------------
+   BANNER DE RESULTADO — Resumen aprobado / no aprobado
+   ------------------------------------------------------------ */
+.banner-resultado {
+    padding: 14px 18px;
+    margin-bottom: 14px;
+    border-radius: 6px;
+}
+
+.banner-aprobado {
+    background: #dcfce7;
+    border-left: 4px solid #16a34a;
+}
+
+.banner-reprobado {
+    background: #fee2e2;
+    border-left: 4px solid #dc2626;
+}
+
+.puntaje-grande {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.puntaje-aprobado  { color: #16a34a; }
+.puntaje-reprobado { color: #dc2626; }
+
+.resultado-etiqueta { font-size: 10px; color: #6b7280; margin-top: 2px; }
+.resultado-detalle  { font-size: 10px; margin-top: 6px; }
+
+
+/* ------------------------------------------------------------
+   CUADRÍCULA DE INFORMACIÓN DEL CANDIDATO
+   ------------------------------------------------------------ */
+.cuadro-info {
+    display: table;
+    width: calc(100% - 56px);
+    border-collapse: collapse;
+    margin: 0 28px 20px;
+}
+
+.info-celda {
+    display: table-cell;
+    width: 50%;
+    border: 1px solid #e5e7eb;
+    padding: 12px 14px;
+    vertical-align: top;
+}
+
+.info-etiqueta {
+    font-size: 9px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 3px;
+}
+
+.info-valor {
+    font-size: 12px;
+    font-weight: 700;
+    color: #111827;
+}
+
+
+/* ------------------------------------------------------------
+   RESUMEN ESTADÍSTICO — Cajas de métricas (ranking)
+   ------------------------------------------------------------ */
+.resumen-estadistico {
+    display: table;
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.resumen-caja {
+    display: table-cell;
+    text-align: center;
+    border: 1px solid #e5e7eb;
+    padding: 12px;
+    vertical-align: middle;
+}
+
+.resumen-numero {
+    font-size: 22px;
+    font-weight: 700;
+    color: #0F766E;
+}
+
+.resumen-etiqueta {
+    font-size: 9px;
+    color: #6b7280;
+    margin-top: 2px;
+    text-transform: uppercase;
+}
+
+
+/* ------------------------------------------------------------
+   TABLA DE RANKING — Filas de clasificación con medallas
+   ------------------------------------------------------------ */
+.tabla-ranking th {
+    background: #0F766E;
+    color: #ffffff;
+}
+
+/* Colores especiales para los tres primeros lugares */
+.puesto-1 td { background: #fef9c3 !important; font-weight: 700; }
+.puesto-2 td { background: #f1f5f9 !important; }
+.puesto-3 td { background: #fdf2e9 !important; }
+
+.medalla    { font-size: 14px; }
+.porcentaje { font-size: 13px; font-weight: 700; }
+
+/* Barra de progreso inline en la tabla de ranking */
+.barra-contenedor {
+    background: #e5e7eb;
+    border-radius: 4px;
+    height: 7px;
+    width: 100px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 6px;
+}
+
+.barra-relleno-tabla {
+    height: 7px;
+    border-radius: 4px;
+}
+
+
+/* ------------------------------------------------------------
+   SALTO DE PÁGINA — Entre pruebas del mismo candidato
+   ------------------------------------------------------------ */
+.salto-pagina {
+    page-break-before: always;
+}

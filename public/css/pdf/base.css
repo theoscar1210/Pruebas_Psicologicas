@@ -1,0 +1,176 @@
+/* ============================================================
+   MENTECLARA — Estilos base compartidos por todos los PDFs
+   Compatibles con DomPDF (evitar flex, grid, SVG inline)
+   Usar display:table / display:table-cell para layouts
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   RESET Y CUERPO
+   ------------------------------------------------------------ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'DejaVu Sans', sans-serif;
+    font-size: 11px;
+    color: #1e293b;
+    background: #ffffff;
+}
+
+.pagina {
+    padding: 28px 30px;
+}
+
+
+/* ------------------------------------------------------------
+   ENCABEZADO — Sin fondo de color para ahorrar tinta al imprimir
+   Separador visual con línea teal en la parte inferior
+   ------------------------------------------------------------ */
+.header {
+    display: table;
+    width: 100%;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #0F766E;
+    margin-bottom: 20px;
+}
+
+.header-celda-logo {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.header-celda-info {
+    display: table-cell;
+    vertical-align: top;
+    text-align: right;
+    width: 180px;
+}
+
+.header-titulo {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0D3330;
+}
+
+.header-subtitulo {
+    font-size: 9px;
+    color: #475569;
+    margin-top: 3px;
+}
+
+.header-fecha {
+    font-size: 9px;
+    color: #94a3b8;
+    margin-top: 4px;
+}
+
+
+/* ------------------------------------------------------------
+   LOGO — Marca "MC" en círculo + wordmark textual
+   El círculo simula el isotipo sin necesidad de SVG
+   ------------------------------------------------------------ */
+.logo-tabla {
+    display: table;
+}
+
+.logo-celda-circulo {
+    display: table-cell;
+    vertical-align: middle;
+    width: 40px;
+}
+
+.logo-circulo {
+    width: 32px;
+    height: 32px;
+    border: 2px solid #0F766E;
+    border-radius: 16px;
+    background: #F0FDFA;
+    text-align: center;
+    padding-top: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #0F766E;
+    letter-spacing: -0.5px;
+}
+
+.logo-celda-texto {
+    display: table-cell;
+    vertical-align: middle;
+    padding-left: 8px;
+}
+
+.logo-nombre {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0D3330;
+    letter-spacing: -0.3px;
+    line-height: 1;
+}
+
+.logo-autor {
+    font-size: 8px;
+    color: #0D9488;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+}
+
+.logo-eslogan {
+    font-size: 8px;
+    color: #94a3b8;
+    font-style: italic;
+    margin-top: 1px;
+}
+
+
+/* ------------------------------------------------------------
+   PIE DE PÁGINA
+   ------------------------------------------------------------ */
+.footer {
+    display: table;
+    width: 100%;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 8px;
+    margin-top: 24px;
+    font-size: 8px;
+    color: #94a3b8;
+}
+
+.footer-izquierda {
+    display: table-cell;
+}
+
+.footer-derecha {
+    display: table-cell;
+    text-align: right;
+}
+
+
+/* ------------------------------------------------------------
+   INSIGNIAS DE ESTADO (badges reutilizables)
+   ------------------------------------------------------------ */
+.badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.badge-aprobado  { background: #dcfce7; color: #166534; }
+.badge-reprobado { background: #fee2e2; color: #991b1b; }
+.badge-pendiente { background: #f1f5f9; color: #475569; }
+.badge-reservas  { background: #fef9c3; color: #854d0e; }
+
+
+/* ------------------------------------------------------------
+   COLORES SEMÁNTICOS DE TEXTO
+   ------------------------------------------------------------ */
+.texto-verde   { color: #16a34a; }
+.texto-rojo    { color: #dc2626; }
+.texto-gris    { color: #9ca3af; }
+.texto-brand   { color: #0F766E; }
+.texto-oscuro  { color: #0D3330; }

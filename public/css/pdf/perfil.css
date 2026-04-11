@@ -1,0 +1,265 @@
+/* ============================================================
+   MENTECLARA — Estilos exclusivos del PDF de Perfil Psicológico
+   Vista: resources/views/admin/profile/pdf.blade.php
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   PÁGINA
+   ------------------------------------------------------------ */
+.pagina {
+    padding: 28px 30px;
+}
+
+
+/* ------------------------------------------------------------
+   BLOQUE DEL CANDIDATO — Fila superior con nombre y recomendación
+   ------------------------------------------------------------ */
+.bloque-candidato {
+    display: table;
+    width: 100%;
+    background: #f0fdfa;
+    border: 1px solid #99f6e4;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+}
+
+.candidato-celda-info {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.candidato-celda-badge {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: right;
+    width: 120px;
+}
+
+.candidato-nombre {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0D3330;
+}
+
+.candidato-meta {
+    font-size: 9px;
+    color: #475569;
+    margin-top: 2px;
+}
+
+/* Insignias de recomendación */
+.badge-recomendacion {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 6px;
+}
+
+.rec-apto     { background: #dcfce7; color: #166534; }
+.rec-reservas { background: #fef9c3; color: #854d0e; }
+.rec-no-apto  { background: #fee2e2; color: #991b1b; }
+
+
+/* ------------------------------------------------------------
+   INDICADORES KPI — Fila de 5 cajas métricas
+   ------------------------------------------------------------ */
+.fila-kpi {
+    display: table;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 6px;
+    margin-bottom: 14px;
+}
+
+.kpi-caja {
+    display: table-cell;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 8px 10px;
+    vertical-align: top;
+}
+
+.kpi-etiqueta {
+    font-size: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #94a3b8;
+}
+
+.kpi-valor {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0F766E;
+    margin-top: 2px;
+}
+
+
+/* ------------------------------------------------------------
+   COLUMNAS — Layout de dos columnas con display:table
+   ------------------------------------------------------------ */
+.dos-columnas {
+    display: table;
+    width: 100%;
+    border-spacing: 12px;
+    border-collapse: separate;
+    margin-bottom: 14px;
+}
+
+.columna-6 {
+    display: table-cell;
+    width: 48%;
+    vertical-align: top;
+}
+
+
+/* ------------------------------------------------------------
+   TÍTULO DE SECCIÓN — Encabezados de módulo dentro del PDF
+   ------------------------------------------------------------ */
+.titulo-seccion {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #475569;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+
+/* ------------------------------------------------------------
+   TARJETA INTERNA — Contenedor de módulo con borde
+   ------------------------------------------------------------ */
+.tarjeta {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+}
+
+
+/* ------------------------------------------------------------
+   BARRAS DE PROGRESO — Big Five, competencias, STAR
+   ------------------------------------------------------------ */
+.barra-fila {
+    margin-bottom: 6px;
+}
+
+.barra-etiqueta {
+    display: table;
+    width: 100%;
+    font-size: 9px;
+    margin-bottom: 2px;
+}
+
+.barra-etiqueta-izq { display: table-cell; }
+.barra-etiqueta-der { display: table-cell; text-align: right; }
+
+.barra-pista {
+    height: 6px;
+    background: #f1f5f9;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.barra-relleno {
+    height: 6px;
+    border-radius: 3px;
+}
+
+/* Colores por dimensión */
+.barra-brand   { background: #0F766E; }
+.barra-violeta { background: #8b5cf6; }
+.barra-ambar   { background: #f59e0b; }
+.barra-verde   { background: #10b981; }
+.barra-rojo    { background: #ef4444; }
+
+
+/* ------------------------------------------------------------
+   SEGMENTOS STAR — Escala visual de 1 a 5 barras
+   ------------------------------------------------------------ */
+.star-fila {
+    display: table;
+    width: 100%;
+    margin-bottom: 4px;
+}
+
+.star-clave {
+    display: table-cell;
+    width: 80px;
+    font-size: 9px;
+    color: #475569;
+    vertical-align: middle;
+}
+
+.star-segmentos {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.star-seg-tabla {
+    display: table;
+    width: 100%;
+    border-spacing: 2px;
+}
+
+.star-seg-celda {
+    display: table-cell;
+    height: 7px;
+    border-radius: 2px;
+}
+
+.seg-activo { background: #0F766E; }
+.seg-vacio  { background: #e2e8f0; }
+
+.star-puntuacion {
+    display: table-cell;
+    width: 16px;
+    text-align: right;
+    font-size: 9px;
+    font-weight: 700;
+    color: #0F766E;
+    vertical-align: middle;
+}
+
+
+/* ------------------------------------------------------------
+   RIESGOS LABORALES
+   ------------------------------------------------------------ */
+.riesgo-item {
+    background: #fff7ed;
+    border-left: 3px solid #f97316;
+    padding: 5px 8px;
+    border-radius: 0 4px 4px 0;
+    margin-bottom: 4px;
+    font-size: 9px;
+    color: #9a3412;
+}
+
+.sin-riesgo {
+    background: #f0fdf4;
+    border-left: 3px solid #22c55e;
+    padding: 5px 8px;
+    border-radius: 0 4px 4px 0;
+    font-size: 9px;
+    color: #166534;
+}
+
+
+/* ------------------------------------------------------------
+   CAJA DE RESUMEN — Conclusión del evaluador
+   ------------------------------------------------------------ */
+.caja-resumen {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 9px;
+    line-height: 1.6;
+    color: #475569;
+    margin-bottom: 8px;
+}

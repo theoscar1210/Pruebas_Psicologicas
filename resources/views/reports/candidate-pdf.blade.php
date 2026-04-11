@@ -4,147 +4,84 @@
     <meta charset="UTF-8">
     <title>Reporte — {{ $candidate->name }}</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'DejaVu Sans', sans-serif; font-size: 11px; color: #1f2937; background: #fff; }
-
-        /* ── Encabezado ── */
-        .header { background: #0D3330; color: #fff; padding: 0; margin-bottom: 20px; }
-        .header-inner { display: table; width: 100%; padding: 16px 28px; }
-        .header-logo-cell { display: table-cell; vertical-align: middle; width: 200px; }
-        .header-info-cell { display: table-cell; vertical-align: middle; text-align: right; }
-        .logo-circle {
-            display: inline-block; width: 30px; height: 30px;
-            border: 2px solid #14B8A6; border-radius: 15px;
-            background: rgba(20,184,166,0.15);
-            text-align: center; padding-top: 4px;
-            font-size: 10px; font-weight: 700; color: #14B8A6;
-            letter-spacing: -0.5px; vertical-align: middle;
-        }
-        .logo-wordmark { display: inline-block; vertical-align: middle; margin-left: 8px; }
-        .logo-name { font-size: 15px; font-weight: 700; color: #fff; letter-spacing: -0.3px; line-height: 1; }
-        .logo-by   { font-size: 8px; color: #5EEAD4; letter-spacing: 0.5px; margin-top: 2px; }
-        .header-title { font-size: 13px; font-weight: 700; color: #fff; }
-        .header-sub   { font-size: 9px; color: #99F6E4; margin-top: 3px; }
-        .header-date  { font-size: 9px; color: #5EEAD4; margin-top: 4px; }
-        .header-strip { height: 3px; background: #14B8A6; }
-
-        /* ── Info candidato ── */
-        .info-grid { display: table; width: 100%; border-collapse: collapse; margin: 0 28px 20px; width: calc(100% - 56px); }
-        .info-box  { display: table-cell; width: 50%; border: 1px solid #e5e7eb; padding: 12px 14px; vertical-align: top; }
-        .info-box:first-child { border-right: none; }
-        .info-label { font-size: 9px; color: #6b7280; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3px; }
-        .info-value { font-size: 12px; font-weight: bold; color: #111827; }
-
-        /* ── Sección prueba ── */
-        .section { margin: 0 28px 22px; }
-        .section-title { font-size: 13px; font-weight: bold; color: #0F766E; border-bottom: 2px solid #0F766E; padding-bottom: 5px; margin-bottom: 12px; }
-
-        /* ── Resultado resumen ── */
-        .result-banner { padding: 14px 18px; margin-bottom: 14px; border-radius: 6px; }
-        .result-banner.passed { background: #dcfce7; border-left: 4px solid #16a34a; }
-        .result-banner.failed { background: #fee2e2; border-left: 4px solid #dc2626; }
-        .result-score { font-size: 28px; font-weight: bold; }
-        .result-score.passed { color: #16a34a; }
-        .result-score.failed { color: #dc2626; }
-        .result-label { font-size: 10px; color: #6b7280; margin-top: 2px; }
-        .result-detail { font-size: 10px; margin-top: 6px; }
-
-        /* ── Tabla de respuestas ── */
-        table { width: 100%; border-collapse: collapse; font-size: 10px; }
-        th { background: #f3f4f6; padding: 7px 10px; text-align: left; font-size: 9px;
-             text-transform: uppercase; letter-spacing: .04em; color: #6b7280; border-bottom: 1px solid #e5e7eb; }
-        td { padding: 7px 10px; border-bottom: 1px solid #f3f4f6; vertical-align: top; }
-        tr:last-child td { border-bottom: none; }
-        .q-num  { width: 24px; color: #9ca3af; font-weight: bold; text-align: center; }
-        .q-text { color: #374151; line-height: 1.4; }
-        .q-ans  { color: #1f2937; }
-        .q-pts  { width: 50px; text-align: center; font-weight: bold; }
-        .pts-ok { color: #16a34a; }
-        .pts-no { color: #dc2626; }
-        .badge  { display: inline-block; padding: 2px 7px; border-radius: 20px; font-size: 9px; font-weight: bold; }
-        .badge-open { background: #f3f4f6; color: #6b7280; }
-
-        /* ── Pie ── */
-        .footer { margin: 20px 28px 0; padding-top: 10px; border-top: 1px solid #e5e7eb;
-                  font-size: 9px; color: #9ca3af; display: table; width: calc(100% - 56px); }
-        .footer-left  { display: table-cell; }
-        .footer-right { display: table-cell; text-align: right; }
-        .page-break { page-break-before: always; }
+        {!! file_get_contents(public_path('css/pdf/base.css')) !!}
+        {!! file_get_contents(public_path('css/pdf/reportes.css')) !!}
     </style>
 </head>
 <body>
 
-    {{-- ── Encabezado ── --}}
+    {{-- ══ ENCABEZADO ══════════════════════════════════════════════════════════ --}}
     <div class="header">
-        <div class="header-inner">
-            <div class="header-logo-cell">
-                <span class="logo-circle">MC</span>
-                <span class="logo-wordmark">
-                    <div class="logo-name">MenteClara</div>
-                    <div class="logo-by">by Emma Naranjo</div>
-                </span>
-            </div>
-            <div class="header-info-cell">
-                <div class="header-title">Reporte de Candidato</div>
-                <div class="header-sub">Sistema de Evaluación Psicológica · RRHH</div>
-                <div class="header-date">Generado: {{ now()->format('d/m/Y H:i') }}</div>
+        <div class="header-celda-logo">
+            <div class="logo-tabla">
+                <div class="logo-celda-circulo">
+                    <div class="logo-circulo">MC</div>
+                </div>
+                <div class="logo-celda-texto">
+                    <div class="logo-nombre">MenteClara</div>
+                    <div class="logo-autor">by Emma Naranjo</div>
+                </div>
             </div>
         </div>
-        <div class="header-strip"></div>
+        <div class="header-celda-info">
+            <div class="header-titulo">Reporte de Candidato</div>
+            <div class="header-subtitulo">Sistema de Evaluación Psicológica · RRHH</div>
+            <div class="header-fecha">Generado: {{ now()->format('d/m/Y H:i') }}</div>
+        </div>
     </div>
 
-    {{-- ── Info del candidato ── --}}
-    <div class="info-grid">
-        <div class="info-box">
-            <div class="info-label">Candidato</div>
-            <div class="info-value">{{ $candidate->name }}</div>
+    {{-- ══ INFORMACIÓN DEL CANDIDATO ════════════════════════════════════════════ --}}
+    <div class="cuadro-info">
+        <div class="info-celda">
+            <div class="info-etiqueta">Candidato</div>
+            <div class="info-valor">{{ $candidate->name }}</div>
             @if($candidate->document_number)
-                <div style="font-size:10px;color:#6b7280;margin-top:3px;">{{ $candidate->document_number }}</div>
+                <div style="font-size:10px;color:#6b7280;margin-top:3px">{{ $candidate->document_number }}</div>
             @endif
         </div>
-        <div class="info-box">
-            <div class="info-label">Cargo</div>
-            <div class="info-value">{{ $candidate->position?->name ?? 'Sin asignar' }}</div>
+        <div class="info-celda" style="border-left:none">
+            <div class="info-etiqueta">Cargo</div>
+            <div class="info-valor">{{ $candidate->position?->name ?? 'Sin asignar' }}</div>
             @if($candidate->email)
-                <div style="font-size:10px;color:#6b7280;margin-top:3px;">{{ $candidate->email }}</div>
+                <div style="font-size:10px;color:#6b7280;margin-top:3px">{{ $candidate->email }}</div>
             @endif
         </div>
     </div>
 
-    {{-- ── Pruebas ── --}}
-    @forelse($candidate->assignments->where('status', 'completed') as $i => $assignment)
+    {{-- ══ PRUEBAS COMPLETADAS ══════════════════════════════════════════════════ --}}
+    @forelse($candidate->assignments->where('status', 'completed') as $i => $asignacion)
 
         @if($i > 0)
-            <div class="page-break"></div>
+            <div class="salto-pagina"></div>
             <div style="height:20px"></div>
         @endif
 
-        <div class="section">
-            <div class="section-title">{{ $assignment->test->name }}</div>
+        <div class="seccion">
+            <div class="seccion-titulo">{{ $asignacion->test->name }}</div>
 
-            {{-- Resultado resumen --}}
-            @if($assignment->result)
-            @php $r = $assignment->result; @endphp
-            <div class="result-banner {{ $r->passed ? 'passed' : 'failed' }}">
+            {{-- Banner de resultado --}}
+            @if($asignacion->result)
+            @php $r = $asignacion->result; @endphp
+            <div class="banner-resultado {{ $r->passed ? 'banner-aprobado' : 'banner-reprobado' }}">
                 <table style="border:none">
                     <tr>
                         <td style="border:none;padding:0;width:120px">
-                            <div class="result-score {{ $r->passed ? 'passed' : 'failed' }}">{{ $r->percentage }}%</div>
-                            <div class="result-label">Puntaje obtenido</div>
+                            <div class="puntaje-grande {{ $r->passed ? 'puntaje-aprobado' : 'puntaje-reprobado' }}">{{ $r->percentage }}%</div>
+                            <div class="resultado-etiqueta">Puntaje obtenido</div>
                         </td>
                         <td style="border:none;padding:0">
-                            <div class="result-detail">
+                            <div class="resultado-detalle">
                                 <strong>{{ $r->total_score }} / {{ $r->max_score }} puntos</strong><br>
-                                Mínimo requerido: {{ $assignment->test->passing_score }}%<br>
+                                Mínimo requerido: {{ $asignacion->test->passing_score }}%<br>
                                 Resultado: <strong>{{ $r->passed ? '✓ Aprobado' : '✗ No aprobado' }}</strong>
                             </div>
                         </td>
                         <td style="border:none;padding:0;text-align:right;vertical-align:top;font-size:10px;color:#6b7280">
-                            @if($assignment->started_at)
-                                Iniciada: {{ $assignment->started_at->format('d/m/Y H:i') }}<br>
+                            @if($asignacion->started_at)
+                                Iniciada: {{ $asignacion->started_at->format('d/m/Y H:i') }}<br>
                             @endif
-                            @if($assignment->completed_at)
-                                Finalizada: {{ $assignment->completed_at->format('d/m/Y H:i') }}
+                            @if($asignacion->completed_at)
+                                Finalizada: {{ $asignacion->completed_at->format('d/m/Y H:i') }}
                             @endif
                         </td>
                     </tr>
@@ -156,42 +93,40 @@
             <table>
                 <thead>
                     <tr>
-                        <th class="q-num">#</th>
-                        <th class="q-text">Pregunta</th>
-                        <th class="q-ans">Respuesta</th>
-                        <th class="q-pts">Pts</th>
+                        <th class="col-num">#</th>
+                        <th class="col-texto">Pregunta</th>
+                        <th class="col-resp">Respuesta</th>
+                        <th class="col-puntos">Pts</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($assignment->test->questions as $question)
-                    @php
-                        $answer = $assignment->answers->firstWhere('question_id', $question->id);
-                    @endphp
+                    @foreach($asignacion->test->questions as $pregunta)
+                    @php $respuesta = $asignacion->answers->firstWhere('question_id', $pregunta->id); @endphp
                     <tr>
-                        <td class="q-num">{{ $question->order }}</td>
-                        <td class="q-text">{{ $question->text }}</td>
-                        <td class="q-ans">
-                            @if(!$answer)
+                        <td class="col-num">{{ $pregunta->order }}</td>
+                        <td class="col-texto">{{ $pregunta->text }}</td>
+                        <td class="col-resp">
+                            @if(!$respuesta)
                                 <span style="color:#9ca3af;font-style:italic">Sin responder</span>
-                            @elseif($question->isOpen())
-                                <span class="badge badge-open">Respuesta abierta</span>
-                                @if($answer->text_answer)
-                                    <br><span style="color:#6b7280;font-style:italic">{{ Str::limit($answer->text_answer, 80) }}</span>
+                            @elseif($pregunta->isOpen())
+                                <span class="badge badge-pendiente">Respuesta abierta</span>
+                                @if($respuesta->text_answer)
+                                    <br><span style="color:#6b7280;font-style:italic">{{ Str::limit($respuesta->text_answer, 80) }}</span>
                                 @endif
                             @else
-                                {{ $answer->option?->text ?? '—' }}
+                                {{ $respuesta->option?->text ?? '—' }}
                             @endif
                         </td>
-                        <td class="q-pts">
-                            @if($answer && !$question->isOpen())
-                                <span class="{{ $answer->score > 0 ? 'pts-ok' : 'pts-no' }}">
-                                    {{ number_format($answer->score, 1) }}
+                        <td class="col-puntos">
+                            @if($respuesta && !$pregunta->isOpen())
+                                <span class="{{ $respuesta->score > 0 ? 'puntos-ok' : 'puntos-no' }}">
+                                    {{ number_format($respuesta->score, 1) }}
                                 </span>
-                                / {{ $question->points }}
-                            @elseif($question->isOpen())
-                                <span style="color:#9ca3af">—</span>
+                                / {{ $pregunta->points }}
+                            @elseif($pregunta->isOpen())
+                                <span class="texto-gris">—</span>
                             @else
-                                <span class="pts-no">0</span> / {{ $question->points }}
+                                <span class="puntos-no">0</span> / {{ $pregunta->points }}
                             @endif
                         </td>
                     </tr>
@@ -201,15 +136,15 @@
         </div>
 
     @empty
-        <div class="section" style="text-align:center;color:#9ca3af;padding:30px 0">
+        <div class="seccion" style="text-align:center;color:#9ca3af;padding:30px 0">
             Este candidato no tiene pruebas completadas aún.
         </div>
     @endforelse
 
-    {{-- ── Pie de página ── --}}
-    <div class="footer">
-        <div class="footer-left">MenteClara · <em>Donde el talento encuentra su medida</em> — Documento confidencial</div>
-        <div class="footer-right">{{ now()->format('d/m/Y') }}</div>
+    {{-- ══ PIE DE PÁGINA ════════════════════════════════════════════════════════ --}}
+    <div class="footer" style="margin:20px 28px 0;width:calc(100% - 56px)">
+        <div class="footer-izquierda">MenteClara · <em>Donde el talento encuentra su medida</em> — Documento confidencial</div>
+        <div class="footer-derecha">{{ now()->format('d/m/Y') }}</div>
     </div>
 
 </body>
