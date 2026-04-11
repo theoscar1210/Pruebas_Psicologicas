@@ -8,6 +8,10 @@
 </style>
 </head>
 <body>
+
+    {{-- Marca de agua: se repite en cada página gracias a position:fixed --}}
+    <div class="marca-agua">CONFIDENCIAL</div>
+
 <div class="pagina">
 
     {{-- ══ ENCABEZADO ══════════════════════════════════════════════════════════ --}}

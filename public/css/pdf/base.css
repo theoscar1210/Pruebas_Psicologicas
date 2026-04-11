@@ -119,6 +119,26 @@ body {
 }
 
 /* ------------------------------------------------------------
+   MARCA DE AGUA — Aparece en todas las páginas del PDF
+   position:fixed en DomPDF se repite en cada página
+   ------------------------------------------------------------ */
+.marca-agua {
+    position: fixed;
+    top: 260px;
+    left: 60px;
+    font-size: 58px;
+    font-weight: 700;
+    color: #0F766E;
+    opacity: 0.055;
+    transform: rotate(-38deg);
+    white-space: nowrap;
+    letter-spacing: 10px;
+    text-transform: uppercase;
+    z-index: -1;
+}
+
+
+/* ------------------------------------------------------------
    PIE DE PÁGINA
    ------------------------------------------------------------ */
 .footer {

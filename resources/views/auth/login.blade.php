@@ -1,47 +1,247 @@
-<x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Iniciar sesión — MenteClara</title>
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap" rel="stylesheet"/>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+<body class="font-sans antialiased bg-white">
 
-    <form method="POST" action="{{ route('login') }}">
-        @csrf
+<div class="min-h-screen flex">
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+    {{-- ══ PANEL IZQUIERDO: Marca ══════════════════════════════════════════════ --}}
+    <div class="hidden lg:flex lg:w-3/5 flex-col justify-between relative overflow-hidden"
+         style="background: linear-gradient(155deg, #0D3330 0%, #0F766E 65%, #14B8A6 100%)">
+
+        {{-- Círculos decorativos de fondo --}}
+        <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full"
+             style="background: rgba(255,255,255,0.04)"></div>
+        <div class="absolute top-1/3 -right-16 w-64 h-64 rounded-full"
+             style="background: rgba(255,255,255,0.03)"></div>
+        <div class="absolute -bottom-20 -left-20 w-80 h-80 rounded-full"
+             style="background: rgba(255,255,255,0.04)"></div>
+        <div class="absolute bottom-1/4 right-10 w-40 h-40 rounded-full"
+             style="background: rgba(255,255,255,0.03)"></div>
+
+        {{-- Patrón de puntos sutil --}}
+        <div class="absolute inset-0 opacity-10"
+             style="background-image: radial-gradient(circle, rgba(255,255,255,0.35) 1px, transparent 1px); background-size: 28px 28px;"></div>
+
+        {{-- Logo superior --}}
+        <div class="relative z-10 p-10 flex items-center gap-4">
+            <div class="w-11 h-11 rounded-full flex items-center justify-center font-bold text-sm tracking-tight"
+                 style="background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); color: #ffffff">
+                MC
+            </div>
+            <div>
+                <div class="font-bold text-xl leading-none" style="color: #ffffff; letter-spacing: -0.3px">MenteClara</div>
+                <div class="text-xs mt-0.5 tracking-wide" style="color: rgba(94,234,212,0.9)">by Emma Naranjo</div>
+            </div>
         </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+        {{-- Contenido central --}}
+        <div class="relative z-10 px-10 pb-4">
+            <h1 class="font-extrabold leading-none mb-5" style="font-size: 46px; color: #ffffff; letter-spacing: -1.5px; line-height: 1.05">
+                Evalúa.<br>Descubre.<br>Decide.
+            </h1>
 
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
+            <p class="text-base leading-relaxed mb-10 max-w-xs"
+               style="color: rgba(204,251,241,0.85)">
+                Sistema profesional de evaluación psicológica para procesos de selección de talento humano.
+            </p>
 
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+            {{-- Feature list --}}
+            <div class="space-y-4">
+                @foreach([
+                    ['Pruebas psicométricas validadas', 'Batería completa de instrumentos científicamente respaldados'],
+                    ['Perfiles psicológicos automáticos', 'Big Five, STAR, Wartegg y más en un solo reporte'],
+                    ['Reportes PDF profesionales', 'Exporta y comparte resultados de forma confidencial'],
+                ] as [$titulo, $desc])
+                <div class="flex items-start gap-3.5">
+                    <div class="mt-0.5 w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                         style="background: rgba(94,234,212,0.2); border: 1px solid rgba(94,234,212,0.4)">
+                        <svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 10 8">
+                            <path d="M1 4l2.5 2.5L9 1" stroke="#5EEAD4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="text-sm font-semibold leading-tight" style="color: #ffffff">{{ $titulo }}</div>
+                        <div class="text-xs mt-0.5 leading-snug" style="color: rgba(204,251,241,0.65)">{{ $desc }}</div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
         </div>
 
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-            </label>
+        {{-- Footer panel izquierdo --}}
+        <div class="relative z-10 px-10 pb-8">
+            <div class="border-t pt-5" style="border-color: rgba(255,255,255,0.1)">
+                <p class="text-xs italic" style="color: rgba(204,251,241,0.5)">
+                    "Donde el talento encuentra su medida"
+                </p>
+            </div>
+        </div>
+    </div>
+
+    {{-- ══ PANEL DERECHO: Formulario ═══════════════════════════════════════════ --}}
+    <div class="w-full lg:w-2/5 flex flex-col items-center justify-center min-h-screen px-8 py-12 lg:px-14 bg-white">
+
+        {{-- Logo visible solo en móvil --}}
+        <div class="lg:hidden flex items-center gap-3 mb-10">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm"
+                 style="border: 2px solid #0F766E; background: #F0FDFA; color: #0F766E">
+                MC
+            </div>
+            <div>
+                <div class="font-bold text-lg leading-none" style="color: #0D3330">MenteClara</div>
+                <div class="text-xs mt-0.5 tracking-wide" style="color: #0D9488">by Emma Naranjo</div>
+            </div>
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
+        <div class="w-full max-w-sm">
+
+            {{-- Encabezado del formulario --}}
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 leading-tight tracking-tight">
+                    Bienvenido de nuevo
+                </h2>
+                <p class="text-gray-500 text-sm mt-1.5">
+                    Ingresa tus credenciales para acceder al sistema
+                </p>
+            </div>
+
+            {{-- Mensaje de estado (recuperación de contraseña, etc.) --}}
+            @if (session('status'))
+                <div class="mb-5 px-4 py-3 rounded-lg bg-brand-50 border border-brand-200 text-sm font-medium text-brand-700 flex items-center gap-2">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 16 16">
+                        <path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 10a1 1 0 110-2 1 1 0 010 2zm.75-4.25a.75.75 0 01-1.5 0V5a.75.75 0 011.5 0v1.75z" fill="currentColor"/>
+                    </svg>
+                    {{ session('status') }}
+                </div>
             @endif
 
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
+            {{-- Alerta de error general --}}
+            @if ($errors->any() && !$errors->has('email') && !$errors->has('password'))
+                <div class="mb-5 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+                    {{ $errors->first() }}
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('login') }}" class="space-y-5">
+                @csrf
+
+                {{-- Campo: Correo electrónico --}}
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1.5">
+                        Correo electrónico
+                    </label>
+                    <input id="email"
+                           type="email"
+                           name="email"
+                           value="{{ old('email') }}"
+                           required
+                           autofocus
+                           autocomplete="username"
+                           placeholder="usuario@empresa.com"
+                           class="w-full px-3.5 py-2.5 rounded-lg border text-sm bg-white text-gray-900 placeholder-gray-400
+                                  transition duration-150 focus:outline-none focus:ring-2
+                                  {{ $errors->has('email')
+                                      ? 'border-red-400 bg-red-50 focus:ring-red-400/20 focus:border-red-500'
+                                      : 'border-gray-300 hover:border-gray-400 focus:ring-brand-500/25 focus:border-brand-600' }}">
+                    @error('email')
+                        <p class="mt-1.5 text-xs text-red-600 flex items-center gap-1">
+                            <svg class="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 12 12">
+                                <path d="M6 1a5 5 0 100 10A5 5 0 006 1zm.5 7.5h-1v-1h1v1zm0-2.5h-1V3.5h1V6z"/>
+                            </svg>
+                            {{ $message }}
+                        </p>
+                    @enderror
+                </div>
+
+                {{-- Campo: Contraseña --}}
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label for="password" class="block text-sm font-medium text-gray-700">
+                            Contraseña
+                        </label>
+                        @if (Route::has('password.request'))
+                            <a href="{{ route('password.request') }}"
+                               class="text-xs font-medium text-brand-700 hover:text-brand-800 transition duration-150">
+                                ¿Olvidaste tu contraseña?
+                            </a>
+                        @endif
+                    </div>
+                    <div class="relative" x-data="{ ver: false }">
+                        <input id="password"
+                               :type="ver ? 'text' : 'password'"
+                               name="password"
+                               required
+                               autocomplete="current-password"
+                               placeholder="••••••••"
+                               class="w-full px-3.5 py-2.5 pr-10 rounded-lg border text-sm bg-white text-gray-900 placeholder-gray-400
+                                      transition duration-150 focus:outline-none focus:ring-2
+                                      {{ $errors->has('password')
+                                          ? 'border-red-400 bg-red-50 focus:ring-red-400/20 focus:border-red-500'
+                                          : 'border-gray-300 hover:border-gray-400 focus:ring-brand-500/25 focus:border-brand-600' }}">
+                        {{-- Botón mostrar/ocultar contraseña --}}
+                        <button type="button"
+                                @click="ver = !ver"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition">
+                            <svg x-show="!ver" class="w-4 h-4" fill="none" viewBox="0 0 20 20">
+                                <path d="M10 4C5.5 4 2 10 2 10s3.5 6 8 6 8-6 8-6-3.5-6-8-6zm0 10a4 4 0 110-8 4 4 0 010 8z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                <circle cx="10" cy="10" r="2" fill="currentColor"/>
+                            </svg>
+                            <svg x-show="ver" class="w-4 h-4" fill="none" viewBox="0 0 20 20" style="display:none">
+                                <path d="M3 3l14 14M8.46 8.52A4 4 0 0013.5 13.5M6.1 6.14C4.37 7.3 2.9 9 2 10c1.74 2.94 4.72 6 8 6a8.42 8.42 0 003.9-.97M10 4c.68 0 1.35.1 2 .27C14.82 5.38 17.22 7.75 18 10c-.56.95-1.37 2-2.35 2.9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                    @error('password')
+                        <p class="mt-1.5 text-xs text-red-600 flex items-center gap-1">
+                            <svg class="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 12 12">
+                                <path d="M6 1a5 5 0 100 10A5 5 0 006 1zm.5 7.5h-1v-1h1v1zm0-2.5h-1V3.5h1V6z"/>
+                            </svg>
+                            {{ $message }}
+                        </p>
+                    @enderror
+                </div>
+
+                {{-- Recordar sesión --}}
+                <div class="flex items-center gap-2.5">
+                    <input id="remember_me"
+                           type="checkbox"
+                           name="remember"
+                           class="w-4 h-4 rounded border-gray-300 text-brand-700 focus:ring-brand-500 focus:ring-offset-0 cursor-pointer">
+                    <label for="remember_me" class="text-sm text-gray-600 select-none cursor-pointer">
+                        Mantener sesión iniciada
+                    </label>
+                </div>
+
+                {{-- Botón de acceso --}}
+                <button type="submit"
+                        class="w-full py-2.5 px-4 rounded-lg text-sm font-semibold text-white bg-brand-700
+                               hover:bg-brand-800 active:bg-brand-900 active:scale-[0.99]
+                               transition duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-600
+                               shadow-sm hover:shadow-md">
+                    Iniciar sesión
+                </button>
+            </form>
+
+            {{-- Divisor --}}
+            <div class="mt-8 pt-6 border-t border-gray-100 text-center">
+                <p class="text-xs text-gray-400 leading-relaxed">
+                    Sistema de uso exclusivo para el equipo de RRHH<br>
+                    <span class="font-medium" style="color: #0D9488">MenteClara</span> · Documento confidencial
+                </p>
+            </div>
         </div>
-    </form>
-</x-guest-layout>
+    </div>
+
+</div>
+
+</body>
+</html>
