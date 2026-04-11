@@ -39,16 +39,23 @@
         :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
 
         {{-- Logo + botón cerrar (móvil) --}}
-        <div class="flex items-center gap-3 px-5 py-5 border-b border-white/5">
-            <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
-                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        <div class="flex items-center gap-3 px-4 py-4 border-b border-white/5">
+            {{-- Isotipo SVG inline --}}
+            <div class="flex-shrink-0">
+                <svg width="36" height="36" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="23" cy="23" r="21" fill="#14B8A6" fill-opacity="0.14"/>
+                    <circle cx="23" cy="23" r="21" stroke="#14B8A6" stroke-width="1.5"/>
+                    <line x1="9" y1="31" x2="9" y2="15" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round"/>
+                    <line x1="9" y1="15" x2="17" y2="24" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round"/>
+                    <line x1="17" y1="24" x2="25" y2="15" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round"/>
+                    <line x1="25" y1="15" x2="25" y2="31" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round"/>
+                    <path d="M39 17 C36 13 28 13 28 23 C28 33 36 33 39 29" stroke="#14B8A6" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+                    <circle cx="40" cy="10" r="3" fill="#14B8A6"/>
                 </svg>
             </div>
-            <div class="leading-tight overflow-hidden flex-1">
-                <p class="text-white text-[13px] font-semibold truncate">Pruebas Psicológicas</p>
-                <p class="text-brand-400 text-[11px]">RRHH</p>
+            <div class="leading-tight overflow-hidden flex-1 min-w-0">
+                <p class="text-white text-[14px] font-bold tracking-tight truncate">MenteClara</p>
+                <p class="text-brand-400 text-[10px] font-light italic truncate">by Emma Naranjo</p>
             </div>
             {{-- Cerrar en móvil --}}
             <button @click="sidebarOpen = false"

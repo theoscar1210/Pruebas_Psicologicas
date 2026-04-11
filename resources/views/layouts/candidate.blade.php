@@ -14,13 +14,20 @@
     <nav class="bg-white border-b border-slate-100 sticky top-0 z-30">
         <div class="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
             <div class="flex items-center gap-2.5">
-                <div class="w-7 h-7 bg-brand-700 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/>
-                    </svg>
+                <svg width="28" height="28" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0">
+                    <circle cx="23" cy="23" r="21" fill="#14B8A6" fill-opacity="0.10"/>
+                    <circle cx="23" cy="23" r="21" stroke="#0F766E" stroke-width="1.5"/>
+                    <line x1="9" y1="31" x2="9" y2="15" stroke="#1E293B" stroke-width="2.4" stroke-linecap="round"/>
+                    <line x1="9" y1="15" x2="17" y2="24" stroke="#1E293B" stroke-width="2.4" stroke-linecap="round"/>
+                    <line x1="17" y1="24" x2="25" y2="15" stroke="#1E293B" stroke-width="2.4" stroke-linecap="round"/>
+                    <line x1="25" y1="15" x2="25" y2="31" stroke="#1E293B" stroke-width="2.4" stroke-linecap="round"/>
+                    <path d="M39 17 C36 13 28 13 28 23 C28 33 36 33 39 29" stroke="#0F766E" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+                    <circle cx="40" cy="10" r="3" fill="#14B8A6"/>
+                </svg>
+                <div class="leading-tight">
+                    <span class="font-bold text-slate-800 text-sm tracking-tight">MenteClara</span>
+                    <span class="text-[10px] text-slate-400 font-light italic block leading-none">by Emma Naranjo</span>
                 </div>
-                <span class="font-semibold text-slate-800 text-sm">{{ config('app.name') }}</span>
             </div>
             <div class="flex items-center gap-4">
                 @yield('nav-info')

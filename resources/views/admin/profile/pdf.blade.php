@@ -73,8 +73,20 @@
     {{-- Header --}}
     <div class="header">
         <div class="header-left">
-            <h1>Perfil Psicológico del Candidato</h1>
-            <p>Sistema de Evaluación Psicológica — RRHH</p>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                <svg width="28" height="28" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="23" cy="23" r="21" fill="#14B8A6" fill-opacity="0.12"/>
+                    <circle cx="23" cy="23" r="21" stroke="#0F766E" stroke-width="1.5"/>
+                    <line x1="9" y1="31" x2="9" y2="15" stroke="#1E293B" stroke-width="2.4" stroke-linecap="round"/>
+                    <line x1="9" y1="15" x2="17" y2="24" stroke="#1E293B" stroke-width="2.4" stroke-linecap="round"/>
+                    <line x1="17" y1="24" x2="25" y2="15" stroke="#1E293B" stroke-width="2.4" stroke-linecap="round"/>
+                    <line x1="25" y1="15" x2="25" y2="31" stroke="#1E293B" stroke-width="2.4" stroke-linecap="round"/>
+                    <path d="M39 17 C36 13 28 13 28 23 C28 33 36 33 39 29" stroke="#0F766E" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+                    <circle cx="40" cy="10" r="3" fill="#14B8A6"/>
+                </svg>
+                <h1>MenteClara</h1>
+            </div>
+            <p>Perfil Psicológico del Candidato — by Emma Naranjo</p>
         </div>
         <div class="header-right">
             Fecha: {{ now()->format('d/m/Y') }}<br>
@@ -235,7 +247,7 @@
 
     {{-- Footer --}}
     <div class="footer">
-        <span>{{ config('app.name') }} — Sistema de Evaluación Psicológica</span>
+        <span>MenteClara · <em>Donde el talento encuentra su medida</em></span>
         <span>Documento confidencial — Uso exclusivo de RRHH · Generado {{ now()->format('d/m/Y H:i') }}</span>
     </div>
 
