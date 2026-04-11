@@ -13,16 +13,12 @@
     {{-- ══ ENCABEZADO ══════════════════════════════════════════════════════════ --}}
     <div class="header">
         <div class="header-celda-logo">
-            <div class="logo-tabla">
-                <div class="logo-celda-circulo">
-                    <div class="logo-circulo">MC</div>
-                </div>
-                <div class="logo-celda-texto">
-                    <div class="logo-nombre">MenteClara</div>
-                    <div class="logo-autor">by Emma Naranjo</div>
-                    <div class="logo-eslogan">Donde el talento encuentra su medida</div>
-                </div>
-            </div>
+            <span class="logo-circulo">MC</span>
+            <span class="logo-textos">
+                <div class="logo-nombre">MenteClara</div>
+                <div class="logo-autor">by Emma Naranjo</div>
+                <div class="logo-eslogan">Donde el talento encuentra su medida</div>
+            </span>
         </div>
         <div class="header-celda-info">
             <div class="header-titulo">Perfil Psicológico del Candidato</div>
