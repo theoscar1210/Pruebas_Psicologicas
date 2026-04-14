@@ -35,7 +35,10 @@ class PsychologicalTestsSeeder extends Seeder
     }
 
     // ══════════════════════════════════════════════════════════════════════
-    // 1. BIG FIVE — IPIP-50 (Spanish)
+    // 1. BIG FIVE — IB5-SL v1.0 (Instrumento de Selección Laboral)
+    //    50 ítems Likert · 5 dimensiones OCEAN · 10 ítems por dimensión
+    //    (5 directos + 5 invertidos por dimensión)
+    //    Referencia: Big5_Test_Seleccion_Laboral_1.md
     // ══════════════════════════════════════════════════════════════════════
     private function seedBigFive(): void
     {
@@ -43,8 +46,8 @@ class PsychologicalTestsSeeder extends Seeder
             ['test_type' => 'big_five'],
             [
                 'name'           => 'Big Five — Evaluación de Personalidad (IPIP-50)',
-                'description'    => 'Inventario de personalidad basado en el modelo de los Cinco Grandes Factores (OCEAN). 50 ítems tipo Likert.',
-                'instructions'   => 'A continuación encontrarás una serie de afirmaciones sobre tu forma de ser y comportarte. No hay respuestas correctas ni incorrectas. Responde con sinceridad según cómo eres habitualmente, no como te gustaría ser. Usa la siguiente escala: 1 = Muy en desacuerdo, 5 = Muy de acuerdo.',
+                'description'    => 'Instrumento de evaluación de personalidad laboral basado en el Modelo de los Cinco Grandes Rasgos (OCEAN). 50 ítems tipo Likert adaptados para contextos de selección de personal.',
+                'instructions'   => "A continuación encontrará una serie de afirmaciones relacionadas con su forma habitual de pensar, sentir y actuar en contextos laborales y cotidianos.\n\nResponda con honestidad. No hay respuestas correctas ni incorrectas. Lo que importa es que sus respuestas reflejen cómo es usted realmente, no cómo le gustaría ser.\n\nUse la siguiente escala:\n1 = Totalmente en desacuerdo\n2 = En desacuerdo\n3 = Neutral / No sé\n4 = De acuerdo\n5 = Totalmente de acuerdo",
                 'module'         => 'personalidad',
                 'test_type'      => 'big_five',
                 'evaluator_scored' => false,
@@ -56,73 +59,90 @@ class PsychologicalTestsSeeder extends Seeder
             ]
         );
 
-        if ($test->questions()->exists()) return;
+        // Si ya existen preguntas, las elimina para re-sembrar con el instrumento actualizado
+        if ($test->questions()->exists()) {
+            $test->questions()->each(function ($q) {
+                $q->options()->delete();
+                $q->delete();
+            });
+        }
 
+        // Escala Likert según el instrumento IB5-SL
         $likertOptions = [
-            ['text' => 'Muy en desacuerdo',           'value' => 1],
-            ['text' => 'En desacuerdo',                'value' => 2],
-            ['text' => 'Ni de acuerdo ni en desacuerdo','value'=> 3],
-            ['text' => 'De acuerdo',                   'value' => 4],
-            ['text' => 'Muy de acuerdo',               'value' => 5],
+            ['text' => 'Totalmente en desacuerdo', 'value' => 1],
+            ['text' => 'En desacuerdo',             'value' => 2],
+            ['text' => 'Neutral / No sé',           'value' => 3],
+            ['text' => 'De acuerdo',                'value' => 4],
+            ['text' => 'Totalmente de acuerdo',     'value' => 5],
         ];
 
-        // [texto, dimensión, reverse_scored]
+        // [texto del ítem, dimensión, reverse_scored]
+        // Orden exacto del instrumento IB5-SL:
+        //   Ítems  1-10 → Apertura a la Experiencia (O)
+        //   Ítems 11-20 → Responsabilidad / Conciencia (C)
+        //   Ítems 21-30 → Extraversión (E)
+        //   Ítems 31-40 → Amabilidad (A)
+        //   Ítems 41-50 → Neuroticismo (N)
         $items = [
-            // Extraversión (E)
-            ['Soy el alma de las reuniones y fiestas.',                              'extraversion', false],
-            ['Prefiero mantenerme en un segundo plano en grupos.',                   'extraversion', true],
-            ['Me siento cómodo/a hablando con personas desconocidas.',               'extraversion', false],
-            ['Casi no intervengo en conversaciones de grupo.',                       'extraversion', true],
-            ['Tomo la iniciativa para comenzar conversaciones.',                     'extraversion', false],
-            ['Tengo poco que aportar en conversaciones grupales.',                   'extraversion', true],
-            ['Me relaciono fácilmente con todo tipo de personas.',                   'extraversion', false],
-            ['Prefiero pasar desapercibido/a en reuniones sociales.',               'extraversion', true],
-            ['No me incomoda ser el centro de atención.',                            'extraversion', false],
-            ['En ambientes nuevos tiendo a quedarme en silencio.',                   'extraversion', true],
-            // Amabilidad (A)
-            ['Genuinamente me importa el bienestar de las personas que me rodean.', 'agreeableness', false],
-            ['En ocasiones digo cosas hirientes sin pensarlo.',                      'agreeableness', true],
-            ['Me identifico fácilmente con los sentimientos ajenos.',                'agreeableness', false],
-            ['Me cuesta preocuparme por los problemas de otras personas.',           'agreeableness', true],
-            ['Soy compasivo/a con quienes pasan por dificultades.',                  'agreeableness', false],
-            ['A veces insulto o critico duramente a las personas.',                  'agreeableness', true],
-            ['Busco soluciones donde todos puedan ganar en los conflictos.',         'agreeableness', false],
-            ['Prefiero anteponer mis intereses a los de los demás.',                 'agreeableness', true],
-            ['Percibo y respondo a las emociones de quienes me rodean.',             'agreeableness', false],
-            ['En discusiones, me cuesta ceder aunque el otro tenga razón.',          'agreeableness', true],
-            // Responsabilidad (C)
-            ['Siempre llego preparado/a a mis compromisos y reuniones.',             'conscientiousness', false],
-            ['Con frecuencia pierdo u olvido mis pertenencias.',                     'conscientiousness', true],
-            ['Pongo atención minuciosa a los detalles de mi trabajo.',               'conscientiousness', false],
-            ['Suelo dejar tareas a medias sin terminarlas.',                         'conscientiousness', true],
-            ['Me fijo metas claras y trabajo disciplinadamente para alcanzarlas.',   'conscientiousness', false],
-            ['Olvido con facilidad las responsabilidades que tengo pendientes.',     'conscientiousness', true],
-            ['Cuando asumo un compromiso, siempre lo cumplo.',                       'conscientiousness', false],
-            ['Mi espacio de trabajo suele estar desordenado.',                       'conscientiousness', true],
-            ['Establezco prioridades y las sigo con constancia.',                    'conscientiousness', false],
-            ['Pospongo las tareas que me parecen difíciles o desagradables.',        'conscientiousness', true],
-            // Neuroticismo (N)
-            ['Me estreso con facilidad ante situaciones de presión.',                'neuroticism', false],
-            ['Generalmente mantengo la calma incluso en situaciones difíciles.',     'neuroticism', true],
-            ['Me preocupo en exceso por las cosas.',                                 'neuroticism', false],
-            ['Rara vez me siento triste o deprimido/a sin razón aparente.',          'neuroticism', true],
-            ['Me altero emocionalmente con más facilidad que otras personas.',       'neuroticism', false],
-            ['Soy emocionalmente estable y equilibrado/a.',                          'neuroticism', true],
-            ['Me irrito o enojo con relativa facilidad.',                            'neuroticism', false],
-            ['En general me siento relajado/a y tranquilo/a.',                      'neuroticism', true],
-            ['Los cambios inesperados me generan angustia o malestar.',              'neuroticism', false],
-            ['Rara vez siento ansiedad o nerviosismo intenso.',                      'neuroticism', true],
-            // Apertura (O)
-            ['Tengo una imaginación muy activa y creativa.',                         'openness', false],
-            ['Me cuesta entender conceptos abstractos o filosóficos.',               'openness', true],
-            ['Disfruto debatir ideas complejas e innovadoras.',                      'openness', false],
-            ['Prefiero lo concreto y práctico sobre lo teórico y abstracto.',        'openness', true],
-            ['Con frecuencia genero ideas originales y poco convencionales.',        'openness', false],
-            ['Rara vez fantaseo o imagino escenarios alternativos.',                 'openness', true],
-            ['Aprendo y comprendo nuevas ideas con rapidez.',                        'openness', false],
-            ['Evito pensar en temas filosóficos o de profundidad intelectual.',      'openness', true],
-            ['Disfruto la complejidad y la profundidad en los problemas.',           'openness', false],
-            ['Prefiero la rutina y la certeza por encima de lo nuevo e incierto.',   'openness', true],
+            // ── DIMENSIÓN 1: APERTURA A LA EXPERIENCIA (O) ──────────────
+            ['Me gusta explorar ideas nuevas y poco convencionales en mi trabajo.',                              'openness', false],
+            ['Disfruto aprender sobre temas o áreas que desconozco.',                                           'openness', false],
+            ['Tengo una imaginación activa que suelo aplicar en la resolución de problemas.',                   'openness', false],
+            ['Me atrae trabajar en proyectos que requieren pensar de manera innovadora.',                       'openness', false],
+            ['Me interesa comprender puntos de vista distintos al mío, aunque no los comparta.',               'openness', false],
+            ['Prefiero hacer las cosas de la manera en que siempre se han hecho.',                             'openness', true],
+            ['No me resulta atractivo involucrarme en actividades que exijan mucha creatividad.',               'openness', true],
+            ['Me cuesta adaptarme cuando cambian significativamente los métodos de trabajo.',                   'openness', true],
+            ['Prefiero tareas rutinarias a aquellas que implican cambios o improvisación.',                     'openness', true],
+            ['Rara vez cuestiono las normas o procedimientos establecidos en mi entorno laboral.',              'openness', true],
+
+            // ── DIMENSIÓN 2: RESPONSABILIDAD / CONCIENCIA (C) ───────────
+            ['Cumplo mis compromisos laborales dentro de los plazos establecidos.',                             'conscientiousness', false],
+            ['Soy una persona organizada y metódica al abordar mis tareas.',                                   'conscientiousness', false],
+            ['Me preparo con anticipación antes de emprender una tarea importante.',                            'conscientiousness', false],
+            ['Reviso mi trabajo con cuidado antes de entregarlo.',                                              'conscientiousness', false],
+            ['Mantengo mis responsabilidades y espacios de trabajo bien estructurados.',                        'conscientiousness', false],
+            ['Con frecuencia olvido responder mensajes o compromisos laborales pendientes.',                    'conscientiousness', true],
+            ['Me cuesta mantener el orden en mis responsabilidades cuando hay mucha carga.',                    'conscientiousness', true],
+            ['Suelo postergar tareas que podría resolver en el momento.',                                       'conscientiousness', true],
+            ['En ocasiones entrego trabajos sin haberlos revisado lo suficiente.',                              'conscientiousness', true],
+            ['Me resulta difícil seguir un plan de trabajo cuando las circunstancias se complican.',            'conscientiousness', true],
+
+            // ── DIMENSIÓN 3: EXTRAVERSIÓN (E) ────────────────────────────
+            ['Me siento cómodo/a siendo protagonista o vocero/a en reuniones de trabajo.',                     'extraversion', false],
+            ['Disfruto trabajar en equipo y relacionarme activamente con mis colegas.',                         'extraversion', false],
+            ['Tomo la iniciativa para iniciar conversaciones con personas que no conozco.',                     'extraversion', false],
+            ['Me energiza participar en actividades grupales dentro del entorno laboral.',                      'extraversion', false],
+            ['Me expreso con facilidad y seguridad frente a grupos de personas.',                               'extraversion', false],
+            ['Prefiero trabajar de forma independiente antes que en equipo.',                                   'extraversion', true],
+            ['Las interacciones sociales intensas en el trabajo me generan desgaste.',                          'extraversion', true],
+            ['Tiendo a hablar poco en reuniones cuando no conozco bien a los participantes.',                   'extraversion', true],
+            ['Prefiero comunicarme por escrito antes que hablar en persona o en público.',                      'extraversion', true],
+            ['Me resulta difícil mostrar entusiasmo o energía frente a otros en el trabajo.',                   'extraversion', true],
+
+            // ── DIMENSIÓN 4: AMABILIDAD (A) ──────────────────────────────
+            ['Me interesa genuinamente el bienestar de mis compañeros de trabajo.',                             'agreeableness', false],
+            ['Estoy dispuesto/a a ceder en mis posiciones cuando hay un conflicto de equipo.',                  'agreeableness', false],
+            ['Trato de ser cordial y respetuoso/a con todas las personas de mi entorno laboral.',               'agreeableness', false],
+            ['Cuando un colega tiene dificultades, trato de apoyarlo sin necesidad de que me lo pida.',         'agreeableness', false],
+            ['Confío en la buena intención de las personas con quienes trabajo habitualmente.',                  'agreeableness', false],
+            ['Me cuesta colaborar con personas que tienen estilos de trabajo muy distintos al mío.',            'agreeableness', true],
+            ['En ocasiones actúo de manera fría o distante con mis colegas.',                                   'agreeableness', true],
+            ['Cuando hay conflictos, tiendo a priorizar mis intereses antes que los del equipo.',               'agreeableness', true],
+            ['A veces soy tan directo/a que puedo afectar negativamente los sentimientos de otros.',            'agreeableness', true],
+            ['Me resulta difícil confiar en las intenciones de mis compañeros de trabajo.',                     'agreeableness', true],
+
+            // ── DIMENSIÓN 5: NEUROTICISMO / INESTABILIDAD EMOCIONAL (N) ──
+            ['Me pongo ansioso/a con facilidad cuando tengo demasiadas responsabilidades a la vez.',            'neuroticism', false],
+            ['Los cambios inesperados en el trabajo me generan un nivel significativo de estrés.',              'neuroticism', false],
+            ['Me preocupo constantemente por la posibilidad de cometer errores en mi trabajo.',                 'neuroticism', false],
+            ['Me cuesta recuperarme emocionalmente cuando recibo críticas o retroalimentación negativa.',       'neuroticism', false],
+            ['Siento que mis estados emocionales interfieren con mi rendimiento laboral.',                      'neuroticism', false],
+            ['Me mantengo tranquilo/a incluso en situaciones de alta presión o exigencia.',                     'neuroticism', true],
+            ['Generalmente mantengo el control emocional cuando surgen problemas inesperados en el trabajo.',   'neuroticism', true],
+            ['Los fracasos o contratiempos laborales no me afectan emocionalmente de forma prolongada.',        'neuroticism', true],
+            ['Puedo tomar decisiones con calma incluso cuando estoy bajo presión.',                             'neuroticism', true],
+            ['Recupero mi equilibrio emocional con rapidez luego de situaciones laborales difíciles.',          'neuroticism', true],
         ];
 
         foreach ($items as $order => [$text, $dimension, $reverse]) {
