@@ -65,13 +65,12 @@
 
         <div class="card overflow-hidden {{ $isCompleted ? 'opacity-75' : '' }}">
 
-            {{-- Barra de color superior --}}
+            {{-- Barra de color superior — completada siempre en teal, no revela aprobado/reprobado --}}
             <div class="h-1 w-full
-                @if($isCompleted && $assignment->result?->passed)   bg-emerald-400
-                @elseif($isCompleted && !$assignment->result?->passed) bg-red-400
+                @if($isCompleted)      bg-brand-400
                 @elseif($isInProgress) bg-amber-400
                 @elseif($isExpired)    bg-slate-300
-                @else                  bg-brand-400 @endif">
+                @else                  bg-brand-300 @endif">
             </div>
 
             <div class="p-4 sm:p-5 flex items-start justify-between gap-4">
@@ -127,16 +126,16 @@
                 <div class="flex-shrink-0">
                     @if($isCompleted && $assignment->result)
                         <div class="text-center">
-                            <p class="text-2xl sm:text-3xl font-bold
-                               {{ $assignment->result->passed ? 'text-emerald-600' : 'text-red-500' }}">
-                                {{ $assignment->result->percentage }}%
-                            </p>
-                            <p class="text-xs font-semibold mt-0.5
-                               {{ $assignment->result->passed ? 'text-emerald-600' : 'text-red-500' }}">
-                                {{ $assignment->result->passed ? '✓ Aprobó' : '✗ No aprobó' }}
-                            </p>
+                            <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-700
+                                         bg-brand-50 border border-brand-200 rounded-full px-3 py-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                          d="M5 13l4 4L19 7"/>
+                                </svg>
+                                Entregada
+                            </span>
                             <a href="{{ route('candidate.result', $assignment) }}"
-                               class="text-xs text-brand-600 hover:underline mt-1 block">Ver detalle</a>
+                               class="text-xs text-brand-600 hover:underline mt-2 block">Ver confirmación</a>
                         </div>
 
                     @elseif(!$isExpired && ($isPending || $isInProgress))

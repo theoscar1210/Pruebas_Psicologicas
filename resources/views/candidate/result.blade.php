@@ -10,9 +10,7 @@
 @section('content')
 
 @php
-    $result   = $assignment->result;
-    $passed   = $result?->passed;
-    $pct      = $result?->percentage ?? 0;
+    $result = $assignment->result;
 @endphp
 
 <div class="max-w-2xl mx-auto px-4 py-10">
@@ -20,74 +18,47 @@
     {{-- Tarjeta principal de resultado --}}
     <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-6">
 
-        {{-- Banner de color --}}
-        <div class="h-2 w-full {{ $passed ? 'bg-gradient-to-r from-green-400 to-emerald-500' : 'bg-gradient-to-r from-red-400 to-rose-500' }}"></div>
+        {{-- Banner de color teal (siempre igual — no revela si aprobó o no) --}}
+        <div class="h-2 w-full bg-gradient-to-r from-brand-500 to-brand-400"></div>
 
         <div class="p-8 text-center">
 
-            {{-- Ícono --}}
-            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full mb-5
-                        {{ $passed ? 'bg-green-100' : 'bg-red-100' }}">
-                @if($passed)
-                    <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                @else
-                    <svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                @endif
+            {{-- Ícono de confirmación neutro --}}
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full mb-5 bg-brand-50">
+                <svg class="w-10 h-10 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
             </div>
 
             <h1 class="text-2xl font-bold text-gray-900 mb-1">
-                {{ $passed ? '¡Felicitaciones!' : 'Prueba completada' }}
+                ¡Evaluación registrada!
             </h1>
 
             <p class="text-gray-500 text-sm mb-8">
                 {{ $assignment->test->name }}
             </p>
 
-            {{-- Porcentaje grande --}}
-            <div class="mb-6">
-                <span class="text-7xl font-extrabold {{ $passed ? 'text-green-600' : 'text-red-500' }}">
-                    {{ number_format($pct, 1) }}%
-                </span>
-                <p class="text-sm font-semibold mt-2 {{ $passed ? 'text-green-600' : 'text-red-500' }}">
-                    {{ $passed ? '✓ Aprobado' : '✗ No aprobado' }}
+            {{-- Mensaje amigable — sin puntaje ni aprobado/reprobado --}}
+            <div class="text-sm text-gray-600 bg-brand-50 border border-brand-100 rounded-xl px-5 py-5 mb-6 text-left">
+                <p class="font-semibold text-brand-800 mb-2">Gracias por completar esta evaluación</p>
+                <p class="leading-relaxed text-gray-600">
+                    Tus respuestas han sido registradas exitosamente. El equipo de Recursos Humanos analizará
+                    los resultados y se pondrá en contacto contigo para informarte sobre los próximos pasos
+                    del proceso de selección.
                 </p>
             </div>
 
-            {{-- Barra de progreso --}}
-            <div class="w-full bg-gray-100 rounded-full h-3 mb-6 max-w-xs mx-auto">
-                <div class="h-3 rounded-full transition-all duration-700
-                            {{ $passed ? 'bg-green-500' : 'bg-red-400' }}"
-                     style="width: {{ $pct }}%">
-                </div>
-            </div>
-
-            {{-- Desglose de puntaje --}}
-            <div class="grid grid-cols-3 gap-4 py-5 border-t border-b border-gray-100 mb-6">
-                <div class="text-center">
-                    <p class="text-2xl font-bold text-gray-900">{{ number_format($result?->total_score, 1) }}</p>
-                    <p class="text-xs text-gray-400 mt-0.5">Tu puntaje</p>
-                </div>
-                <div class="text-center border-x border-gray-100">
-                    <p class="text-2xl font-bold text-gray-900">{{ number_format($result?->max_score, 1) }}</p>
-                    <p class="text-xs text-gray-400 mt-0.5">Puntaje máximo</p>
-                </div>
-                <div class="text-center">
-                    <p class="text-2xl font-bold text-gray-900">{{ $assignment->test->passing_score }}%</p>
-                    <p class="text-xs text-gray-400 mt-0.5">Mínimo requerido</p>
-                </div>
-            </div>
-
-            {{-- Mensaje personalizado --}}
-            <div class="text-sm text-gray-600 bg-gray-50 rounded-xl px-5 py-4">
-                @if($passed)
-                    <p>Has superado el puntaje mínimo requerido para esta prueba. El equipo de Recursos Humanos revisará tu resultado y se pondrá en contacto contigo.</p>
-                @else
-                    <p>Tu resultado no alcanzó el puntaje mínimo requerido ({{ $assignment->test->passing_score }}%). El equipo de Recursos Humanos revisará tu resultado.</p>
-                @endif
+            {{-- Nota informativa --}}
+            <div class="flex items-start gap-3 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-left">
+                <svg class="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <p class="text-xs text-amber-700 leading-relaxed">
+                    Los resultados de las evaluaciones son analizados por el equipo de psicología.
+                    No se proporcionan puntajes individuales durante el proceso de selección.
+                </p>
             </div>
 
         </div>
