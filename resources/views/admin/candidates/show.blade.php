@@ -248,7 +248,7 @@
                         </div>
                     </div>
 
-                    {{-- Resultado --}}
+                    {{-- Resultado global --}}
                     @if($assignment->result)
                     <div class="text-center flex-shrink-0 bg-slate-50 rounded-xl px-4 py-3 min-w-24">
                         <p class="text-2xl font-bold {{ $assignment->result->passed ? 'text-emerald-600' : 'text-red-500' }}">
@@ -263,6 +263,58 @@
                     </div>
                     @endif
                 </div>
+
+                {{-- ── INTERPRETACIÓN DE RESULTADOS (solo RRHH/Admin) ── --}}
+                @if($assignment->dimensionScores->isNotEmpty())
+                <div class="mt-4 pt-4 border-t border-slate-100">
+                    <div class="flex items-center gap-2 mb-3">
+                        <svg class="w-3.5 h-3.5 text-brand-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        <h4 class="text-xs font-semibold text-brand-700 uppercase tracking-wider">Interpretación de resultados</h4>
+                        <span class="ml-auto text-[10px] font-semibold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full uppercase tracking-wide">Solo RRHH</span>
+                    </div>
+
+                    <div class="space-y-3">
+                        @foreach($assignment->dimensionScores as $dim)
+                        <div class="bg-slate-50/70 rounded-lg p-3">
+                            <div class="flex items-center justify-between gap-3 mb-1.5">
+                                <span class="text-sm font-medium text-slate-800">{{ $dim->dimension_name }}</span>
+                                <div class="flex items-center gap-2 flex-shrink-0">
+                                    <span class="text-xs text-slate-500 font-mono">{{ number_format($dim->normalized_score, 0) }}%</span>
+                                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full
+                                        @if($dim->level === 'muy_alto') bg-emerald-100 text-emerald-700
+                                        @elseif($dim->level === 'alto') bg-brand-100 text-brand-700
+                                        @elseif($dim->level === 'medio') bg-slate-200 text-slate-600
+                                        @elseif($dim->level === 'bajo') bg-amber-100 text-amber-700
+                                        @else bg-red-100 text-red-700
+                                        @endif">
+                                        {{ $dim->levelLabel() }}
+                                    </span>
+                                </div>
+                            </div>
+                            {{-- Barra de progreso --}}
+                            <div class="w-full bg-slate-200 rounded-full h-1.5 mb-2 overflow-hidden">
+                                @php
+                                    $pct = max(0, min(100, (float)$dim->normalized_score));
+                                    $barColor = match($dim->level) {
+                                        'muy_alto' => 'bg-emerald-500',
+                                        'alto'     => 'bg-brand-500',
+                                        'medio'    => 'bg-slate-400',
+                                        'bajo'     => 'bg-amber-400',
+                                        default    => 'bg-red-400',
+                                    };
+                                @endphp
+                                <div class="{{ $barColor }} h-1.5 rounded-full transition-all" style="width: {{ $pct }}%"></div>
+                            </div>
+                            <p class="text-xs text-slate-500 leading-relaxed">{{ $dim->interpretation }}</p>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+                {{-- ── fin interpretación ── --}}
+
             </div>
         </div>
         @empty
