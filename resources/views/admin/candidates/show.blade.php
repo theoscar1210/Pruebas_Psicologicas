@@ -91,16 +91,31 @@
                 <form action="{{ route('admin.candidates.assign-test', $candidate) }}" method="POST" class="space-y-3">
                     @csrf
                     <div class="form-group">
-                        <select name="test_id" required class="select">
+                        <select name="test_id" required
+                                class="select {{ $errors->has('test_id') ? 'border-red-400 ring-1 ring-red-400' : '' }}">
                             <option value="">Selecciona una prueba…</option>
                             @foreach(\App\Models\Test::where('is_active', true)->orderBy('name')->get() as $test)
-                                <option value="{{ $test->id }}">{{ $test->name }}</option>
+                                <option value="{{ $test->id }}" {{ old('test_id') == $test->id ? 'selected' : '' }}>
+                                    {{ $test->name }}
+                                </option>
                             @endforeach
                         </select>
+                        @error('test_id')
+                            <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Fecha límite <span class="form-hint">(opcional)</span></label>
-                        <input type="datetime-local" name="expires_at" class="input">
+                        <label class="form-label">
+                            Fecha límite <span class="form-hint">(opcional)</span>
+                        </label>
+                        <input type="datetime-local"
+                               name="expires_at"
+                               value="{{ old('expires_at') }}"
+                               min="{{ now()->format('Y-m-d\TH:i') }}"
+                               class="input {{ $errors->has('expires_at') ? 'border-red-400 ring-1 ring-red-400' : '' }}">
+                        @error('expires_at')
+                            <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                     <button type="submit" class="btn-primary w-full justify-center">Asignar prueba</button>
                 </form>

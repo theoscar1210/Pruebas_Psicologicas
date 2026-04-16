@@ -92,7 +92,12 @@ class CandidateController extends Controller
     {
         $validated = $request->validate([
             'test_id'    => 'required|exists:tests,id',
-            'expires_at' => 'nullable|date|after:now',
+            'expires_at' => 'nullable|date|after:yesterday',
+        ], [
+            'test_id.required' => 'Debes seleccionar una prueba.',
+            'test_id.exists'   => 'La prueba seleccionada no existe.',
+            'expires_at.date'  => 'El formato de la fecha límite no es válido.',
+            'expires_at.after' => 'La fecha límite debe ser hoy o una fecha futura.',
         ]);
 
         $redirectTo = redirect()->route('admin.candidates.show', $candidate);
