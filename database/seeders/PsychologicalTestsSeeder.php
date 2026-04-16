@@ -170,173 +170,180 @@ class PsychologicalTestsSeeder extends Seeder
     }
 
     // ══════════════════════════════════════════════════════════════════════
-    // 2. 16PF SIMPLIFICADO — 32 ítems (2 por factor)
+    // 2. 16PF-SL v1.0 — 64 ítems Likert (4 por factor × 16 factores)
+    //    2 directos + 2 invertidos por factor
+    //    Referencia: 16PF_SL_Instrumento_Seleccion_Laboral.md
     // ══════════════════════════════════════════════════════════════════════
     private function seedSixteenPF(): void
     {
         $test = Test::firstOrCreate(
             ['test_type' => '16pf'],
             [
-                'name'           => '16PF — 16 Factores de Personalidad (Simplificado)',
-                'description'    => 'Versión abreviada del cuestionario 16PF de Cattell. 32 ítems de elección múltiple (a/b/c).',
-                'instructions'   => 'Lee cada enunciado y elige la opción que mejor te describe. Responde con sinceridad. Evita la opción "b" (intermedia) a menos que realmente no puedas elegir entre las otras dos.',
+                'name'           => '16PF — 16 Factores de Personalidad (Selección Laboral)',
+                'description'    => 'Instrumento 16PF-SL basado en el modelo de Raymond B. Cattell. 64 ítems tipo Likert que evalúan 16 factores de personalidad relevantes para el desempeño laboral.',
+                'instructions'   => "A continuación encontrará una serie de afirmaciones relacionadas con su forma habitual de pensar, sentir y actuar en contextos laborales y cotidianos.\n\nResponda con honestidad — no hay respuestas correctas ni incorrectas. Lo que importa es que sus respuestas reflejen cómo es usted realmente, no cómo le gustaría ser.\n\nUse la siguiente escala:\n1 = Totalmente en desacuerdo\n2 = En desacuerdo\n3 = Neutral / No sé\n4 = De acuerdo\n5 = Totalmente de acuerdo",
                 'module'         => 'personalidad',
                 'test_type'      => '16pf',
                 'evaluator_scored' => false,
                 'scoring_method' => 'dimensional',
-                'time_limit'     => 25,
+                'time_limit'     => 30,
                 'passing_score'  => 0,
                 'is_active'      => true,
                 'created_by'     => $this->adminId,
             ]
         );
 
-        if ($test->questions()->exists()) return;
+        // Elimina preguntas existentes para re-sembrar con el instrumento actualizado
+        if ($test->questions()->exists()) {
+            $test->questions()->each(function ($q) {
+                $q->options()->delete();
+                $q->delete();
+            });
+        }
 
-        // [texto, opciones[a,b,c], valores[a,b,c], dimension]
+        // Escala Likert según instrumento 16PF-SL
+        $likertOptions = [
+            ['text' => 'Totalmente en desacuerdo', 'value' => 1],
+            ['text' => 'En desacuerdo',             'value' => 2],
+            ['text' => 'Neutral / No sé',           'value' => 3],
+            ['text' => 'De acuerdo',                'value' => 4],
+            ['text' => 'Totalmente de acuerdo',     'value' => 5],
+        ];
+
+        // [texto del ítem, factor/dimensión, reverse_scored]
+        // Orden exacto del instrumento 16PF-SL (ítems 1-64):
+        //   Ítems  1- 4 → Factor A  (Calidez)
+        //   Ítems  5- 8 → Factor B  (Razonamiento)
+        //   Ítems  9-12 → Factor C  (Estabilidad Emocional)
+        //   Ítems 13-16 → Factor E  (Dominancia)
+        //   Ítems 17-20 → Factor F  (Animación)
+        //   Ítems 21-24 → Factor G  (Atención a las Normas)
+        //   Ítems 25-28 → Factor H  (Atrevimiento Social)
+        //   Ítems 29-32 → Factor I  (Sensibilidad)
+        //   Ítems 33-36 → Factor L  (Vigilancia)
+        //   Ítems 37-40 → Factor M  (Abstracción)
+        //   Ítems 41-44 → Factor N  (Privacidad)
+        //   Ítems 45-48 → Factor O  (Aprensión)
+        //   Ítems 49-52 → Factor Q1 (Apertura al Cambio)
+        //   Ítems 53-56 → Factor Q2 (Autosuficiencia)
+        //   Ítems 57-60 → Factor Q3 (Perfeccionismo)
+        //   Ítems 61-64 → Factor Q4 (Tensión)
         $items = [
-            // A – Afabilidad (Calidez)
-            ['Al trabajar con otras personas, prefiero…',
-             ['Colaborar en equipo y apoyar a mis colegas', 'Depende de la situación', 'Trabajar de forma independiente'],
-             [2, 1, 0], 'factor_A'],
-            ['Con personas que acabo de conocer, usualmente…',
-             ['Me acerco con facilidad y busco conocerlas', 'Depende de quién sea', 'Espero a que ellas tomen la iniciativa'],
-             [2, 1, 0], 'factor_A'],
-            // B – Razonamiento
-            ['Ante un problema complejo, tiendo a…',
-             ['Analizarlo desde varios ángulos antes de decidir', 'Buscar ayuda o información adicional', 'Elegir la primera solución que parece funcionar'],
-             [2, 1, 0], 'factor_B'],
-            ['Cuando aprendo algo nuevo, prefiero…',
-             ['Entender los principios subyacentes', 'Mezclar teoría con práctica', 'Aprender haciendo directamente'],
-             [2, 1, 0], 'factor_B'],
-            // C – Estabilidad emocional
-            ['Ante contratiempos inesperados, generalmente…',
-             ['Me recupero rápido y busco soluciones', 'Me afecta un poco pero sigo adelante', 'Me cuesta recuperarme emocionalmente'],
-             [2, 1, 0], 'factor_C'],
-            ['Cuando tengo muchas responsabilidades al mismo tiempo…',
-             ['Las organizo y las manejo con calma', 'Me estreso algo pero funciono', 'Me siento abrumado/a con facilidad'],
-             [2, 1, 0], 'factor_C'],
-            // E – Dominancia
-            ['En situaciones de desacuerdo, suelo…',
-             ['Defender mi punto de vista con firmeza', 'Buscar un punto intermedio', 'Ceder para evitar conflictos'],
-             [2, 1, 0], 'factor_E'],
-            ['Al liderar un grupo, me resulta natural…',
-             ['Tomar decisiones y marcar el rumbo', 'Consultar a los demás antes de decidir', 'Seguir las decisiones del grupo'],
-             [2, 1, 0], 'factor_E'],
-            // F – Animación
-            ['En una reunión social, tiendo a…',
-             ['Ser entusiasta y animar el ambiente', 'Participar según el momento', 'Mantenerme tranquilo/a y discreto/a'],
-             [2, 1, 0], 'factor_F'],
-            ['Al afrontar tareas nuevas, normalmente siento…',
-             ['Entusiasmo y ganas de empezar', 'Algo de motivación', 'Cautela y preferencia por lo conocido'],
-             [2, 1, 0], 'factor_F'],
-            // G – Atención a normas
-            ['Respecto a las reglas y normas establecidas, yo…',
-             ['Las sigo cuidadosamente aunque no entienda el motivo', 'Las sigo cuando tienen sentido', 'Cuestiono las que me parecen innecesarias'],
-             [2, 1, 0], 'factor_G'],
-            ['Cuando cometo un error, generalmente…',
-             ['Me esfuerzo por corregirlo y evitar que se repita', 'Lo corrijo si es importante', 'Tiendo a minimizarlo'],
-             [2, 1, 0], 'factor_G'],
-            // H – Atrevimiento social
-            ['Al hablar en público, me siento…',
-             ['Cómodo/a y confiado/a', 'Algo nervioso/a pero puedo manejarlo', 'Muy nervioso/a e inseguro/a'],
-             [2, 1, 0], 'factor_H'],
-            ['En situaciones de riesgo social (evaluar o ser evaluado), yo…',
-             ['Me siento seguro/a de mí mismo/a', 'Un poco ansioso/a', 'Muy incómodo/a'],
-             [2, 1, 0], 'factor_H'],
-            // I – Sensibilidad
-            ['Ante el sufrimiento ajeno, generalmente…',
-             ['Me conmuevo profundamente y busco ayudar', 'Me preocupo pero mantengo distancia', 'Prefiero no involucrarme emocionalmente'],
-             [2, 1, 0], 'factor_I'],
-            ['Al tomar decisiones importantes, me guío más por…',
-             ['Mis valores y sentimientos', 'Una mezcla de razón y emoción', 'La lógica y los datos objetivos'],
-             [2, 1, 0], 'factor_I'],
-            // L – Vigilancia
-            ['En el entorno laboral, mi actitud es…',
-             ['Confiar en los demás hasta que demuestren lo contrario', 'Ser cauto/a con gente que no conozco bien', 'Ser muy precavido/a con la mayoría de personas'],
-             [2, 1, 0], 'factor_L'],
-            ['Cuando algo sale mal en el trabajo, pienso que…',
-             ['Puede deberse a causas diversas, no siempre a personas', 'A veces hay responsables individuales', 'Generalmente hay alguien que no cumplió'],
-             [2, 1, 0], 'factor_L'],
-            // M – Abstracción
-            ['En mis horas libres, prefiero…',
-             ['Reflexionar sobre ideas, leer o crear', 'Mezclar actividades intelectuales y prácticas', 'Actividades concretas y físicas'],
-             [2, 1, 0], 'factor_M'],
-            ['Al resolver problemas, me enfoco más en…',
-             ['El panorama general y las implicaciones futuras', 'Una combinación de detalles y visión global', 'Los detalles prácticos del momento'],
-             [2, 1, 0], 'factor_M'],
-            // N – Privacidad
-            ['Con personas que no conozco mucho, comparto…',
-             ['Solo lo estrictamente necesario', 'Información general sin entrar en detalles', 'Abiertamente mis experiencias y pensamientos'],
-             [2, 1, 0], 'factor_N'],
-            ['En conversaciones grupales, suelo…',
-             ['Guardar mis opiniones personales para mí', 'Compartirlas selectivamente', 'Expresar mis puntos de vista libremente'],
-             [2, 1, 0], 'factor_N'],
-            // O – Aprensión
-            ['Sobre mi desempeño en el trabajo, siento…',
-             ['Con frecuencia preocupación por si lo hago bien', 'Algo de incertidumbre ocasional', 'Generalmente seguridad y confianza'],
-             [2, 1, 0], 'factor_O'],
-            ['Cuando recibo críticas, mi primera reacción es…',
-             ['Sentirme inseguro/a y cuestionarme', 'Analizarla objetivamente con algo de incomodidad', 'Evaluarla sin que afecte mi autoestima'],
-             [2, 1, 0], 'factor_O'],
-            // Q1 – Apertura al cambio
-            ['Ante cambios organizacionales, mi reacción típica es…',
-             ['Verlos como oportunidades y adaptarme rápido', 'Adaptarme aunque me cueste un poco', 'Preferir las rutinas establecidas'],
-             [2, 1, 0], 'factor_Q1'],
-            ['Respecto a las ideas tradicionales, yo…',
-             ['Cuestiono lo establecido y busco nuevas perspectivas', 'Mezclo lo nuevo con lo que funciona', 'Valoro lo tradicional y probado'],
-             [2, 1, 0], 'factor_Q1'],
-            // Q2 – Autosuficiencia
-            ['Al tomar decisiones, prefiero…',
-             ['Reflexionar y decidir por mí mismo/a', 'Consultar y luego decidir', 'Buscar consenso con otros antes de actuar'],
-             [2, 1, 0], 'factor_Q2'],
-            ['Trabajar solo/a o en grupo, me resulta más productivo…',
-             ['Solo/a, con total autonomía', 'Depende de la tarea', 'En grupo, con respaldo del equipo'],
-             [2, 1, 0], 'factor_Q2'],
-            // Q3 – Perfeccionismo / Autocontrol
-            ['Respecto a mis objetivos y estándares, yo…',
-             ['Me exijo cumplir mis metas con alta precisión', 'Me esfuerzo pero acepto resultados razonables', 'Me conformo con lo suficientemente bueno'],
-             [2, 1, 0], 'factor_Q3'],
-            ['Mi nivel de organización personal es…',
-             ['Muy ordenado/a y metódico/a', 'Organizado/a en lo esencial', 'Bastante flexible e informal'],
-             [2, 1, 0], 'factor_Q3'],
-            // Q4 – Tensión
-            ['En términos generales, me siento…',
-             ['Con frecuencia tenso/a o con energía reprimida', 'A veces tenso/a según la situación', 'Generalmente relajado/a y sin tensión acumulada'],
-             [2, 1, 0], 'factor_Q4'],
-            ['Cuando no puedo controlar los resultados de algo importante, siento…',
-             ['Mucha ansiedad e inquietud', 'Algo de preocupación', 'Relativa tranquilidad y aceptación'],
-             [2, 1, 0], 'factor_Q4'],
+            // ── FACTOR A — Calidez / Afecto (Warmth) ─────────────────────
+            ['Me resulta fácil relacionarme de manera cálida y cercana con las personas en mi entorno laboral.',          'factor_a', false],
+            ['Disfruto generar un ambiente amigable y de apoyo mutuo con mis compañeros de trabajo.',                     'factor_a', false],
+            ['Prefiero mantener distancia emocional con mis colegas para preservar la objetividad profesional.',          'factor_a', true],
+            ['No considero necesario establecer vínculos personales estrechos dentro del trabajo.',                       'factor_a', true],
+
+            // ── FACTOR B — Razonamiento (Reasoning) ──────────────────────
+            ['Me resulta fácil comprender conceptos complejos o abstractos con rapidez.',                                 'factor_b', false],
+            ['Aprendo nuevas habilidades y procedimientos de trabajo con facilidad.',                                     'factor_b', false],
+            ['Prefiero instrucciones concretas y detalladas antes de comenzar una tarea nueva.',                          'factor_b', true],
+            ['Me cuesta seguir razonamientos muy abstractos o teóricos en el contexto laboral.',                          'factor_b', true],
+
+            // ── FACTOR C — Estabilidad Emocional (Emotional Stability) ───
+            ['Me mantengo emocionalmente estable incluso cuando enfrento situaciones difíciles en el trabajo.',           'factor_c', false],
+            ['Generalmente soy capaz de controlar mis emociones cuando surgen problemas laborales.',                      'factor_c', false],
+            ['Con frecuencia me siento perturbado/a por situaciones que otros consideran menores.',                       'factor_c', true],
+            ['Cuando algo sale mal en el trabajo, me cuesta recuperar la calma con rapidez.',                             'factor_c', true],
+
+            // ── FACTOR E — Dominancia / Asertividad (Dominance) ──────────
+            ['En situaciones grupales, tiendo a tomar el liderazgo y orientar al equipo.',                                'factor_e', false],
+            ['Defiendo mis puntos de vista con firmeza, incluso cuando hay oposición.',                                   'factor_e', false],
+            ['Prefiero seguir las instrucciones de otros antes que imponer mi propio criterio.',                          'factor_e', true],
+            ['Me resulta difícil confrontar a otros cuando no estoy de acuerdo con sus decisiones.',                      'factor_e', true],
+
+            // ── FACTOR F — Animación / Vivacidad (Liveliness) ────────────
+            ['Las personas de mi entorno me describen como alguien entusiasta y lleno/a de energía.',                    'factor_f', false],
+            ['Me gusta agregar dinamismo y buen ánimo a los ambientes de trabajo.',                                       'factor_f', false],
+            ['Prefiero un estilo de trabajo serio y formal antes que uno desenfadado o espontáneo.',                      'factor_f', true],
+            ['En el trabajo, tiendo a ser más reflexivo/a y cauteloso/a que espontáneo/a.',                               'factor_f', true],
+
+            // ── FACTOR G — Atención a las Normas (Rule-Consciousness) ────
+            ['Cumplo rigurosamente las normas y procedimientos establecidos en mi organización.',                         'factor_g', false],
+            ['Considero que respetar las políticas y reglamentos de la empresa es fundamental.',                          'factor_g', false],
+            ['En ocasiones omito algunos procedimientos cuando considero que son innecesarios.',                          'factor_g', true],
+            ['Adapto las normas de trabajo según las circunstancias cuando lo creo más conveniente.',                     'factor_g', true],
+
+            // ── FACTOR H — Atrevimiento Social (Social Boldness) ─────────
+            ['Me siento cómodo/a hablando en público o frente a grupos numerosos.',                                       'factor_h', false],
+            ['Iniciar conversaciones con personas desconocidas me resulta fácil y natural.',                              'factor_h', false],
+            ['Me pongo nervioso/a cuando tengo que hablar o presentar frente a un grupo de personas.',                   'factor_h', true],
+            ['Prefiero evitar situaciones en las que soy el centro de atención.',                                         'factor_h', true],
+
+            // ── FACTOR I — Sensibilidad / Receptividad (Sensitivity) ─────
+            ['Suelo guiarme por mis sentimientos e intuición al tomar decisiones laborales importantes.',                 'factor_i', false],
+            ['Me afectan emocionalmente las situaciones injustas o conflictivas que ocurren en mi entorno.',              'factor_i', false],
+            ['Prefiero basar mis decisiones en datos y hechos concretos antes que en emociones.',                         'factor_i', true],
+            ['Me considero una persona práctica que no se deja llevar por sentimentalismos en el trabajo.',               'factor_i', true],
+
+            // ── FACTOR L — Vigilancia / Desconfianza (Vigilance) ─────────
+            ['Suelo cuestionar las motivaciones detrás de las acciones de mis compañeros de trabajo.',                   'factor_l', false],
+            ['Me mantengo alerta ante posibles intenciones ocultas en los acuerdos y negociaciones laborales.',          'factor_l', false],
+            ['En general, confío en que mis compañeros actúan de buena fe.',                                              'factor_l', true],
+            ['No suelo sospechar de las intenciones de las personas con quienes trabajo habitualmente.',                  'factor_l', true],
+
+            // ── FACTOR M — Abstracción / Imaginación (Abstractedness) ────
+            ['Con frecuencia me pierdo en mis propios pensamientos o ideas mientras realizo tareas cotidianas.',         'factor_m', false],
+            ['Prefiero pensar en posibilidades y escenarios futuros antes que en los detalles inmediatos.',               'factor_m', false],
+            ['Me concentro fácilmente en las tareas prácticas del día a día sin distraerme con ideas abstractas.',       'factor_m', true],
+            ['Prefiero ocuparme de lo concreto y tangible antes que de teorías o conceptos alejados de la realidad.',    'factor_m', true],
+
+            // ── FACTOR N — Privacidad / Reserva (Privateness) ────────────
+            ['Suelo compartir muy poco sobre mi vida personal con mis compañeros de trabajo.',                            'factor_n', false],
+            ['Prefiero mantener una imagen estrictamente profesional y revelar solo lo necesario sobre mí mismo/a.',     'factor_n', false],
+            ['Me resulta fácil abrirme y hablar sobre mis experiencias personales con mis colegas.',                     'factor_n', true],
+            ['Soy una persona directa que expresa abiertamente lo que piensa y siente en el trabajo.',                   'factor_n', true],
+
+            // ── FACTOR O — Aprensión / Autoculpa (Apprehension) ──────────
+            ['Con frecuencia me preocupa que mis errores puedan tener consecuencias graves en el trabajo.',              'factor_o', false],
+            ['Suelo sentirme inseguro/a respecto a si estoy desempeñando bien mis funciones.',                           'factor_o', false],
+            ['Confío en mis capacidades profesionales y raramente me preocupo en exceso por mis errores.',               'factor_o', true],
+            ['Me siento seguro/a de mí mismo/a en la mayoría de las situaciones laborales.',                             'factor_o', true],
+
+            // ── FACTOR Q1 — Apertura al Cambio (Openness to Change) ──────
+            ['Me entusiasma cuando la organización implementa nuevas formas de trabajar o de estructurarse.',            'factor_q1', false],
+            ['Busco activamente nuevas maneras de mejorar los procesos y métodos en los que participo.',                 'factor_q1', false],
+            ['Prefiero métodos probados y confiables antes que arriesgarme con enfoques desconocidos.',                  'factor_q1', true],
+            ['Los cambios frecuentes en los procedimientos o estructuras de trabajo me generan incomodidad.',             'factor_q1', true],
+
+            // ── FACTOR Q2 — Autosuficiencia / Independencia (Self-Reliance)
+            ['Prefiero tomar decisiones de forma independiente sin necesitar la aprobación del grupo.',                  'factor_q2', false],
+            ['Me siento más productivo/a cuando puedo trabajar de forma autónoma.',                                      'factor_q2', false],
+            ['Prefiero consultar con otros antes de tomar decisiones importantes en el trabajo.',                         'factor_q2', true],
+            ['Disfruto más trabajar en equipo que hacerlo de manera individual.',                                         'factor_q2', true],
+
+            // ── FACTOR Q3 — Perfeccionismo / Autocontrol (Perfectionism) ─
+            ['Me esfuerzo por entregar un trabajo impecable, revisando cada detalle con cuidado.',                       'factor_q3', false],
+            ['Tengo altos estándares de calidad y me resulta difícil conformarme con resultados mediocres.',             'factor_q3', false],
+            ['No me molesta entregar un trabajo que es "suficientemente bueno", aunque no sea perfecto.',                'factor_q3', true],
+            ['Soy flexible con los estándares de calidad cuando las circunstancias o el tiempo lo requieren.',           'factor_q3', true],
+
+            // ── FACTOR Q4 — Tensión / Frustración (Tension) ──────────────
+            ['Con frecuencia me siento tenso/a o bajo presión, incluso sin una causa aparente.',                         'factor_q4', false],
+            ['Me resulta difícil relajarme o desconectarme cuando hay tareas laborales pendientes.',                     'factor_q4', false],
+            ['Generalmente me siento tranquilo/a y sereno/a, incluso cuando hay mucho trabajo por hacer.',               'factor_q4', true],
+            ['Mantengo la calma con facilidad incluso cuando enfrento múltiples demandas simultáneas.',                  'factor_q4', true],
         ];
 
-        $factorNames = [
-            'factor_A' => 'Afabilidad', 'factor_B' => 'Razonamiento',
-            'factor_C' => 'Estabilidad emocional', 'factor_E' => 'Dominancia',
-            'factor_F' => 'Animación', 'factor_G' => 'Atención a normas',
-            'factor_H' => 'Atrevimiento social', 'factor_I' => 'Sensibilidad',
-            'factor_L' => 'Vigilancia', 'factor_M' => 'Abstracción',
-            'factor_N' => 'Privacidad', 'factor_O' => 'Aprensión',
-            'factor_Q1'=> 'Apertura al cambio', 'factor_Q2'=> 'Autosuficiencia',
-            'factor_Q3'=> 'Perfeccionismo', 'factor_Q4'=> 'Tensión',
-        ];
-
-        foreach ($items as $order => [$text, $options, $values, $dimension]) {
+        foreach ($items as $order => [$text, $dimension, $reverse]) {
             $question = Question::create([
-                'test_id'     => $test->id,
-                'text'        => $text,
-                'type'        => 'multiple_choice',
-                'points'      => 2,
-                'order'       => $order + 1,
-                'is_required' => true,
-                'dimension'   => $dimension,
+                'test_id'        => $test->id,
+                'text'           => $text,
+                'type'           => 'likert',
+                'points'         => 5,
+                'order'          => $order + 1,
+                'is_required'    => true,
+                'dimension'      => $dimension,
+                'reverse_scored' => $reverse,
             ]);
 
-            foreach ($options as $i => $optText) {
+            foreach ($likertOptions as $i => $opt) {
                 QuestionOption::create([
                     'question_id' => $question->id,
-                    'text'        => $optText,
-                    'value'       => $values[$i],
-                    'is_correct'  => $values[$i] === 2,
+                    'text'        => $opt['text'],
+                    'value'       => $opt['value'],
+                    'is_correct'  => false,
                     'order'       => $i + 1,
                 ]);
             }

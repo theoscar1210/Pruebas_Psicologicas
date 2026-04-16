@@ -7,6 +7,7 @@ use App\Models\Candidate;
 use App\Models\Position;
 use App\Models\Test;
 use App\Models\TestAssignment;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -90,9 +91,11 @@ class CandidateController extends Controller
     public function assignTest(Request $request, Candidate $candidate): RedirectResponse
     {
         $validated = $request->validate([
-            'test_id' => 'required|exists:tests,id',
+            'test_id'    => 'required|exists:tests,id',
             'expires_at' => 'nullable|date|after:now',
         ]);
+
+        $redirectTo = redirect()->route('admin.candidates.show', $candidate);
 
         // Evita duplicados: no asignar si ya tiene esa prueba pendiente o en progreso
         $exists = TestAssignment::where('candidate_id', $candidate->id)
@@ -101,19 +104,21 @@ class CandidateController extends Controller
             ->exists();
 
         if ($exists) {
-            return back()->with('error', 'El candidato ya tiene esta prueba asignada y pendiente.');
+            return $redirectTo->with('error', 'El candidato ya tiene esta prueba asignada y pendiente.');
         }
 
         TestAssignment::create([
             'candidate_id' => $candidate->id,
-            'test_id' => $validated['test_id'],
-            'position_id' => $candidate->position_id,
-            'assigned_by' => auth()->id(),
-            'status' => 'pending',
-            'expires_at' => $validated['expires_at'] ?? null,
+            'test_id'      => $validated['test_id'],
+            'position_id'  => $candidate->position_id,
+            'assigned_by'  => auth()->id(),
+            'status'       => 'pending',
+            'expires_at'   => $validated['expires_at'] ?? null,
         ]);
 
-        return back()->with('success', 'Prueba asignada correctamente.');
+        $testName = Test::find($validated['test_id'])?->name ?? 'Prueba';
+
+        return $redirectTo->with('success', "«{$testName}» asignada correctamente a {$candidate->name}.");
     }
 
     private function assignPositionTests(Candidate $candidate): void
