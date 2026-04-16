@@ -42,7 +42,7 @@ class PsychologicalTestsSeeder extends Seeder
     // ══════════════════════════════════════════════════════════════════════
     private function seedBigFive(): void
     {
-        $test = Test::firstOrCreate(
+        $test = Test::updateOrCreate(
             ['test_type' => 'big_five'],
             [
                 'name'           => 'Big Five — Evaluación de Personalidad (IPIP-50)',
@@ -176,20 +176,19 @@ class PsychologicalTestsSeeder extends Seeder
     // ══════════════════════════════════════════════════════════════════════
     private function seedSixteenPF(): void
     {
-        $test = Test::firstOrCreate(
+        $test = Test::updateOrCreate(
             ['test_type' => '16pf'],
             [
-                'name'           => '16PF — 16 Factores de Personalidad (Selección Laboral)',
-                'description'    => 'Instrumento 16PF-SL basado en el modelo de Raymond B. Cattell. 64 ítems tipo Likert que evalúan 16 factores de personalidad relevantes para el desempeño laboral.',
-                'instructions'   => "A continuación encontrará una serie de afirmaciones relacionadas con su forma habitual de pensar, sentir y actuar en contextos laborales y cotidianos.\n\nResponda con honestidad — no hay respuestas correctas ni incorrectas. Lo que importa es que sus respuestas reflejen cómo es usted realmente, no cómo le gustaría ser.\n\nUse la siguiente escala:\n1 = Totalmente en desacuerdo\n2 = En desacuerdo\n3 = Neutral / No sé\n4 = De acuerdo\n5 = Totalmente de acuerdo",
-                'module'         => 'personalidad',
-                'test_type'      => '16pf',
+                'name'             => '16PF — 16 Factores de Personalidad (Selección Laboral)',
+                'description'      => 'Instrumento 16PF-SL basado en el modelo de Raymond B. Cattell. 64 ítems tipo Likert que evalúan 16 factores de personalidad relevantes para el desempeño laboral.',
+                'instructions'     => "A continuación encontrará una serie de afirmaciones relacionadas con su forma habitual de pensar, sentir y actuar en contextos laborales y cotidianos.\n\nResponda con honestidad — no hay respuestas correctas ni incorrectas. Lo que importa es que sus respuestas reflejen cómo es usted realmente, no cómo le gustaría ser o cómo cree que debería responder.\n\nUse la siguiente escala:\n1 = Totalmente en desacuerdo — Esta afirmación NO me describe en absoluto.\n2 = En desacuerdo — Esta afirmación me describe pocas veces o en raras ocasiones.\n3 = Neutral / No sé — No estoy seguro/a si esta afirmación me describe o no.\n4 = De acuerdo — Esta afirmación me describe frecuentemente o en la mayoría de contextos.\n5 = Totalmente de acuerdo — Esta afirmación me describe de manera precisa y consistente.",
+                'module'           => 'personalidad',
                 'evaluator_scored' => false,
-                'scoring_method' => 'dimensional',
-                'time_limit'     => 30,
-                'passing_score'  => 0,
-                'is_active'      => true,
-                'created_by'     => $this->adminId,
+                'scoring_method'   => 'dimensional',
+                'time_limit'       => 30,
+                'passing_score'    => 0,
+                'is_active'        => true,
+                'created_by'       => $this->adminId,
             ]
         );
 

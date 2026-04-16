@@ -95,7 +95,7 @@
                 </svg>
                 <div>
                     <p class="text-xs font-semibold text-brand-700 mb-1">Instrucciones</p>
-                    <p class="text-sm text-brand-800/80 leading-relaxed">{{ $assignment->test->instructions }}</p>
+                    <p class="text-sm text-brand-800/80 leading-relaxed whitespace-pre-line">{{ $assignment->test->instructions }}</p>
                 </div>
             </div>
         </div>
