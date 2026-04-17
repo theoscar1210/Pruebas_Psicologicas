@@ -264,7 +264,61 @@
                     @endif
                 </div>
 
-                {{-- ── INTERPRETACIÓN DE RESULTADOS (solo RRHH/Admin) ── --}}
+                {{-- ── INTERPRETACIÓN RAVEN (solo RRHH/Admin) ── --}}
+                @if($assignment->result && $assignment->test->scoring_method === 'percentage' && $assignment->test->test_type === 'raven')
+                @php
+                    $ravenScore = (int) $assignment->result->total_score;
+                    [$ravenLevel, $ravenPct, $ravenColor, $ravenDesc] = match(true) {
+                        $ravenScore >= 18 => ['Superior',                  'P96–P99', 'emerald', 'Razonamiento abstracto excepcional. Identifica patrones multivariables complejos con rapidez y precisión. Inteligencia fluida en el rango más alto de la población.'],
+                        $ravenScore >= 15 => ['Bueno / Encima del promedio','P87–P95', 'brand',   'Capacidad por encima del promedio. Identifica patrones abstractos con solidez. Adaptabilidad cognitiva notable ante problemas novedosos.'],
+                        $ravenScore >= 11 => ['Promedio / Adecuado',        'P60–P86', 'slate',   'Capacidad dentro del rango medio. Identifica patrones concretos y parte de los abstractos. Desempeño adecuado para la mayoría de posiciones.'],
+                        $ravenScore >= 7  => ['Por debajo del promedio',    'P22–P50', 'amber',   'Dificultad con patrones abstractos de mediana complejidad. Mayoría de aciertos en ítems de baja dificultad.'],
+                        default           => ['Muy por debajo del promedio','P1–P21',  'red',     'Dificultades significativas en razonamiento abstracto. Desempeño limitado incluso en ítems de baja dificultad.'],
+                    };
+                    $ravenBarColor = match($ravenColor) {
+                        'emerald' => 'bg-emerald-500',
+                        'brand'   => 'bg-brand-500',
+                        'amber'   => 'bg-amber-400',
+                        'red'     => 'bg-red-400',
+                        default   => 'bg-slate-400',
+                    };
+                    $ravenBadgeClass = match($ravenColor) {
+                        'emerald' => 'bg-emerald-100 text-emerald-700',
+                        'brand'   => 'bg-brand-100 text-brand-700',
+                        'amber'   => 'bg-amber-100 text-amber-700',
+                        'red'     => 'bg-red-100 text-red-700',
+                        default   => 'bg-slate-200 text-slate-600',
+                    };
+                @endphp
+                <div class="mt-4 pt-4 border-t border-slate-100">
+                    <div class="flex items-center gap-2 mb-3">
+                        <svg class="w-3.5 h-3.5 text-brand-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        <h4 class="text-xs font-semibold text-brand-700 uppercase tracking-wider">Interpretación de resultados</h4>
+                        <span class="ml-auto text-[10px] font-semibold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full uppercase tracking-wide">Solo RRHH</span>
+                    </div>
+                    <div class="bg-slate-50/70 rounded-lg p-3">
+                        <div class="flex items-center justify-between gap-3 mb-1.5">
+                            <span class="text-sm font-medium text-slate-800">Inteligencia Fluida (Gf) — Razonamiento Abstracto</span>
+                            <div class="flex items-center gap-2 flex-shrink-0">
+                                <span class="text-xs text-slate-500 font-mono">Puntaje {{ $ravenScore }}/20</span>
+                                <span class="text-xs font-semibold px-2 py-0.5 rounded-full {{ $ravenBadgeClass }}">
+                                    {{ $ravenLevel }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-1.5 mb-2 overflow-hidden">
+                            <div class="{{ $ravenBarColor }} h-1.5 rounded-full transition-all" style="width: {{ ($ravenScore / 20) * 100 }}%"></div>
+                        </div>
+                        <p class="text-xs text-slate-500 mb-1 leading-relaxed">{{ $ravenDesc }}</p>
+                        <p class="text-xs text-slate-400">Percentil aproximado: <span class="font-medium text-slate-600">{{ $ravenPct }}</span></p>
+                    </div>
+                </div>
+                @endif
+                {{-- ── fin interpretación Raven ── --}}
+
+                {{-- ── INTERPRETACIÓN DE RESULTADOS DIMENSIONAL (solo RRHH/Admin) ── --}}
                 @if($assignment->dimensionScores->isNotEmpty())
                 <div class="mt-4 pt-4 border-t border-slate-100">
                     <div class="flex items-center gap-2 mb-3">

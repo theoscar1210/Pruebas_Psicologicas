@@ -350,102 +350,160 @@ class PsychologicalTestsSeeder extends Seeder
     }
 
     // ══════════════════════════════════════════════════════════════════════
-    // 3. MATRICES PROGRESIVAS DE RAVEN — 36 ítems (Sets A–D, 9 c/u)
+    // 3. MPR-SL — Matrices Progresivas de Raven (Selección Laboral) v1.0
+    //    20 ítems · 3 sets (A×7 + B×7 + C×6) · 6 opciones A–F
+    //    Referencia: MPR_SL_Guia_Tecnica_Raven.md
     // ══════════════════════════════════════════════════════════════════════
     private function seedRaven(): void
     {
-        $test = Test::firstOrCreate(
+        $test = Test::updateOrCreate(
             ['test_type' => 'raven'],
             [
-                'name'           => 'Matrices Progresivas de Raven',
-                'description'    => 'Prueba de inteligencia no verbal. Mide capacidad de razonamiento abstracto y lógico. 36 matrices de dificultad progresiva (Sets A, B, C, D).',
-                'instructions'   => 'En cada ejercicio verás una matriz con una pieza faltante. Debajo encontrarás 6 opciones numeradas. Selecciona la opción que completa correctamente el patrón. Trabaja con calma; si una respuesta te cuesta, continúa y regresa después.',
+                'name'           => 'MPR-SL — Matrices Progresivas de Raven (Selección Laboral)',
+                'description'    => 'Medida de inteligencia fluida (Gf) y razonamiento abstracto. 20 ítems de dificultad progresiva organizados en tres sets (A: fácil, B: medio, C: difícil). Cada ítem presenta una matriz con una pieza faltante y 6 opciones de respuesta (A–F).',
+                'instructions'   => "A continuación encontrará una serie de matrices (figuras con un patrón lógico) en las que falta una pieza.\n\nObserve con atención el patrón de cada matriz y seleccione, entre las seis opciones (A – F), la que completa correctamente la figura.\n\nIndicaciones importantes:\n• No hay penalización por respuestas incorrectas.\n• Si un ítem le resulta difícil, continúe y regrese al final si le queda tiempo.\n• Trabaje con calma pero sin demorarse demasiado en un solo ítem.\n• Dispone de 20 minutos para completar los 20 ítems.",
                 'module'         => 'cognitivo',
                 'test_type'      => 'raven',
                 'evaluator_scored' => false,
-                'scoring_method' => 'dimensional',
-                'time_limit'     => 45,
-                'passing_score'  => 50,
+                'scoring_method' => 'percentage',
+                'time_limit'     => 20,
+                'passing_score'  => 55,
                 'is_active'      => true,
                 'created_by'     => $this->adminId,
             ]
         );
 
-        if ($test->questions()->exists()) return;
+        // Elimina ítems anteriores para re-sembrar con el instrumento MPR-SL v1.0
+        if ($test->questions()->exists()) {
+            $test->questions()->each(function ($q) {
+                $q->options()->delete();
+                $q->delete();
+            });
+        }
 
-        // Estructura: [texto descriptivo, set/categoria, opcion_correcta(1-6), descripcion_opciones]
-        // En producción, image_path apuntaría a /storage/tests/raven/set_X_item_Y.png
-        $sets = [
-            'set_a' => [
-                ['Completa el patrón: figuras que aumentan de tamaño de izquierda a derecha. Fila inferior.',         3],
-                ['Patrón de sombras: la figura va oscureciendo en diagonal. Selecciona la pieza faltante.',           5],
-                ['Patrón de líneas horizontales que se cruzan con verticales. ¿Cuál continúa la secuencia?',          2],
-                ['Serie de formas que rotan 45° en cada casilla. Identifica la pieza de la esquina inferior derecha.',1],
-                ['Las figuras cambian de sólido a hueco siguiendo un patrón. ¿Cuál completa la matriz?',              4],
-                ['Patrón con puntos: cada fila suma el mismo número de puntos. Selecciona la pieza correcta.',        6],
-                ['Las formas internas varían en número de acuerdo a una regla. ¿Cuál es la pieza faltante?',          2],
-                ['Patrón de ángulos que giran progresivamente. Completa la secuencia.',                               5],
-                ['Combinación de dos atributos (tamaño y relleno) en progresión sistemática. ¿Cuál falta?',          3],
+        // Estructura: [texto del ítem, set (categoría), letra_correcta (A–F), dificultad]
+        // La letra correcta proviene de la clave de respuestas del instrumento MPR-SL.
+        // image_path apuntará a /storage/tests/raven/{set}_item_{n}.png cuando se carguen las imágenes.
+        $items = [
+            // ── SET A — Fácil (ítems 1–7) ─────────────────────────────────
+            // Regla única por ítem: progresión, rotación, posición, ciclo de formas.
+            [
+                'text'       => "Set A — Ítem 1\nObserve la matriz 3×3. El fondo de cada figura cambia gradualmente de claro a oscuro de izquierda a derecha y de arriba a abajo. ¿Cuál de las seis opciones (A–F) completa correctamente el patrón de la casilla faltante?",
+                'set'        => 'set_a', 'correct' => 'A', 'difficulty' => 1,
             ],
-            'set_b' => [
-                ['Las figuras en cada fila se combinan para formar la tercera. Selecciona la pieza faltante.',        4],
-                ['Cada fila contiene tres figuras que, al superponerse, forman la última. Elige la correcta.',        1],
-                ['Patrón de analogía: la relación entre la primera y segunda figura es igual a la de la tercera y…', 6],
-                ['Las líneas internas se suman entre columnas para producir la figura central.',                      3],
-                ['Aplica la regla: el total de lados en cada fila es constante. Completa la serie.',                  2],
-                ['Identifica la figura que completa la secuencia: cada elemento añade un rasgo adicional.',           5],
-                ['Las formas se fusionan de fila en fila siguiendo una ley de adición. ¿Cuál falta?',                1],
-                ['Patrón de simetría: cada columna tiene simetría vertical. Selecciona la pieza correcta.',          4],
-                ['Regla de diferencia: las figuras de cada fila difieren en un único atributo. Completa.',            6],
+            [
+                'text'       => "Set A — Ítem 2\nEn esta matriz las figuras aumentan progresivamente de tamaño siguiendo una dirección definida. Identifique la opción (A–F) que ocupa la posición faltante respetando la regla de tamaño.",
+                'set'        => 'set_a', 'correct' => 'A', 'difficulty' => 1,
             ],
-            'set_c' => [
-                ['Las figuras evolucionan según dos reglas simultáneas (forma y relleno). ¿Cuál completa?',           2],
-                ['Cada celda es resultado de combinar la fila anterior con la columna izquierda.',                    5],
-                ['Los elementos de la matriz aumentan en complejidad. Identifica la pieza final.',                    3],
-                ['Patrón de rotación + reflejo progresivo en 3×3. Selecciona la pieza de la posición [3,3].',        1],
-                ['Las figuras eliminan atributos compartidos por dos de ellas (XOR visual). Completa.',               6],
-                ['Cada fila aplica una transformación diferente (rotar, reflejar, invertir). Identifica cuál.',       4],
-                ['Patrón de degradación progresiva: elementos desaparecen según una secuencia. ¿Cuál falta?',        2],
-                ['La tercera figura de cada fila es la superposición exclusiva de las dos primeras.',                 5],
-                ['Combina las reglas de las filas y columnas para encontrar la pieza de intersección.',               3],
+            [
+                'text'       => "Set A — Ítem 3\nCada fila de la matriz contiene un número creciente de elementos. Seleccione la opción (A–F) que mantiene la progresión de conteo en la casilla faltante.",
+                'set'        => 'set_a', 'correct' => 'C', 'difficulty' => 1,
             ],
-            'set_d' => [
-                ['Las figuras cambian de posición dentro de la celda siguiendo un patrón de traslación.',             4],
-                ['En cada fila hay exactamente 3 atributos distintos distribuidos. Completa la matriz.',              6],
-                ['Las formas giran 90° en sentido horario en cada columna. Identifica la pieza [3,3].',               1],
-                ['Patrón numérico codificado visualmente: las puntas de las figuras siguen la serie 2-4-6.',          3],
-                ['Cada fila contiene exactamente los mismos elementos en diferente orden. ¿Cuál falta?',              5],
-                ['Las figuras se construyen por adición de partes. La tercera tiene todo lo de las dos primeras.',    2],
-                ['Aplica dos reglas: simetría y complementariedad de relleno. Selecciona la pieza correcta.',         4],
-                ['Regla: si los elementos son iguales en fila y columna, la celda está vacía. De lo contrario, tiene forma.', 6],
-                ['Patrón de inversión + rotación doble. Es el ítem de mayor dificultad del set.',                     1],
+            [
+                'text'       => "Set A — Ítem 4\nUn triángulo gira en cada casilla siguiendo una secuencia de rotación. ¿Cuál opción (A–F) muestra la orientación correcta del triángulo en la posición faltante?",
+                'set'        => 'set_a', 'correct' => 'A', 'difficulty' => 2,
+            ],
+            [
+                'text'       => "Set A — Ítem 5\nUna figura se desplaza de una posición a otra dentro de la cuadrícula 3×3 siguiendo un patrón regular. ¿Qué opción (A–F) indica la posición correcta de la figura en la casilla que falta?",
+                'set'        => 'set_a', 'correct' => 'B', 'difficulty' => 1,
+            ],
+            [
+                'text'       => "Set A — Ítem 6\nLas formas geométricas de la matriz se suceden en un ciclo repetitivo (p. ej. círculo → triángulo → cuadrado → …). Identifique la opción (A–F) que continúa el ciclo en la casilla faltante.",
+                'set'        => 'set_a', 'correct' => 'C', 'difficulty' => 2,
+            ],
+            [
+                'text'       => "Set A — Ítem 7\nUna flecha cambia de dirección en cada casilla siguiendo una secuencia lógica. ¿Cuál opción (A–F) muestra la dirección correcta de la flecha en la posición que falta?",
+                'set'        => 'set_a', 'correct' => 'D', 'difficulty' => 2,
+            ],
+
+            // ── SET B — Medio (ítems 8–14) ────────────────────────────────
+            // Dos reglas simultáneas por ítem: combinaciones de tamaño, relleno,
+            // adición, eliminación, rotación y conteo.
+            [
+                'text'       => "Set B — Ítem 8\nEn esta matriz dos atributos varían al mismo tiempo: el tamaño de la figura y su nivel de relleno (vacío → sombreado → relleno). Seleccione la opción (A–F) que satisface ambas reglas en la casilla faltante.",
+                'set'        => 'set_b', 'correct' => 'E', 'difficulty' => 3,
+            ],
+            [
+                'text'       => "Set B — Ítem 9\nCada fila aplica una regla de adición: la tercera figura es el resultado de combinar los elementos de las dos primeras. ¿Cuál opción (A–F) es la combinación correcta?",
+                'set'        => 'set_b', 'correct' => 'A', 'difficulty' => 3,
+            ],
+            [
+                'text'       => "Set B — Ítem 10\nEn esta matriz los elementos se eliminan progresivamente fila a fila siguiendo una secuencia lógica. ¿Qué opción (A–F) refleja el estado correcto de eliminación en la casilla faltante?",
+                'set'        => 'set_b', 'correct' => 'C', 'difficulty' => 3,
+            ],
+            [
+                'text'       => "Set B — Ítem 11\nUna línea interna rota 30° en el sentido de las agujas del reloj en cada casilla. Seleccione la opción (A–F) con el ángulo de rotación correcto para la posición faltante.",
+                'set'        => 'set_b', 'correct' => 'A', 'difficulty' => 3,
+            ],
+            [
+                'text'       => "Set B — Ítem 12\nEl relleno de la figura de la primera columna se copia en la figura de la tercera columna de la misma fila. ¿Qué opción (A–F) aplica correctamente esta regla de copia en la casilla faltante?",
+                'set'        => 'set_b', 'correct' => 'B', 'difficulty' => 4,
+            ],
+            [
+                'text'       => "Set B — Ítem 13\nEl patrón de relleno sigue una diagonal: las casillas se rellenan en orden diagonal de izquierda a derecha. Identifique la opción (A–F) que completa el patrón diagonal en la casilla que falta.",
+                'set'        => 'set_b', 'correct' => 'C', 'difficulty' => 4,
+            ],
+            [
+                'text'       => "Set B — Ítem 14\nEl número de elementos dentro de cada figura sigue una regla de multiplicación entre filas y columnas. ¿Cuál opción (A–F) tiene el número correcto de elementos en la casilla faltante?",
+                'set'        => 'set_b', 'correct' => 'E', 'difficulty' => 4,
+            ],
+
+            // ── SET C — Difícil (ítems 15–20) ─────────────────────────────
+            // Múltiples reglas independientes: ciclos dobles, figuras anidadas,
+            // diferencia booleana, triple atributo, posición y cuadrado latino.
+            [
+                'text'       => "Set C — Ítem 15\nDos ciclos se desarrollan simultáneamente: la forma exterior cambia en secuencia mientras el relleno interior sigue su propio ciclo independiente. Seleccione la opción (A–F) que satisface ambos ciclos en la casilla faltante.",
+                'set'        => 'set_c', 'correct' => 'C', 'difficulty' => 5,
+            ],
+            [
+                'text'       => "Set C — Ítem 16\nLas figuras se anidan de mayor a menor, pero en orden inverso al de las filas superiores. ¿Cuál opción (A–F) respeta la regla de anidamiento inverso en la casilla que falta?",
+                'set'        => 'set_c', 'correct' => 'D', 'difficulty' => 5,
+            ],
+            [
+                'text'       => "Set C — Ítem 17\nLa tercera figura de cada fila contiene solo los elementos que NO son compartidos por las dos primeras figuras (diferencia booleana / XOR visual). ¿Qué opción (A–F) aplica correctamente esta regla?",
+                'set'        => 'set_c', 'correct' => 'B', 'difficulty' => 6,
+            ],
+            [
+                'text'       => "Set C — Ítem 18\nTres atributos (forma, tamaño y relleno) cambian de manera independiente en cada casilla. Las nueve casillas de la matriz contienen cada combinación exactamente una vez. Identifique la opción (A–F) que completa el conjunto sin repetir combinaciones.",
+                'set'        => 'set_c', 'correct' => 'D', 'difficulty' => 6,
+            ],
+            [
+                'text'       => "Set C — Ítem 19\nDos reglas posicionales actúan de forma independiente: una rige la posición horizontal del elemento y otra la posición vertical. ¿Qué opción (A–F) satisface ambas reglas posicionales en la casilla faltante?",
+                'set'        => 'set_c', 'correct' => 'A', 'difficulty' => 7,
+            ],
+            [
+                'text'       => "Set C — Ítem 20\nLa matriz sigue un cuadrado latino: cada símbolo aparece exactamente una vez en cada fila y en cada columna, combinado además con un atributo de relleno que también sigue la misma restricción. Seleccione la opción (A–F) que completa la matriz correctamente.",
+                'set'        => 'set_c', 'correct' => 'E', 'difficulty' => 7,
             ],
         ];
 
-        $globalOrder = 1;
-        foreach ($sets as $setKey => $items) {
-            foreach ($items as $idx => [$text, $correctPos]) {
-                $question = Question::create([
-                    'test_id'     => $test->id,
-                    'text'        => "Set " . strtoupper(substr($setKey, -1)) . " — Ítem " . ($idx + 1) . ": {$text}",
-                    'type'        => 'multiple_choice',
-                    'points'      => 1,
-                    'order'       => $globalOrder++,
-                    'is_required' => true,
-                    'dimension'   => 'raven_total',
-                    'category'    => $setKey,
-                    'image_path'  => "raven/{$setKey}_item_" . ($idx + 1) . ".png",
-                ]);
+        // Mapa de letra → índice 0-based (A=0, B=1, C=2, D=3, E=4, F=5)
+        $letterIndex = ['A' => 0, 'B' => 1, 'C' => 2, 'D' => 3, 'E' => 4, 'F' => 5];
+        $labels      = ['A', 'B', 'C', 'D', 'E', 'F'];
 
-                for ($opt = 1; $opt <= 6; $opt++) {
-                    QuestionOption::create([
-                        'question_id' => $question->id,
-                        'text'        => "Opción {$opt}",
-                        'value'       => $opt === $correctPos ? 1 : 0,
-                        'is_correct'  => $opt === $correctPos,
-                        'order'       => $opt,
-                    ]);
-                }
+        foreach ($items as $order => $item) {
+            $correctIdx = $letterIndex[$item['correct']];
+
+            $question = Question::create([
+                'test_id'     => $test->id,
+                'text'        => $item['text'],
+                'type'        => 'multiple_choice',
+                'points'      => 1,
+                'order'       => $order + 1,
+                'is_required' => true,
+                'dimension'   => 'raven_total',
+                'category'    => $item['set'],
+                'image_path'  => "raven/{$item['set']}_item_" . ($order + 1) . ".png",
+            ]);
+
+            foreach ($labels as $i => $label) {
+                QuestionOption::create([
+                    'question_id' => $question->id,
+                    'text'        => $label,
+                    'value'       => $i === $correctIdx ? 1 : 0,
+                    'is_correct'  => $i === $correctIdx,
+                    'order'       => $i + 1,
+                ]);
             }
         }
     }
