@@ -131,17 +131,17 @@
             </div>
         </div>
 
-        {{-- Matriz SVG --}}
+        {{-- Matriz SVG — x-html reactivo: se actualiza al cambiar 'current' --}}
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-4 flex flex-col items-center">
-            <div id="raven-grid" class="raven-grid"></div>
+            <div class="raven-grid" x-html="buildMatrix()"></div>
         </div>
 
-        {{-- Opciones A–F --}}
+        {{-- Opciones A–F — event delegation para capturar clicks --}}
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4">
             <p class="text-xs font-medium text-slate-500 mb-3 text-center">
                 ¿Cuál de las seis opciones completa correctamente el patrón?
             </p>
-            <div id="raven-opts" class="raven-opts"></div>
+            <div class="raven-opts" @click.stop="handleOptClick($event)" x-html="buildOpts()"></div>
 
             {{-- Indicador respondida --}}
             <div class="flex justify-center mt-3">
@@ -555,6 +555,8 @@ const ITEMS=[
 const KEYS=['A','B','C','D','E','F'];
 
 // ─── Alpine: modo Raven ──────────────────────────────────────────────────────
+// Usa x-html reactivo: buildMatrix() y buildOpts() son evaluados por Alpine
+// automáticamente cada vez que cambia `current` o `answers`, sin timing issues.
 function ravenApp({ saveUrl, timeRemaining, ravenQuestions, savedAnswers, totalQuestions }) {
     return {
         current: 0,
@@ -574,11 +576,9 @@ function ravenApp({ saveUrl, timeRemaining, ravenQuestions, savedAnswers, totalQ
         },
 
         init() {
-            // Restaurar respuestas previas
             for (const [qId, val] of Object.entries(savedAnswers)) {
                 if (val != null) this.answers[qId] = val;
             }
-            // Timer
             if (this.timeRemaining !== null && this.timeRemaining > 0) {
                 this.timerInterval = setInterval(() => {
                     this.timeRemaining--;
@@ -589,9 +589,46 @@ function ravenApp({ saveUrl, timeRemaining, ravenQuestions, savedAnswers, totalQ
                     }
                 }, 1000);
             }
-            this.$nextTick(() => this.renderMatrix());
         },
 
+        // ── Getters reactivos — Alpine re-evalúa x-html cuando cambian ──────
+        buildMatrix() {
+            const item = ITEMS[this.current];
+            if (!item) return '';
+            let html = '';
+            for (let r = 0; r < 3; r++) {
+                for (let c = 0; c < 3; c++) {
+                    const shapes = item.matrix[r][c];
+                    if (shapes === null) {
+                        html += '<div class="raven-cell raven-empty"><div class="raven-q">?</div></div>';
+                    } else {
+                        html += `<div class="raven-cell">${cellSVG(shapes, 90)}</div>`;
+                    }
+                }
+            }
+            return html;
+        },
+
+        buildOpts() {
+            const item = ITEMS[this.current];
+            if (!item) return '';
+            const selIdx = this.selectedIdx();
+            return item.opts.map((shapes, i) =>
+                `<button type="button" class="raven-opt${i === selIdx ? ' sel' : ''}" data-opt="${i}">
+                    ${cellSVG(shapes, 58)}
+                    <div class="raven-opt-key">${KEYS[i]}</div>
+                </button>`
+            ).join('');
+        },
+
+        // Event delegation para los clicks en opciones
+        handleOptClick(event) {
+            const btn = event.target.closest('[data-opt]');
+            if (!btn) return;
+            this.selectOption(parseInt(btn.dataset.opt));
+        },
+
+        // ── Lógica de selección ──────────────────────────────────────────────
         isAnswered(idx) {
             const qId = ravenQuestions[idx]?.qId;
             return qId != null && this.answers[qId] != null;
@@ -607,75 +644,18 @@ function ravenApp({ saveUrl, timeRemaining, ravenQuestions, savedAnswers, totalQ
 
         selectOption(optIdx) {
             const meta = ravenQuestions[this.current];
+            if (!meta) return;
             const optId = meta.optionIds[optIdx];
-            this.answers[meta.qId] = optId;
+            // Forzar reactividad creando un nuevo objeto answers
+            this.answers = { ...this.answers, [meta.qId]: optId };
             this.persistAnswer(meta.qId, optId);
-            this.renderOptions(); // re-paint selection
         },
 
-        goTo(idx) {
-            this.current = idx;
-            this.$nextTick(() => this.renderMatrix());
-        },
+        goTo(idx)  { this.current = idx; },
+        next()     { this.current < totalQuestions - 1 ? this.current++ : (this.showModal = true); },
+        prev()     { if (this.current > 0) this.current--; },
 
-        next() {
-            if (this.current < totalQuestions - 1) {
-                this.current++;
-                this.$nextTick(() => this.renderMatrix());
-            } else {
-                this.showModal = true;
-            }
-        },
-
-        prev() {
-            if (this.current > 0) {
-                this.current--;
-                this.$nextTick(() => this.renderMatrix());
-            }
-        },
-
-        renderMatrix() {
-            const item = ITEMS[this.current];
-            if (!item) return;
-
-            // Pintar cuadrícula 3×3
-            const grid = document.getElementById('raven-grid');
-            if (!grid) return;
-            grid.innerHTML = '';
-            for (let r = 0; r < 3; r++) {
-                for (let c = 0; c < 3; c++) {
-                    const el = document.createElement('div');
-                    const shapes = item.matrix[r][c];
-                    if (shapes === null) {
-                        el.className = 'raven-cell raven-empty';
-                        el.innerHTML = '<div class="raven-q">?</div>';
-                    } else {
-                        el.className = 'raven-cell';
-                        el.innerHTML = cellSVG(shapes, 90);
-                    }
-                    grid.appendChild(el);
-                }
-            }
-            this.renderOptions();
-        },
-
-        renderOptions() {
-            const item = ITEMS[this.current];
-            if (!item) return;
-            const og = document.getElementById('raven-opts');
-            if (!og) return;
-            const selIdx = this.selectedIdx();
-            og.innerHTML = '';
-            item.opts.forEach((shapes, i) => {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = 'raven-opt' + (i === selIdx ? ' sel' : '');
-                btn.innerHTML = cellSVG(shapes, 58) + `<div class="raven-opt-key">${KEYS[i]}</div>`;
-                btn.onclick = () => this.selectOption(i);
-                og.appendChild(btn);
-            });
-        },
-
+        // ── Persistencia ────────────────────────────────────────────────────
         persistAnswer(qId, optId) {
             this.saving = true;
             clearTimeout(this.saveTimeout);
