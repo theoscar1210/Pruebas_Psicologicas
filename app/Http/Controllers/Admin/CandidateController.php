@@ -16,18 +16,34 @@ class CandidateController extends Controller
 {
     public function index(Request $request): View
     {
+        $filter = $request->filter;
+
         $candidates = Candidate::with(['position', 'assignments.result'])
             ->when($request->search, fn ($q) => $q->where('name', 'like', "%{$request->search}%")
                 ->orWhere('document_number', 'like', "%{$request->search}%"))
             ->when($request->position_id, fn ($q) => $q->where('position_id', $request->position_id))
             ->when($request->status, fn ($q) => $q->where('status', $request->status))
+            ->when($filter === 'evaluacion', fn ($q) =>
+                $q->whereHas('assignments', fn ($q) => $q->where('status', 'completed'))
+                  ->with(['evaluatorAssessments'])
+            )
             ->orderByDesc('created_at')
             ->paginate(20)
             ->withQueryString();
 
         $positions = Position::where('is_active', true)->orderBy('name')->get();
 
-        return view('admin.candidates.index', compact('candidates', 'positions'));
+        return view('admin.candidates.index', compact('candidates', 'positions', 'filter'));
+    }
+
+    public function perfilesIndex(): View
+    {
+        $candidates = Candidate::with(['position', 'latestReport'])
+            ->whereHas('psychologicalReports')
+            ->orderByDesc('updated_at')
+            ->paginate(25);
+
+        return view('admin.perfiles.index', compact('candidates'));
     }
 
     public function create(): View

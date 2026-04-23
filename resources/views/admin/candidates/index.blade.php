@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Candidatos')
-@section('header', 'Candidatos')
+@section('title', $filter === 'evaluacion' ? 'Evaluaciones Clínicas' : 'Candidatos')
+@section('header', $filter === 'evaluacion' ? 'Evaluaciones Clínicas' : 'Candidatos')
 
 @section('header-actions')
     <a href="{{ route('admin.candidates.create') }}" class="btn-primary btn-sm">
@@ -13,6 +13,17 @@
 @endsection
 
 @section('content')
+
+@if($filter === 'evaluacion')
+<div class="card-info p-4 mb-4">
+    <div class="flex items-center gap-2 text-brand-700 text-sm">
+        <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+        </svg>
+        Mostrando candidatos con al menos una prueba completada, listos para evaluación clínica.
+    </div>
+</div>
+@endif
 
 {{-- Filtros --}}
 <form method="GET" class="card mb-4">
@@ -99,8 +110,16 @@
                     @endif
                 </td>
                 <td class="text-right">
-                    <a href="{{ route('admin.candidates.show', $candidate) }}"
-                       class="text-brand-600 hover:text-brand-800 text-xs font-medium transition-colors">Ver detalle</a>
+                    <div class="flex items-center justify-end gap-3">
+                        @if($filter === 'evaluacion')
+                        <a href="{{ route('admin.assessments.create', $candidate) }}"
+                           class="text-emerald-600 hover:text-emerald-800 text-xs font-medium transition-colors">
+                            {{ $candidate->evaluatorAssessments->isNotEmpty() ? '+ Evaluación' : 'Evaluar' }}
+                        </a>
+                        @endif
+                        <a href="{{ route('admin.candidates.show', $candidate) }}"
+                           class="text-brand-600 hover:text-brand-800 text-xs font-medium transition-colors">Ver</a>
+                    </div>
                 </td>
             </tr>
             @empty
