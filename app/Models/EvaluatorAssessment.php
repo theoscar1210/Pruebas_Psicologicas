@@ -45,7 +45,7 @@ class EvaluatorAssessment extends Model
         return match ($this->assessment_type) {
             'wartegg'           => 'Wartegg',
             'star_interview'    => 'Entrevista STAR',
-            'assessment_center' => 'Assessment Center',
+            'assessment_center' => 'AC-SL Assessment Center',
             default             => ucfirst($this->assessment_type),
         };
     }

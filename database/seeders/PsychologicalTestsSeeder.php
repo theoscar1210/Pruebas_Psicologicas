@@ -509,63 +509,30 @@ class PsychologicalTestsSeeder extends Seeder
     }
 
     // ══════════════════════════════════════════════════════════════════════
-    // 4. ASSESSMENT CENTER — 5 escenarios escritos
+    // 4. AC-SL — Assessment Center para Selección Laboral v1.0
+    //    8 competencias conductuales · 3 clústeres · Escala BARS 1-5
+    //    Calificado exclusivamente por assessors — evaluator_scored = true
+    //    Referencia: ACSL_Assessment_Center_Seleccion_Laboral.md
     // ══════════════════════════════════════════════════════════════════════
     private function seedAssessmentCenter(): void
     {
-        $test = Test::firstOrCreate(
+        Test::updateOrCreate(
             ['test_type' => 'assessment_center'],
             [
-                'name'           => 'Assessment Center — Evaluación de Competencias Laborales',
-                'description'    => 'Simulación de situaciones laborales reales. El candidato responde por escrito; el evaluador califica las competencias demostradas.',
-                'instructions'   => 'A continuación se presentan situaciones laborales reales. Lee cada escenario con atención y responde de manera detallada explicando qué harías, por qué y cómo. No hay respuestas únicas correctas; se evalúa tu capacidad de análisis, criterio y orientación a resultados.',
-                'module'         => 'competencias',
-                'test_type'      => 'assessment_center',
-                'evaluator_scored' => false,
-                'scoring_method' => 'dimensional',
-                'time_limit'     => 60,
-                'passing_score'  => 60,
-                'is_active'      => true,
-                'created_by'     => $this->adminId,
+                'name'             => 'AC-SL — Assessment Center para Selección Laboral',
+                'description'      => 'Evaluación integral de 8 competencias conductuales organizadas en 3 clústeres (Liderazgo y Gestión, Relaciones Interpersonales, Desempeño y Resultados). Calificado por assessors certificados mediante escala BARS 1-5. Técnicas: In-Basket, Role Play, Caso Grupal, Presentación e Entrevista Conductual (BEI).',
+                'instructions'     => 'EVALUACIÓN ADMINISTRADA POR EL ASSESSOR. El candidato participa en los ejercicios del Assessment Center (In-Basket, Role Play, Caso Grupal, Presentación, BEI). Los assessors observan conductas directamente observables y califican según la escala BARS 1-5 por competencia. Esta vista corresponde al registro de resultados del evaluador tras la sesión de integración (wash-up).',
+                'module'           => 'competencias',
+                'evaluator_scored' => true,
+                'scoring_method'   => 'evaluator',
+                'time_limit'       => null,
+                'passing_score'    => 60,
+                'is_active'        => true,
+                'created_by'       => $this->adminId,
             ]
         );
-
-        if ($test->questions()->exists()) return;
-
-        $scenarios = [
-            [
-                'dimension' => 'liderazgo',
-                'text'      => "ESCENARIO 1 — Liderazgo bajo presión\n\nEres el/la responsable de un equipo de 6 personas que debe entregar un proyecto importante en 48 horas. A 24 horas del plazo, dos miembros clave del equipo han tenido un conflicto personal que está afectando el trabajo de todos. El ambiente es tenso, la productividad ha bajado y el plazo está en riesgo.\n\n¿Qué harías concretamente? Describe paso a paso tus acciones, priorizando tanto la entrega como el bienestar del equipo.",
-            ],
-            [
-                'dimension' => 'trabajo_equipo',
-                'text'      => "ESCENARIO 2 — Trabajo en equipo y colaboración\n\nFormas parte de un comité interdisciplinario para rediseñar un proceso de atención al cliente. Tu equipo tiene diferentes criterios sobre la solución: algunos priorizan la eficiencia operativa, otros la experiencia del usuario. Las discusiones han llegado a un punto muerto después de dos reuniones sin acuerdo.\n\n¿Cómo contribuirías para destrabar la situación y llegar a una propuesta concreta? ¿Qué rol asumirías?",
-            ],
-            [
-                'dimension' => 'orientacion_cliente',
-                'text'      => "ESCENARIO 3 — Orientación al cliente\n\nUn cliente importante llama furioso porque recibió su pedido incompleto por tercera vez consecutiva. Exige hablar con el gerente y amenaza con cancelar su contrato anual. Tú eres el/la ejecutivo/a de cuenta a cargo y el gerente está en una reunión inaccesible.\n\n¿Cómo manejarías esta situación? ¿Qué le dirías al cliente? ¿Qué acciones tomarías de inmediato y cuáles a mediano plazo?",
-            ],
-            [
-                'dimension' => 'toma_decisiones',
-                'text'      => "ESCENARIO 4 — Toma de decisiones bajo incertidumbre\n\nDebes aprobar el lanzamiento de un nuevo servicio. Cuentas con datos positivos de un grupo piloto pequeño, pero el mercado objetivo es diez veces más grande. Tu director exige una decisión en 2 horas. El equipo de desarrollo dice que está listo; el de marketing pide más tiempo para validar. La empresa necesita ingresos este trimestre.\n\n¿Qué factores considerarías para decidir? ¿Lanzarías el servicio, lo pospondrías, o tomarías una tercera opción? Justifica tu respuesta.",
-            ],
-            [
-                'dimension' => 'adaptabilidad',
-                'text'      => "ESCENARIO 5 — Adaptabilidad al cambio\n\nLa empresa acaba de anunciar que tu área migrará a un sistema de gestión completamente nuevo en 30 días. Esto implica aprender una nueva plataforma, redefinir flujos de trabajo y gestionar la resistencia de tu equipo (algunos llevan más de 10 años con el sistema actual). Adicionalmente, debes mantener los indicadores de desempeño habituales durante la transición.\n\n¿Cómo gestionarías esta transición? ¿Qué harías para que tú y tu equipo se adapten con éxito?",
-            ],
-        ];
-
-        foreach ($scenarios as $order => $item) {
-            Question::create([
-                'test_id'     => $test->id,
-                'text'        => $item['text'],
-                'type'        => 'open',
-                'points'      => 20,
-                'order'       => $order + 1,
-                'is_required' => true,
-                'dimension'   => $item['dimension'],
-            ]);
-        }
+        // El AC-SL es evaluado directamente por assessors mediante EvaluatorAssessment.
+        // No requiere preguntas en el sistema de candidatos.
     }
 
     // ══════════════════════════════════════════════════════════════════════

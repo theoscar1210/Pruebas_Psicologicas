@@ -188,8 +188,8 @@
                             </svg>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-slate-800 group-hover:text-brand-700 truncate">Assessment Center</p>
-                            <p class="text-xs text-slate-400 truncate">5 escenarios escritos</p>
+                            <p class="text-sm font-medium text-slate-800 group-hover:text-brand-700 truncate">AC-SL Assessment Center</p>
+                            <p class="text-xs text-slate-400 truncate">8 competencias · 3 clústeres BARS</p>
                         </div>
                         <span class="flex-shrink-0 {{ $ac ? 'badge-success' : 'badge-neutral' }} text-xs">
                             {{ $ac ? 'Listo' : 'Pendiente' }}
