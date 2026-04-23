@@ -126,6 +126,20 @@ class CandidateController extends Controller
         return $redirectTo->with('success', "«{$testName}» asignada correctamente a {$candidate->name}.");
     }
 
+    public function destroyAssignment(TestAssignment $assignment): RedirectResponse
+    {
+        $candidate = $assignment->candidate;
+        $testName  = $assignment->test->name;
+
+        $assignment->answers()->delete();
+        $assignment->dimensionScores()->delete();
+        $assignment->result()->delete();
+        $assignment->delete();
+
+        return redirect()->route('admin.candidates.show', $candidate)
+            ->with('success', "Prueba «{$testName}» eliminada correctamente.");
+    }
+
     private function assignPositionTests(Candidate $candidate): void
     {
         $position = $candidate->position()->with('tests')->first();

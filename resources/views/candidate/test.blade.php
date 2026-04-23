@@ -1,4 +1,4 @@
-@extends('layouts.candidate')
+﻿@extends('layouts.candidate')
 @section('title', $assignment->test->name)
 
 @php
@@ -9,7 +9,8 @@
     );
 
     // Metadatos para el renderer Raven: IDs de preguntas y opciones en orden
-    $ravenMeta = [];
+    $ravenMeta  = [];
+    $ravenItems = [];
     if ($isRaven) {
         foreach ($assignment->test->questions->sortBy('order') as $q) {
             $ravenMeta[] = [
@@ -17,28 +18,217 @@
                 'optionIds' => $q->options->sortBy('order')->pluck('id')->values()->toArray(),
             ];
         }
+        $ravenItems = \App\Services\RavenRenderer::items();
     }
 @endphp
 
 @section('content')
+
+<script>
+// ─── Alpine: modo Raven ──────────────────────────────────────────────────────
+window.ravenApp=function({ saveUrl, timeRemaining, ravenQuestions, savedAnswers, totalQuestions }) {
+    return {
+        current: 0,
+        answers: {},
+        saving: false,
+        showModal: false,
+        timeRemaining,
+        timerInterval: null,
+        saveTimeout: null,
+
+        get answeredCount() {
+            return Object.values(this.answers).filter(v => v != null).length;
+        },
+        get setLabel() {
+            var idx = this.current;
+            var s = idx < 7 ? 'A' : idx < 14 ? 'B' : 'C';
+            return s === 'A' ? 'SET A · FÁCIL' : s === 'B' ? 'SET B · MEDIO' : 'SET C · DIFÍCIL';
+        },
+
+        init() {
+            for (var k in savedAnswers) {
+                if (savedAnswers[k] != null) this.answers[k] = savedAnswers[k];
+            }
+            if (this.timeRemaining !== null && this.timeRemaining > 0) {
+                this.timerInterval = setInterval(() => {
+                    this.timeRemaining--;
+                    if (this.timeRemaining % 30 === 0) this.syncTime();
+                    if (this.timeRemaining <= 0) {
+                        clearInterval(this.timerInterval);
+                        document.getElementById('finish-form')?.submit();
+                    }
+                }, 1000);
+            }
+        },
+
+        isAnswered(idx) {
+            var qId = ravenQuestions[idx]?.qId;
+            return qId != null && this.answers[qId] != null;
+        },
+
+        selectOpt(qId, optId) {
+            this.answers[qId] = optId;
+            this.persistAnswer(qId, optId);
+        },
+
+        goTo(idx)  { this.current = idx; },
+        next()     { this.current < totalQuestions - 1 ? this.current++ : (this.showModal = true); },
+        prev()     { if (this.current > 0) this.current--; },
+
+        persistAnswer(qId, optId) {
+            this.saving = true;
+            clearTimeout(this.saveTimeout);
+            this.saveTimeout = setTimeout(() => {
+                fetch(saveUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    },
+                    body: JSON.stringify({
+                        question_id: qId,
+                        question_option_id: optId,
+                        text_answer: null,
+                        time_remaining: this.timeRemaining,
+                    }),
+                })
+                .then(r => r.json())
+                .finally(() => { this.saving = false; });
+            }, 400);
+        },
+
+        syncTime() {
+            var firstQ = Object.keys(this.answers)[0];
+            if (!firstQ) return;
+            fetch(saveUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: JSON.stringify({ question_id: parseInt(firstQ), time_remaining: this.timeRemaining }),
+            }).catch(() => {});
+        },
+
+        formatTime(s) {
+            if (s === null || s === undefined) return '';
+            var m = Math.floor(s / 60).toString().padStart(2, '0');
+            var sec = (s % 60).toString().padStart(2, '0');
+            return m + ':' + sec;
+        },
+    };
+};
+
+// ─── Alpine: modo estándar ───────────────────────────────────────────────────
+window.testApp=function({ assignmentId, saveUrl, timeRemaining, totalQuestions, savedAnswers }) {
+    return {
+        answers:      {},
+        textAnswers:  {},
+        saving:       false,
+        showModal:    false,
+        timeRemaining,
+        timerInterval: null,
+        saveTimeout:   null,
+
+        get answeredCount() {
+            const opts  = Object.values(this.answers).filter(v => v !== null && v !== undefined).length;
+            const texts = Object.values(this.textAnswers).filter(v => v?.trim()).length;
+            return opts + texts;
+        },
+
+        init() {
+            for (const [qId, val] of Object.entries(savedAnswers)) {
+                if (typeof val === 'number') this.answers[qId] = val;
+                else if (val)               this.textAnswers[qId] = val;
+            }
+            if (this.timeRemaining !== null && this.timeRemaining > 0) {
+                this.timerInterval = setInterval(() => {
+                    this.timeRemaining--;
+                    if (this.timeRemaining % 30 === 0) this.syncTime();
+                    if (this.timeRemaining <= 0) {
+                        clearInterval(this.timerInterval);
+                        document.querySelector('form[action$="/finalizar"]')?.submit();
+                    }
+                }, 1000);
+            }
+        },
+
+        formatTime(s) {
+            if (s === null || s === undefined) return '';
+            const m = Math.floor(s / 60).toString().padStart(2, '0');
+            const sec = (s % 60).toString().padStart(2, '0');
+            return m + ':' + sec;
+        },
+
+        saveAnswer(questionId, optionId, textAnswer) {
+            if (optionId !== null)        this.answers[questionId]     = optionId;
+            else if (textAnswer !== null) this.textAnswers[questionId] = textAnswer;
+
+            this.saving = true;
+            clearTimeout(this.saveTimeout);
+
+            this.saveTimeout = setTimeout(() => {
+                fetch(saveUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept':       'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    },
+                    body: JSON.stringify({
+                        question_id:        questionId,
+                        question_option_id: optionId,
+                        text_answer:        textAnswer,
+                        time_remaining:     this.timeRemaining,
+                    }),
+                })
+                .then(r => r.json())
+                .finally(() => { this.saving = false; });
+            }, 500);
+        },
+
+        syncTime() {
+            const firstQ = Object.keys(this.answers)[0];
+            if (!firstQ) return;
+            fetch(saveUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: JSON.stringify({ question_id: firstQ, time_remaining: this.timeRemaining }),
+            }).catch(() => {});
+        },
+    };
+};
+</script>
 
 @if($isRaven)
 {{-- ════════════════════════════════════════════════════════════════════
      MODO RAVEN — Renderer SVG ítem a ítem
      Motor gráfico portado de raven_progressive_matrices_test.html
 ════════════════════════════════════════════════════════════════════ --}}
+<script>
+window.RAVEN_QUESTIONS    = {!! json_encode($ravenMeta) !!};
+window.RAVEN_SAVED        = {!! json_encode($savedAnswers) !!};
+</script>
 
 <style>
-.raven-grid{display:grid;grid-template-columns:repeat(3,90px);grid-template-rows:repeat(3,90px);border:2.5px solid #0F766E;width:fit-content;margin:0 auto;border-radius:4px;overflow:hidden}
-.raven-cell{width:90px;height:90px;border:0.5px solid #cbd5e1;display:flex;align-items:center;justify-content:center;background:#fff}
-.raven-cell.raven-empty{background:#f0fdfa;position:relative}
-.raven-q{position:absolute;font-size:28px;font-weight:700;color:#0F766E;opacity:.45}
-.raven-opts{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
-.raven-opt{border:1.5px solid #e2e8f0;border-radius:10px;padding:5px 3px;cursor:pointer;display:flex;flex-direction:column;align-items:center;background:#fff;transition:border-color .1s,background .1s;width:100%}
+.raven-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;border:2px solid #1a1a1a;border-radius:8px;background:#e2e8f0;padding:4px;user-select:none;width:100%}
+.raven-cell{display:flex;align-items:center;justify-content:center;aspect-ratio:1;background:#fff;border-radius:4px;overflow:hidden}
+.raven-cell svg{width:100%;height:auto;display:block}
+.raven-empty{background:#f0fdfa}
+.raven-q{font-size:clamp(1.4rem,6vw,2.2rem);font-weight:900;color:#0F766E;line-height:1}
+.raven-opts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%}
+.raven-opt{border:2px solid #e2e8f0;border-radius:12px;cursor:pointer;padding:6px 4px 4px;background:#fff;transition:border-color .15s,background .15s,box-shadow .15s;display:flex;flex-direction:column;align-items:center;gap:3px;overflow:hidden}
+.raven-opt svg{width:100%;height:auto;display:block}
 .raven-opt:hover{border-color:#0F766E;background:#f0fdfa}
-.raven-opt.sel{border-color:#0F766E;background:rgba(15,118,110,.09)}
-.raven-opt-key{font-size:10px;font-weight:700;color:#64748b;margin-top:2px}
-.raven-opt.sel .raven-opt-key{color:#0F766E}
+.raven-opt.sel{border-color:#0F766E;background:#f0fdfa;box-shadow:0 0 0 2px #0F766E}
+.raven-opt-lbl{font-size:11px;font-weight:700;color:#94a3b8}
+.raven-opt.sel .raven-opt-lbl{color:#0F766E}
 </style>
 
 <div
@@ -46,8 +236,8 @@
     x-data="ravenApp({
         saveUrl: '{{ route('candidate.answer', $assignment) }}',
         timeRemaining: {{ $assignment->time_remaining ?? ($assignment->test->time_limit ? $assignment->test->time_limit * 60 : 'null') }},
-        ravenQuestions: {!! json_encode($ravenMeta) !!},
-        savedAnswers: {!! json_encode($savedAnswers) !!},
+        ravenQuestions: window.RAVEN_QUESTIONS,
+        savedAnswers: window.RAVEN_SAVED,
         totalQuestions: {{ $totalQ }}
     })"
     x-init="init()"
@@ -113,14 +303,14 @@
     <div class="max-w-xl mx-auto px-4 py-6 pb-32">
 
         {{-- Set label + mini-mapa de ítems --}}
-        <div class="flex items-center justify-between mb-4">
+        <div class="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
             <span class="text-xs font-bold tracking-widest text-slate-400 uppercase" x-text="setLabel"></span>
-            <div class="flex gap-1">
+            <div class="flex gap-1 overflow-x-auto pb-0.5 flex-shrink-0">
                 @for($i = 0; $i < $totalQ; $i++)
                 <button
                     @click="goTo({{ $i }})"
                     type="button"
-                    class="w-5 h-5 rounded-full text-[9px] font-bold transition-all"
+                    class="w-5 h-5 flex-shrink-0 rounded-full text-[9px] font-bold transition-all"
                     :class="{
                         'bg-brand-600 text-white scale-110': current === {{ $i }},
                         'bg-emerald-400 text-white': current !== {{ $i }} && isAnswered({{ $i }}),
@@ -131,17 +321,39 @@
             </div>
         </div>
 
-        {{-- Matriz SVG — x-html reactivo: se actualiza al cambiar 'current' --}}
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-4 flex flex-col items-center">
-            <div class="raven-grid" x-html="buildMatrix()"></div>
+        {{-- Cuadrícula SVG de la matriz (renderizada en servidor) --}}
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 mb-4">
+            @foreach($ravenItems as $idx => $item)
+            <div x-show="current === {{ $idx }}"
+                 @if($idx > 0) style="display:none" @endif
+                 class="raven-grid">
+                {!! \App\Services\RavenRenderer::matrix($item, 90) !!}
+            </div>
+            @endforeach
         </div>
 
-        {{-- Opciones A–F — event delegation para capturar clicks --}}
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4">
-            <p class="text-xs font-medium text-slate-500 mb-3 text-center">
-                ¿Cuál de las seis opciones completa correctamente el patrón?
+        {{-- Opciones SVG A–F (prerenderizadas por PHP, Alpine gestiona estado) --}}
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+            <p class="text-xs font-semibold text-slate-400 text-center mb-3 uppercase tracking-widest">
+                Selecciona tu respuesta
             </p>
-            <div class="raven-opts" @click.stop="handleOptClick($event)" x-html="buildOpts()"></div>
+            @foreach($ravenItems as $idx => $item)
+            @php $meta = $ravenMeta[$idx]; @endphp
+            <div x-show="current === {{ $idx }}"
+                 @if($idx > 0) style="display:none" @endif
+                 class="raven-opts">
+                @foreach($item['opts'] as $optIdx => $opt)
+                @php $optId = $meta['optionIds'][$optIdx] ?? 0; @endphp
+                <button type="button"
+                        class="raven-opt"
+                        :class="{ 'sel': answers[{{ $meta['qId'] }}] == {{ $optId }} }"
+                        @click="selectOpt({{ $meta['qId'] }}, {{ $optId }})">
+                    {!! \App\Services\RavenRenderer::cellSVG($opt, 58) !!}
+                    <span class="raven-opt-lbl">{{ chr(65 + $optIdx) }}</span>
+                </button>
+                @endforeach
+            </div>
+            @endforeach
 
             {{-- Indicador respondida --}}
             <div class="flex justify-center mt-3">
@@ -498,294 +710,5 @@
 </div>
 @endif
 
-{{-- ════════════════════════════════════════════════════════════════════
-     SCRIPTS — Motor SVG Raven + Alpine components
-════════════════════════════════════════════════════════════════════ --}}
-<script>
-// ─── Motor gráfico SVG (portado de raven_progressive_matrices_test.html) ───
-const _=(t,f=3,s=26,x=50,y=50,r=0)=>({t,f,s,x,y,r});
-const FILLS=['#fff','#ccc','#888','#1a1a1a'];
-const SK='#1a1a1a',SW=2.2;
-
-function shp(sh,K){
-  const{t,f=3,s=26,x=50,y=50,r=0}=sh;
-  const cx=x*K,cy=y*K,sz=s*K,fill=FILLS[Math.min(f,3)];
-  const tr=r?` transform="rotate(${r},${cx},${cy})"`:'';
-  if(t==='C')return`<circle cx="${cx}" cy="${cy}" r="${sz}" fill="${fill}" stroke="${SK}" stroke-width="${SW}"/>`;
-  if(t==='S')return`<rect x="${cx-sz}" y="${cy-sz}" width="${sz*2}" height="${sz*2}" fill="${fill}" stroke="${SK}" stroke-width="${SW}"${tr}/>`;
-  if(t==='T'){const p=`${cx},${cy-sz} ${cx+sz*.866},${cy+sz*.5} ${cx-sz*.866},${cy+sz*.5}`;return`<polygon points="${p}" fill="${fill}" stroke="${SK}" stroke-width="${SW}"${tr}/>`;}
-  if(t==='D'){const p=`${cx},${cy-sz} ${cx+sz*.68},${cy} ${cx},${cy+sz} ${cx-sz*.68},${cy}`;return`<polygon points="${p}" fill="${fill}" stroke="${SK}" stroke-width="${SW}"${tr}/>`;}
-  if(t==='P'){const pts=Array.from({length:5},(_,i)=>{const a=(i*72-90)*Math.PI/180;return`${cx+sz*Math.cos(a)},${cy+sz*Math.sin(a)}`;}).join(' ');return`<polygon points="${pts}" fill="${fill}" stroke="${SK}" stroke-width="${SW}"${tr}/>`;}
-  if(t==='H'){const pts=Array.from({length:6},(_,i)=>{const a=(i*60-30)*Math.PI/180;return`${cx+sz*Math.cos(a)},${cy+sz*Math.sin(a)}`;}).join(' ');return`<polygon points="${pts}" fill="${fill}" stroke="${SK}" stroke-width="${SW}"${tr}/>`;}
-  if(t==='X'){const w=sz*.32;return`<g${tr}><rect x="${cx-w}" y="${cy-sz}" width="${w*2}" height="${sz*2}" fill="${fill}" stroke="${SK}" stroke-width="${SW*.4}"/><rect x="${cx-sz}" y="${cy-w}" width="${sz*2}" height="${w*2}" fill="${fill}" stroke="${SK}" stroke-width="${SW*.4}"/></g>`;}
-  if(t==='A'){const bw=sz*.35,hw=sz*.65,bl=sz*1.1,tl=sz*1.7,h=tl/2;const p=`${cx-h},${cy-bw} ${cx+bl-h},${cy-bw} ${cx+bl-h},${cy-hw} ${cx+h},${cy} ${cx+bl-h},${cy+hw} ${cx+bl-h},${cy+bw} ${cx-h},${cy+bw}`;return`<polygon points="${p}" fill="${fill}" stroke="${SK}" stroke-width="${SW}"${tr}/>`;}
-  if(t==='L'){const lc=f===0?'#fff':f===1?'#bbb':f===2?'#777':'#1a1a1a';return`<line x1="${cx}" y1="${cy-sz}" x2="${cx}" y2="${cy+sz}" stroke="${lc}" stroke-width="${SW*1.8}" stroke-linecap="round"${tr}/>`;}
-  return'';
-}
-
-function cellSVG(shapes,px){
-  if(!shapes)return'';
-  const K=px/100;
-  return`<svg width="${px}" height="${px}" viewBox="0 0 ${px} ${px}" style="display:block">${shapes.map(s=>shp(s,K)).join('')}</svg>`;
-}
-
-// ─── Datos de los 20 ítems MPR-SL (matrices + opciones) ─────────────────────
-const ITEMS=[
-{id:1,set:'A',label:'A-1',matrix:[[[_('T',0)],[_('T',2)],[_('T',3)]],[[_('S',0)],[_('S',2)],[_('S',3)]],[[_('C',0)],[_('C',2)],null]],ans:0,opts:[[_('C',3)],[_('C',2)],[_('C',0)],[_('S',3)],[_('T',3)],[_('D',3)]]},
-{id:2,set:'A',label:'A-2',matrix:[[[_('C',3,13)],[_('C',3,22)],[_('C',3,34)]],[[_('S',3,13)],[_('S',3,22)],[_('S',3,34)]],[[_('D',3,13)],[_('D',3,22)],null]],ans:0,opts:[[_('D',3,34)],[_('D',3,22)],[_('D',3,13)],[_('C',3,34)],[_('S',3,34)],[_('T',3,34)]]},
-{id:3,set:'A',label:'A-3',matrix:[[[_('C',3,17,50,50)],[_('C',3,14,32,50),_('C',3,14,68,50)],[_('C',3,12,20,50),_('C',3,12,50,50),_('C',3,12,80,50)]],[[_('S',3,17,50,50)],[_('S',3,14,32,50),_('S',3,14,68,50)],[_('S',3,12,20,50),_('S',3,12,50,50),_('S',3,12,80,50)]],[[_('T',3,17,50,50)],[_('T',3,14,32,50),_('T',3,14,68,50)],null]],ans:2,opts:[[_('T',3,17,50,50)],[_('T',3,14,32,50),_('T',3,14,68,50)],[_('T',3,12,20,50),_('T',3,12,50,50),_('T',3,12,80,50)],[_('C',3,12,20,50),_('C',3,12,50,50),_('C',3,12,80,50)],[_('S',3,12,20,50),_('S',3,12,50,50),_('S',3,12,80,50)],[_('D',3,12,20,50),_('D',3,12,50,50),_('D',3,12,80,50)]]},
-{id:4,set:'A',label:'A-4',matrix:[[[_('T',3,26,50,50,0)],[_('T',3,26,50,50,90)],[_('T',3,26,50,50,180)]],[[_('T',3,26,50,50,90)],[_('T',3,26,50,50,180)],[_('T',3,26,50,50,270)]],[[_('T',3,26,50,50,180)],[_('T',3,26,50,50,270)],null]],ans:0,opts:[[_('T',3,26,50,50,0)],[_('T',3,26,50,50,90)],[_('T',3,26,50,50,180)],[_('T',3,26,50,50,270)],[_('C',3,26)],[_('S',3,26)]]},
-{id:5,set:'A',label:'A-5',matrix:[[[_('C',3,11,25,25)],[_('C',3,11,50,25)],[_('C',3,11,75,25)]],[[_('C',3,11,25,50)],[_('C',3,11,50,50)],[_('C',3,11,75,50)]],[[_('C',3,11,25,75)],[_('C',3,11,50,75)],null]],ans:1,opts:[[_('C',3,11,25,75)],[_('C',3,11,75,75)],[_('C',3,11,50,50)],[_('C',3,11,75,25)],[_('C',3,11,25,25)],[_('C',3,11,75,50)]]},
-{id:6,set:'A',label:'A-6',matrix:[[[_('C',3)],[_('S',3)],[_('T',3)]],[[_('S',3)],[_('T',3)],[_('C',3)]],[[_('T',3)],[_('C',3)],null]],ans:2,opts:[[_('T',3)],[_('C',3)],[_('S',3)],[_('D',3)],[_('P',3)],[_('H',3)]]},
-{id:7,set:'A',label:'A-7',matrix:[[[_('A',3,22,50,50,0)],[_('A',3,22,50,50,90)],[_('A',3,22,50,50,180)]],[[_('A',3,22,50,50,90)],[_('A',3,22,50,50,180)],[_('A',3,22,50,50,270)]],[[_('A',3,22,50,50,180)],[_('A',3,22,50,50,270)],null]],ans:3,opts:[[_('A',3,22,50,50,90)],[_('A',3,22,50,50,180)],[_('A',3,22,50,50,270)],[_('A',3,22,50,50,0)],[_('T',3,22,50,50,0)],[_('A',3,22,50,50,45)]]},
-{id:8,set:'B',label:'B-1',matrix:[[[_('C',0,14)],[_('C',2,24)],[_('C',3,36)]],[[_('P',0,14)],[_('P',2,24)],[_('P',3,36)]],[[_('H',0,14)],[_('H',2,24)],null]],ans:4,opts:[[_('H',0,36)],[_('H',2,36)],[_('H',3,24)],[_('H',0,14)],[_('H',3,36)],[_('C',3,36)]]},
-{id:9,set:'B',label:'B-2',matrix:[[[_('C',3,20)],[_('S',0,20)],[_('C',3,18,33,33),_('S',0,18,67,67)]],[[_('T',3,20)],[_('D',0,20)],[_('T',3,18,33,33),_('D',0,18,67,67)]],[[_('P',3,20)],[_('H',0,20)],null]],ans:0,opts:[[_('P',3,18,33,33),_('H',0,18,67,67)],[_('P',3,20)],[_('H',0,20)],[_('H',3,18,33,33),_('P',0,18,67,67)],[_('P',0,18,33,33),_('H',3,18,67,67)],[_('C',3,18,33,33),_('H',0,18,67,67)]]},
-{id:10,set:'B',label:'B-3',matrix:[[[_('T',3,14,28,28),_('C',0,14,72,28),_('S',2,14,50,73)],[_('T',3,17,36,36),_('C',0,17,64,64)],[_('T',3,22)]],[[_('C',0,14,28,28),_('S',2,14,72,28),_('D',3,14,50,73)],[_('C',0,17,36,36),_('S',2,17,64,64)],[_('C',0,22)]],[[_('S',2,14,28,28),_('D',3,14,72,28),_('T',0,14,50,73)],[_('S',2,17,36,36),_('D',3,17,64,64)],null]],ans:2,opts:[[_('D',3,22)],[_('T',0,22)],[_('S',2,22)],[_('C',0,22)],[_('S',3,22)],[_('S',2,17,36,36),_('D',3,17,64,64)]]},
-{id:11,set:'B',label:'B-4',matrix:[[[_('L',3,30,50,50,0)],[_('L',3,30,50,50,30)],[_('L',3,30,50,50,60)]],[[_('L',3,30,50,50,30)],[_('L',3,30,50,50,60)],[_('L',3,30,50,50,90)]],[[_('L',3,30,50,50,60)],[_('L',3,30,50,50,90)],null]],ans:0,opts:[[_('L',3,30,50,50,120)],[_('L',3,30,50,50,90)],[_('L',3,30,50,50,60)],[_('L',3,30,50,50,0)],[_('L',3,30,50,50,150)],[_('C',3,26)]]},
-{id:12,set:'B',label:'B-5',matrix:[[[_('C',0,26)],[_('S',3,26)],[_('C',3,26)]],[[_('T',0,26)],[_('D',3,26)],[_('T',3,26)]],[[_('P',0,26)],[_('H',3,26)],null]],ans:1,opts:[[_('H',3,26)],[_('P',3,26)],[_('P',0,26)],[_('D',3,26)],[_('P',2,26)],[_('H',0,26)]]},
-{id:13,set:'B',label:'B-6',matrix:[[[_('C',3)],[_('C',0)],[_('C',2)]],[[_('C',0)],[_('C',2)],[_('C',3)]],[[_('C',2)],[_('C',3)],null]],ans:2,opts:[[_('C',3)],[_('C',2)],[_('C',0)],[_('C',1)],[_('S',0)],[_('D',0)]]},
-{id:14,set:'B',label:'B-7',matrix:[[[_('C',3,11)],[_('C',3,11,32,50),_('C',3,11,68,50)],[_('C',3,11,20,50),_('C',3,11,50,50),_('C',3,11,80,50)]],[[_('C',3,11,50,33),_('C',3,11,50,67)],[_('C',3,11,32,33),_('C',3,11,68,33),_('C',3,11,32,67),_('C',3,11,68,67)],[_('C',3,10,20,33),_('C',3,10,50,33),_('C',3,10,80,33),_('C',3,10,20,67),_('C',3,10,50,67),_('C',3,10,80,67)]],[[_('C',3,11,50,25),_('C',3,11,50,50),_('C',3,11,50,75)],[_('C',3,10,32,25),_('C',3,10,68,25),_('C',3,10,32,50),_('C',3,10,68,50),_('C',3,10,32,75),_('C',3,10,68,75)],null]],ans:4,opts:[[_('C',3,11,20,50),_('C',3,11,50,50),_('C',3,11,80,50)],[_('C',3,10,32,25),_('C',3,10,68,25),_('C',3,10,32,50),_('C',3,10,68,50),_('C',3,10,32,75),_('C',3,10,68,75)],[_('C',3,12,32,33),_('C',3,12,68,33),_('C',3,12,32,67),_('C',3,12,68,67)],[_('C',3,10,25,25),_('C',3,10,50,25),_('C',3,10,75,25),_('C',3,10,25,50),_('C',3,10,75,50),_('C',3,10,25,75),_('C',3,10,50,75),_('C',3,10,75,75)],[_('C',3,9,25,25),_('C',3,9,50,25),_('C',3,9,75,25),_('C',3,9,25,50),_('C',3,9,50,50),_('C',3,9,75,50),_('C',3,9,25,75),_('C',3,9,50,75),_('C',3,9,75,75)],[_('C',3,8,20,25),_('C',3,8,40,25),_('C',3,8,60,25),_('C',3,8,80,25),_('C',3,8,20,50),_('C',3,8,40,50),_('C',3,8,60,50),_('C',3,8,80,50),_('C',3,8,20,75),_('C',3,8,40,75),_('C',3,8,60,75),_('C',3,8,80,75)]]},
-{id:15,set:'C',label:'C-1',matrix:[[[_('C',3)],[_('S',0)],[_('T',2)]],[[_('S',0)],[_('T',2)],[_('C',3)]],[[_('T',2)],[_('C',3)],null]],ans:2,opts:[[_('C',0)],[_('T',3)],[_('S',0)],[_('S',3)],[_('T',0)],[_('S',2)]]},
-{id:16,set:'C',label:'C-2',matrix:[[[_('C',0,33),_('S',3,8)],[_('C',0,24),_('S',3,16)],[_('C',0,16),_('S',0,22)]],[[_('S',0,33),_('T',3,8)],[_('S',0,24),_('T',3,16)],[_('S',0,16),_('T',0,22)]],[[_('T',0,33),_('D',3,8)],[_('T',0,24),_('D',3,16)],null]],ans:3,opts:[[_('T',0,33),_('D',3,8)],[_('T',0,24),_('D',3,16)],[_('T',3,16),_('D',0,22)],[_('T',0,16),_('D',0,22)],[_('T',0,16),_('D',3,22)],[_('C',0,16),_('D',0,22)]]},
-{id:17,set:'C',label:'C-3',matrix:[[[_('C',3,14,28,28),_('S',3,14,72,28),_('T',3,14,50,73)],[_('S',3,14,72,28),_('T',3,14,50,73)],[_('C',3,14,28,28)]],[[_('T',3,14,28,28),_('C',3,14,72,28),_('D',3,14,50,73)],[_('C',3,14,72,28),_('D',3,14,50,73)],[_('T',3,14,28,28)]],[[_('S',3,14,28,28),_('D',3,14,72,28),_('T',3,14,50,73)],[_('D',3,14,72,28),_('T',3,14,50,73)],null]],ans:1,opts:[[_('D',3,14,28,28)],[_('S',3,14,28,28)],[_('T',3,14,50,73)],[_('D',3,14,72,28)],[_('D',3,14,72,28),_('T',3,14,50,73)],[_('S',3,22)]]},
-{id:18,set:'C',label:'C-4',matrix:[[[_('C',0,14)],[_('S',2,24)],[_('T',3,36)]],[[_('S',0,14)],[_('T',2,24)],[_('C',3,36)]],[[_('T',0,14)],[_('C',2,24)],null]],ans:3,opts:[[_('T',3,36)],[_('C',3,36)],[_('S',0,36)],[_('S',3,36)],[_('S',2,24)],[_('D',3,36)]]},
-{id:19,set:'C',label:'C-5',matrix:[[[_('C',0,18,30,72),_('D',3,18,70,28)],[_('C',2,18,30,72),_('P',3,18,70,28)],[_('C',3,18,30,72),_('H',3,18,70,28)]],[[_('S',0,18,30,72),_('D',2,18,70,28)],[_('S',2,18,30,72),_('P',2,18,70,28)],[_('S',3,18,30,72),_('H',2,18,70,28)]],[[_('T',0,18,30,72),_('D',0,18,70,28)],[_('T',2,18,30,72),_('P',0,18,70,28)],null]],ans:0,opts:[[_('T',3,18,30,72),_('H',0,18,70,28)],[_('T',0,18,30,72),_('H',3,18,70,28)],[_('T',3,18,30,72),_('H',3,18,70,28)],[_('C',3,18,30,72),_('H',0,18,70,28)],[_('T',3,18,30,72),_('P',0,18,70,28)],[_('S',3,18,30,72),_('H',0,18,70,28)]]},
-{id:20,set:'C',label:'C-6',matrix:[[[_('C',3,17,28,28),_('D',0,17,60,62)],[_('C',3,17,28,28),_('P',2,17,60,62)],[_('C',3,17,28,28),_('H',3,17,60,62)]],[[_('S',0,17,28,28),_('D',0,17,60,62)],[_('S',0,17,28,28),_('P',2,17,60,62)],[_('S',0,17,28,28),_('H',3,17,60,62)]],[[_('T',2,17,28,28),_('D',0,17,60,62)],[_('T',2,17,28,28),_('P',2,17,60,62)],null]],ans:4,opts:[[_('T',0,17,28,28),_('H',3,17,60,62)],[_('T',3,17,28,28),_('H',3,17,60,62)],[_('S',2,17,28,28),_('H',3,17,60,62)],[_('T',2,17,28,28),_('H',0,17,60,62)],[_('T',2,17,28,28),_('H',3,17,60,62)],[_('C',2,17,28,28),_('H',3,17,60,62)]]},
-];
-const KEYS=['A','B','C','D','E','F'];
-
-// ─── Alpine: modo Raven ──────────────────────────────────────────────────────
-// Usa x-html reactivo: buildMatrix() y buildOpts() son evaluados por Alpine
-// automáticamente cada vez que cambia `current` o `answers`, sin timing issues.
-function ravenApp({ saveUrl, timeRemaining, ravenQuestions, savedAnswers, totalQuestions }) {
-    return {
-        current: 0,
-        answers: {},
-        saving: false,
-        showModal: false,
-        timeRemaining,
-        timerInterval: null,
-        saveTimeout: null,
-
-        get answeredCount() {
-            return Object.values(this.answers).filter(v => v != null).length;
-        },
-        get setLabel() {
-            const s = ITEMS[this.current]?.set;
-            return s === 'A' ? 'SET A · FÁCIL' : s === 'B' ? 'SET B · MEDIO' : 'SET C · DIFÍCIL';
-        },
-
-        init() {
-            for (const [qId, val] of Object.entries(savedAnswers)) {
-                if (val != null) this.answers[qId] = val;
-            }
-            if (this.timeRemaining !== null && this.timeRemaining > 0) {
-                this.timerInterval = setInterval(() => {
-                    this.timeRemaining--;
-                    if (this.timeRemaining % 30 === 0) this.syncTime();
-                    if (this.timeRemaining <= 0) {
-                        clearInterval(this.timerInterval);
-                        document.getElementById('finish-form')?.submit();
-                    }
-                }, 1000);
-            }
-        },
-
-        // ── Getters reactivos — Alpine re-evalúa x-html cuando cambian ──────
-        buildMatrix() {
-            const item = ITEMS[this.current];
-            if (!item) return '';
-            let html = '';
-            for (let r = 0; r < 3; r++) {
-                for (let c = 0; c < 3; c++) {
-                    const shapes = item.matrix[r][c];
-                    if (shapes === null) {
-                        html += '<div class="raven-cell raven-empty"><div class="raven-q">?</div></div>';
-                    } else {
-                        html += `<div class="raven-cell">${cellSVG(shapes, 90)}</div>`;
-                    }
-                }
-            }
-            return html;
-        },
-
-        buildOpts() {
-            const item = ITEMS[this.current];
-            if (!item) return '';
-            const selIdx = this.selectedIdx();
-            return item.opts.map((shapes, i) =>
-                `<button type="button" class="raven-opt${i === selIdx ? ' sel' : ''}" data-opt="${i}">
-                    ${cellSVG(shapes, 58)}
-                    <div class="raven-opt-key">${KEYS[i]}</div>
-                </button>`
-            ).join('');
-        },
-
-        // Event delegation para los clicks en opciones
-        handleOptClick(event) {
-            const btn = event.target.closest('[data-opt]');
-            if (!btn) return;
-            this.selectOption(parseInt(btn.dataset.opt));
-        },
-
-        // ── Lógica de selección ──────────────────────────────────────────────
-        isAnswered(idx) {
-            const qId = ravenQuestions[idx]?.qId;
-            return qId != null && this.answers[qId] != null;
-        },
-
-        selectedIdx() {
-            const meta = ravenQuestions[this.current];
-            if (!meta) return -1;
-            const saved = this.answers[meta.qId];
-            if (saved == null) return -1;
-            return meta.optionIds.indexOf(saved);
-        },
-
-        selectOption(optIdx) {
-            const meta = ravenQuestions[this.current];
-            if (!meta) return;
-            const optId = meta.optionIds[optIdx];
-            // Forzar reactividad creando un nuevo objeto answers
-            this.answers = { ...this.answers, [meta.qId]: optId };
-            this.persistAnswer(meta.qId, optId);
-        },
-
-        goTo(idx)  { this.current = idx; },
-        next()     { this.current < totalQuestions - 1 ? this.current++ : (this.showModal = true); },
-        prev()     { if (this.current > 0) this.current--; },
-
-        // ── Persistencia ────────────────────────────────────────────────────
-        persistAnswer(qId, optId) {
-            this.saving = true;
-            clearTimeout(this.saveTimeout);
-            this.saveTimeout = setTimeout(() => {
-                fetch(saveUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    },
-                    body: JSON.stringify({
-                        question_id: qId,
-                        question_option_id: optId,
-                        text_answer: null,
-                        time_remaining: this.timeRemaining,
-                    }),
-                })
-                .then(r => r.json())
-                .finally(() => { this.saving = false; });
-            }, 400);
-        },
-
-        syncTime() {
-            const firstQ = Object.keys(this.answers)[0];
-            if (!firstQ) return;
-            fetch(saveUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                },
-                body: JSON.stringify({ question_id: parseInt(firstQ), time_remaining: this.timeRemaining }),
-            }).catch(() => {});
-        },
-
-        formatTime(s) {
-            if (s === null || s === undefined) return '';
-            const m = Math.floor(s / 60).toString().padStart(2, '0');
-            const sec = (s % 60).toString().padStart(2, '0');
-            return `${m}:${sec}`;
-        },
-    };
-}
-
-// ─── Alpine: modo estándar (Big Five, 16PF, Assessment Center…) ─────────────
-function testApp({ assignmentId, saveUrl, timeRemaining, totalQuestions, savedAnswers }) {
-    return {
-        answers:      {},
-        textAnswers:  {},
-        saving:       false,
-        showModal:    false,
-        timeRemaining,
-        timerInterval: null,
-        saveTimeout:   null,
-
-        get answeredCount() {
-            const opts  = Object.values(this.answers).filter(v => v !== null && v !== undefined).length;
-            const texts = Object.values(this.textAnswers).filter(v => v?.trim()).length;
-            return opts + texts;
-        },
-
-        init() {
-            for (const [qId, val] of Object.entries(savedAnswers)) {
-                if (typeof val === 'number') this.answers[qId] = val;
-                else if (val)               this.textAnswers[qId] = val;
-            }
-
-            if (this.timeRemaining !== null && this.timeRemaining > 0) {
-                this.timerInterval = setInterval(() => {
-                    this.timeRemaining--;
-                    if (this.timeRemaining % 30 === 0) this.syncTime();
-                    if (this.timeRemaining <= 0) {
-                        clearInterval(this.timerInterval);
-                        document.querySelector('form[action$="/finalizar"]')?.submit();
-                    }
-                }, 1000);
-            }
-        },
-
-        formatTime(s) {
-            if (s === null || s === undefined) return '';
-            const m = Math.floor(s / 60).toString().padStart(2, '0');
-            const sec = (s % 60).toString().padStart(2, '0');
-            return `${m}:${sec}`;
-        },
-
-        saveAnswer(questionId, optionId, textAnswer) {
-            if (optionId !== null)        this.answers[questionId]     = optionId;
-            else if (textAnswer !== null) this.textAnswers[questionId] = textAnswer;
-
-            this.saving = true;
-            clearTimeout(this.saveTimeout);
-
-            this.saveTimeout = setTimeout(() => {
-                fetch(saveUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept':       'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    },
-                    body: JSON.stringify({
-                        question_id:        questionId,
-                        question_option_id: optionId,
-                        text_answer:        textAnswer,
-                        time_remaining:     this.timeRemaining,
-                    }),
-                })
-                .then(r => r.json())
-                .finally(() => { this.saving = false; });
-            }, 500);
-        },
-
-        syncTime() {
-            const firstQ = Object.keys(this.answers)[0];
-            if (!firstQ) return;
-            fetch(saveUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                },
-                body: JSON.stringify({ question_id: firstQ, time_remaining: this.timeRemaining }),
-            }).catch(() => {});
-        },
-    };
-}
-</script>
-
+{{-- scripts defined at top of section --}}
 @endsection

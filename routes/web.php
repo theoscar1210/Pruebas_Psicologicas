@@ -44,6 +44,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::resource('candidates', CandidateController::class);
     Route::post('candidates/{candidate}/assign-test', [CandidateController::class, 'assignTest'])
         ->name('candidates.assign-test');
+    Route::delete('assignments/{assignment}', [CandidateController::class, 'destroyAssignment'])
+        ->name('assignments.destroy');
 
     // Evaluaciones clínicas del evaluador
     Route::get('candidates/{candidate}/evaluacion', [EvaluatorAssessmentController::class, 'create'])->name('assessments.create');

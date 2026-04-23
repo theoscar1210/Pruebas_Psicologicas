@@ -248,20 +248,36 @@
                         </div>
                     </div>
 
-                    {{-- Resultado global --}}
-                    @if($assignment->result)
-                    <div class="text-center flex-shrink-0 bg-slate-50 rounded-xl px-4 py-3 min-w-24">
-                        <p class="text-2xl font-bold {{ $assignment->result->passed ? 'text-emerald-600' : 'text-red-500' }}">
-                            {{ $assignment->result->percentage }}%
-                        </p>
-                        <p class="text-xs text-slate-500 mt-0.5">
-                            {{ $assignment->result->total_score }}/{{ $assignment->result->max_score }} pts
-                        </p>
-                        <p class="text-xs font-semibold mt-1 {{ $assignment->result->passed ? 'text-emerald-600' : 'text-red-500' }}">
-                            {{ $assignment->result->passed ? '✓ Aprobó' : '✗ No aprobó' }}
-                        </p>
+                    {{-- Resultado global + botón eliminar --}}
+                    <div class="flex items-start gap-2 flex-shrink-0">
+                        @if($assignment->result)
+                        <div class="text-center bg-slate-50 rounded-xl px-4 py-3 min-w-24">
+                            <p class="text-2xl font-bold {{ $assignment->result->passed ? 'text-emerald-600' : 'text-red-500' }}">
+                                {{ $assignment->result->percentage }}%
+                            </p>
+                            <p class="text-xs text-slate-500 mt-0.5">
+                                {{ $assignment->result->total_score }}/{{ $assignment->result->max_score }} pts
+                            </p>
+                            <p class="text-xs font-semibold mt-1 {{ $assignment->result->passed ? 'text-emerald-600' : 'text-red-500' }}">
+                                {{ $assignment->result->passed ? '✓ Aprobó' : '✗ No aprobó' }}
+                            </p>
+                        </div>
+                        @endif
+                        <form method="POST"
+                              action="{{ route('admin.assignments.destroy', $assignment) }}"
+                              onsubmit="return confirm('¿Eliminar la prueba «{{ addslashes($assignment->test->name) }}»?\nEsta acción eliminará también las respuestas y resultados.')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit"
+                                    class="p-1.5 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors"
+                                    title="Eliminar prueba asignada">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </button>
+                        </form>
                     </div>
-                    @endif
                 </div>
 
                 {{-- ── INTERPRETACIÓN RAVEN (solo RRHH/Admin) ── --}}
