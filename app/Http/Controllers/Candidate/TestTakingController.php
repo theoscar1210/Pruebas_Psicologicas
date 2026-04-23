@@ -67,6 +67,12 @@ class TestTakingController extends Controller
             return redirect()->route('candidate.access');
         }
 
+        // Pruebas administradas por el evaluador no son accesibles por el candidato
+        if ($assignment->test->evaluator_scored) {
+            return redirect()->route('candidate.dashboard')
+                ->with('info', 'Esta prueba es administrada directamente por el evaluador.');
+        }
+
         if ($assignment->isCompleted()) {
             return redirect()->route('candidate.result', $assignment)
                 ->with('info', 'Esta prueba ya fue completada.');

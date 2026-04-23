@@ -124,7 +124,20 @@
 
                 {{-- Resultado o botón de acción --}}
                 <div class="flex-shrink-0">
-                    @if($isCompleted && $assignment->result)
+                    @if($assignment->test->evaluator_scored)
+                        {{-- Prueba administrada por el evaluador (Wartegg, AC-SL, STAR) --}}
+                        <div class="text-center">
+                            <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-violet-700
+                                         bg-violet-50 border border-violet-200 rounded-full px-3 py-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
+                                Administrada por el evaluador
+                            </span>
+                        </div>
+
+                    @elseif($isCompleted && $assignment->result)
                         <div class="text-center">
                             <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-700
                                          bg-brand-50 border border-brand-200 rounded-full px-3 py-1">
