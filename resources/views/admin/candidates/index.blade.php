@@ -112,7 +112,7 @@
                 <td class="text-right">
                     <div class="flex items-center justify-end gap-3">
                         @if($filter === 'evaluacion')
-                        <a href="{{ route('admin.assessments.create', $candidate) }}"
+                        <a href="{{ route('admin.assessments.select', $candidate) }}"
                            class="text-emerald-600 hover:text-emerald-800 text-xs font-medium transition-colors">
                             {{ $candidate->evaluatorAssessments->isNotEmpty() ? '+ Evaluación' : 'Evaluar' }}
                         </a>

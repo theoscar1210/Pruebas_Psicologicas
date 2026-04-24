@@ -12,6 +12,20 @@ use Illuminate\View\View;
 
 class EvaluatorAssessmentController extends Controller
 {
+    /** Selección del tipo de evaluación clínica a realizar */
+    public function select(Candidate $candidate): View
+    {
+        $candidate->load(['position', 'evaluatorAssessments']);
+
+        $assessments = [
+            'wartegg'           => $candidate->evaluatorAssessments->firstWhere('assessment_type', 'wartegg'),
+            'star_interview'    => $candidate->evaluatorAssessments->firstWhere('assessment_type', 'star_interview'),
+            'assessment_center' => $candidate->evaluatorAssessments->firstWhere('assessment_type', 'assessment_center'),
+        ];
+
+        return view('admin.assessments.select', compact('candidate', 'assessments'));
+    }
+
     /** Formulario para crear/editar evaluación clínica */
     public function create(Request $request, Candidate $candidate): View
     {

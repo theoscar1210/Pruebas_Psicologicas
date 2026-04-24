@@ -50,6 +50,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         ->name('perfiles.index');
 
     // Evaluaciones clínicas del evaluador
+    Route::get('candidates/{candidate}/evaluar', [EvaluatorAssessmentController::class, 'select'])->name('assessments.select');
     Route::get('candidates/{candidate}/evaluacion', [EvaluatorAssessmentController::class, 'create'])->name('assessments.create');
     Route::post('candidates/{candidate}/evaluacion', [EvaluatorAssessmentController::class, 'store'])->name('assessments.store');
     Route::get('evaluaciones/{assessment}/editar', [EvaluatorAssessmentController::class, 'edit'])->name('assessments.edit');
