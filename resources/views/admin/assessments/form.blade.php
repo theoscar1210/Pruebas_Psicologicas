@@ -8,8 +8,14 @@
     default             => 'Evaluación — ' . $candidate->name,
 })
 
+@php
+    $backUrl = request('back') === 'select'
+        ? route('admin.assessments.select', $candidate)
+        : route('admin.candidates.show', $candidate);
+@endphp
+
 @section('header-actions')
-    <a href="{{ route('admin.candidates.show', $candidate) }}" class="btn-ghost btn-sm">← Volver</a>
+    <a href="{{ $backUrl }}" class="btn-ghost btn-sm">← Volver</a>
 @endsection
 
 @section('content')
@@ -522,7 +528,7 @@
                 </svg>
                 {{ $isEdit ? 'Actualizar evaluación' : 'Guardar evaluación' }}
             </button>
-            <a href="{{ route('admin.candidates.show', $candidate) }}" class="btn-ghost">Cancelar</a>
+            <a href="{{ $backUrl }}" class="btn-ghost">Cancelar</a>
         </div>
     </form>
 </div>
