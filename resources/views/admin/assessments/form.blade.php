@@ -89,7 +89,7 @@
                         <p class="text-[11px] text-slate-400 mb-2">{{ $box['hint'] }}</p>
                         <div class="flex gap-2">
                             @for($i = 1; $i <= 5; $i++)
-                            <label class="flex-1 cursor-pointer">
+                            <label class="flex-1 cursor-pointer relative">
                                 <input type="radio" name="scores[{{ $box['key'] }}]" value="{{ $i }}"
                                        {{ ($scores[$box['key']] ?? null) == $i ? 'checked' : '' }}
                                        class="sr-only peer" required>
@@ -128,7 +128,7 @@
                             </div>
                             <div class="flex gap-1.5 flex-shrink-0">
                                 @for($i = 1; $i <= 5; $i++)
-                                <label class="cursor-pointer">
+                                <label class="cursor-pointer relative">
                                     <input type="radio" name="scores[{{ $comp['key'] }}]" value="{{ $i }}"
                                            {{ ($scores[$comp['key']] ?? null) == $i ? 'checked' : '' }}
                                            class="sr-only peer" required>
@@ -420,7 +420,7 @@
                             <p class="form-label text-xs mb-2">Puntaje BARS final integrado</p>
                             <div class="grid grid-cols-5 gap-2">
                                 @for($val = 1; $val <= 5; $val++)
-                                <label class="cursor-pointer">
+                                <label class="cursor-pointer relative">
                                     <input type="radio" name="scores[{{ $comp['key'] }}]" value="{{ $val }}"
                                            {{ ($scores[$comp['key']] ?? null) == $val ? 'checked' : '' }}
                                            class="sr-only peer" required>
