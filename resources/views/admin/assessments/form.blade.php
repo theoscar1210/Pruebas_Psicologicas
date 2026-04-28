@@ -69,6 +69,31 @@
         @endif
     </div>
 
+    {{-- Auditoría (solo en edición Wartegg) --}}
+    @if($isEdit && $type === 'wartegg')
+    <div class="card border-slate-100 mb-5">
+        <div class="card-body py-3">
+            <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Auditoría del protocolo</p>
+            <div class="flex flex-wrap gap-x-6 gap-y-1 text-xs text-slate-600">
+                <span><span class="text-slate-400">Evaluador:</span>
+                    {{ $existing->evaluator?->name ?? 'Desconocido' }}
+                </span>
+                <span><span class="text-slate-400">Creado:</span>
+                    {{ $existing->created_at->format('d/m/Y H:i') }}
+                </span>
+                <span><span class="text-slate-400">Última modificación:</span>
+                    {{ $existing->updated_at->format('d/m/Y H:i') }}
+                </span>
+                @if($existing->completed_at)
+                <span><span class="text-slate-400">Completado:</span>
+                    {{ $existing->completed_at->format('d/m/Y H:i') }}
+                </span>
+                @endif
+            </div>
+        </div>
+    </div>
+    @endif
+
     <form action="{{ $action }}" method="POST">
         @csrf
         @if($isEdit) @method('PUT') @endif
@@ -89,6 +114,65 @@
             ['key'=>'box_8','label'=>'Campo VIII — Arco abierto',       'psych'=>'Integración del yo · Apertura al mundo · Síntesis',     'org'=>'Adaptabilidad e Integración','indicators'=>['Apertura vs. cierre del dibujo','Contenido de integración (paisaje, horizonte)','¿Uso completo del campo?','Tono emocional (optimista/amenazante)'],'contents'=>['Paisaje/horizonte','Taza/cuenco','Figura humana abierta','Luna/figura cerrada','Dibujo oscuro'],'alerts'=>['Figura cerrada (arco convertido en círculo cerrado)','Contenido oscuro o amenazante','Dibujo que no usa el arco']],
         ];
 
+        $wBoxBars = [
+            1 => [ // Campo I — Punto
+                5 => 'Figura elaborada, expansiva e integrada con el punto como núcleo central. Trazo firme, tamaño apropiado, contenido simbólico rico → autoconcepto positivo, seguridad interna sólida.',
+                4 => 'Figura integrada con buena elaboración. Trazo estable y tamaño adecuado. Menor riqueza expresiva pero autoconcepto funcional.',
+                3 => 'Punto integrado, figura simple o convencional. Trazo adecuado. Autoconcepto presente pero sin profundidad ni diferenciación.',
+                2 => 'Punto no integrado o ignorado como núcleo. Figura muy pequeña, periférica o trazo inseguro → fragilidad en la imagen de sí mismo.',
+                1 => 'Campo vacío, punto ignorado, o figura primitiva sin relación con el estímulo. Posible dificultad severa de autoconcepto o contacto con la realidad.',
+            ],
+            2 => [ // Campo II — Línea ondulada
+                5 => 'Dibujo fluido y orgánico (agua, paisaje, ser vivo) con la curva naturalmente integrada. Elaboración rica y contenido cálido → flexibilidad emocional e inteligencia afectiva altas.',
+                4 => 'Curva integrada con buena fluidez. Contenido empático aunque menos expresivo. Adaptación emocional adecuada.',
+                3 => 'Curva integrada pero de forma rígida o convencional. Contenido neutro, poca expresividad emocional. Adaptación funcional.',
+                2 => 'Curva convertida en elemento rígido o escasamente integrada. Contenido frío o sin vínculo emocional → rigidez afectiva.',
+                1 => 'Dibujo muy pobre o vacío. Curva completamente ignorada o bloqueada. Posible bloqueo emocional significativo.',
+            ],
+            3 => [ // Campo III — Tres puntos
+                5 => 'Diagonal ascendente clara con los tres puntos integrados. Contenido de logro o progresión (escalera, cohete, montaña). Trazo firme → alta orientación al logro y motivación de logro.',
+                4 => 'Dos o tres puntos integrados, orientación mayormente ascendente. Contenido de logro aunque menos elaborado. Motivación de logro presente.',
+                3 => 'Puntos integrados sin orientación clara. Figura simple o convencional sin elemento de progresión. Nivel de aspiración moderado.',
+                2 => 'Diagonal invertida (descendente) o puntos no integrados. Sin carga aspiracional → motivación de logro baja o inhibida.',
+                1 => 'Puntos ignorados, figura primitiva o diagonal descendente marcada. Posible desmotivación o dificultad con metas a futuro.',
+            ],
+            4 => [ // Campo IV — Cuadrado negro
+                5 => 'Cuadrado integrado creativamente (ventana, pantalla, base positiva). Tono neutro o positivo → manejo maduro de la autoridad y la norma, sin conflicto.',
+                4 => 'Cuadrado integrado con tono neutro o levemente positivo. Figura funcional. Relación con la autoridad adecuada.',
+                3 => 'Cuadrado contenido en figura simple sin transformarlo. Tono neutro. Relación con la norma funcional pero sin elaboración.',
+                2 => 'Cuadrado amplificado, usado como elemento pesado, o levemente ignorado → posible conflicto con la autoridad o la norma.',
+                1 => 'Campo vacío, cuadrado ignorado, o contenido destructivo (bomba, trampa, amenaza). Alta conflictividad con figuras de autoridad.',
+            ],
+            5 => [ // Campo V — Ángulo (techo)
+                5 => 'Dibujo expansivo y dinámico (pájaro, avión, flecha). Trazo enérgico, uso amplio del campo, contenido vital positivo → alto dinamismo, energía e iniciativa conductual.',
+                4 => 'Figura dinámica con buen uso del campo. Trazo firme. Contenido de movimiento aunque menos elaborado. Buena energía vital.',
+                3 => 'Figura integrada con el ángulo pero sin dinamismo marcado. Tamaño adecuado, contenido neutro. Energía funcional.',
+                2 => 'Figura muy pequeña, encerrada o sin relación con el ángulo. Contenido sin movimiento → energía inhibida o baja proactividad.',
+                1 => 'Dibujo ausente o muy pequeño. Contenido agresivo o destructivo. Sin dinamismo → bloqueo de la vitalidad o agresividad sin canalización.',
+            ],
+            6 => [ // Campo VI — Ángulo recto
+                5 => 'Ambas líneas integradas armónicamente en figura significativa (árbol, gráfico, arquitectura) con variación creativa. Muestra integración de razón y emoción.',
+                4 => 'Ambas líneas integradas, figura bien elaborada. Puede ser algo rígida en la simetría pero funcional. Pensamiento analítico adecuado.',
+                3 => 'Ambas líneas integradas de forma simple o convencional. Simetría perfecta sin variación. Pensamiento correcto pero poco flexible.',
+                2 => 'Una línea ignorada o figura con asimetría disfuncional. Dificultad para integrar dimensiones distintas del problema.',
+                1 => 'Ambas líneas ignoradas, figura sin relación con el estímulo. Posible dificultad en la integración lógica o pensamiento muy concreto.',
+            ],
+            7 => [ // Campo VII — Puntos dispersos
+                5 => 'Contenido grupal o social (constelación, personas en red). Puntos integrados en figura cohesionada. Calidez y riqueza → altas habilidades sociales y sentido de pertenencia.',
+                4 => 'Contenido social con puntos bien integrados. Figura cálida aunque menos elaborada. Habilidades sociales presentes.',
+                3 => 'Puntos integrados en figura individual o neutral (lluvia, geometría). Sin contenido claramente relacional. Sociabilidad funcional pero no proactiva.',
+                2 => 'Puntos escasamente integrados. Sin vínculo relacional. Figuras humanas rígidas o amenazantes → posible dificultad en la pertenencia.',
+                1 => 'Puntos completamente ignorados. Sin ninguna figura relacional. Contenido primitivo o aislado → posible dificultad severa en la vinculación.',
+            ],
+            8 => [ // Campo VIII — Arco abierto
+                5 => 'Dibujo abierto que usa el arco como horizonte (paisaje, amanecer, cuenco abierto). Uso completo del campo, tono optimista → alta integración del yo y apertura al entorno.',
+                4 => 'Arco integrado con apertura, contenido positivo. Buen uso del campo. Integración del yo adecuada.',
+                3 => 'Arco integrado pero con tendencia a cerrarse. Contenido neutro, uso moderado del campo. Apertura funcional.',
+                2 => 'Arco muy pequeño o parcialmente cerrado. Contenido sin apertura → defensividad o cierre ante el entorno.',
+                1 => 'Arco completamente cerrado (círculo), campo vacío o contenido oscuro. Posible dificultad severa en la apertura o integración del yo.',
+            ],
+        ];
+
         $barsLabels = [1=>'Muy deficiente',2=>'Deficiente',3=>'Adecuado',4=>'Bueno',5=>'Muy destacado'];
 
         $orgDimensions = [
@@ -103,15 +187,23 @@
         ];
         @endphp
 
-        {{-- ── Advertencia ética ─────────────────────────────────────────── --}}
+        {{-- ── Seguridad y advertencia ética ──────────────────────────────── --}}
         <div class="card border-amber-200 bg-amber-50 mb-5">
-            <div class="card-body py-3 flex items-start gap-3">
-                <svg class="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                </svg>
-                <div class="text-xs text-amber-800 leading-relaxed">
-                    <strong>Uso profesional exclusivo.</strong> Registre solo conductas directamente observadas. Las señales de alerta no son diagnósticos — deben confirmarse con otras fuentes.
-                    La interpretación proyectiva requiere formación certificada en técnicas proyectivas (Ley 1090/2006).
+            <div class="card-body py-3">
+                <div class="flex items-start gap-3">
+                    <svg class="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <strong class="text-xs text-amber-800">Protocolo confidencial — Uso profesional exclusivo</strong>
+                            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-200 text-amber-900 uppercase tracking-wide flex-shrink-0">🔒 Confidencial</span>
+                        </div>
+                        <div class="text-xs text-amber-800 leading-relaxed space-y-1">
+                            <p>Registre únicamente conductas directamente observadas en el protocolo. Las señales de alerta no son diagnósticos clínicos: deben confirmarse con múltiples fuentes.</p>
+                            <p>La interpretación proyectiva requiere formación certificada (Ley 1090/2006, Art. 36). La custodia de datos sensibles está regulada por la <strong>Ley 1581/2012</strong> (Habeas Data); no comparta capturas de pantalla ni información de este protocolo fuera del sistema.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -151,6 +243,61 @@
                     Completado: {{ $warteggSession->completed_at?->format('d/m/Y H:i') }}
                     · {{ $warteggSession->completedBoxesCount() }}/8 campos con dibujo
                 </p>
+            </div>
+        </div>
+        @endif
+
+        {{-- ── Integración con otros tests ────────────────────────────────── --}}
+        @if(isset($candidateContext) && ($candidateContext['completedTests']->isNotEmpty() || $candidateContext['otherAssessments']->isNotEmpty()))
+        @php
+        $crossRef = [
+            'raven'   => ['Campo III (logro/metas)','Campo VI (análisis)','Campo I (autoconcepto intelectual)'],
+            'star_interview' => ['Dimensión Logro (Campo III)','Dimensión Social (Campo VII)','Dimensión Autoridad (Campo IV)'],
+            'assessment_center' => ['Dimensión Energía/Proactividad (Campo V)','Dimensión Social (Campo VII)','Dimensión Adaptabilidad (Campo VIII)'],
+        ];
+        @endphp
+        <div class="card mb-5 border-sky-200">
+            <div class="card-body">
+                <p class="text-xs font-bold text-sky-700 uppercase tracking-wider mb-3">Integración con otros instrumentos psicométricos</p>
+                <div class="space-y-2">
+                    @foreach($candidateContext['completedTests'] as $ct)
+                    <div class="flex items-start gap-3 p-2.5 bg-sky-50/60 rounded-lg">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-semibold text-slate-700">{{ $ct['name'] }}</p>
+                            <p class="text-[11px] text-slate-500">
+                                Puntaje: <strong>{{ $ct['score'] }}/{{ $ct['max_score'] }}</strong> ({{ $ct['percentage'] }}%)
+                                @if($ct['passed'] !== null)
+                                — <span class="{{ $ct['passed'] ? 'text-emerald-600' : 'text-red-600' }} font-medium">{{ $ct['passed'] ? 'Aprobado' : 'No aprobado' }}</span>
+                                @endif
+                            </p>
+                            @if(isset($crossRef[$ct['test_type']]))
+                            <p class="text-[10px] text-sky-600 mt-0.5">
+                                Contrastar con: {{ implode(', ', $crossRef[$ct['test_type']]) }}
+                            </p>
+                            @endif
+                        </div>
+                        <span class="text-[10px] text-slate-400 flex-shrink-0 mt-0.5">{{ optional($ct['completed_at'])->format('d/m/Y') }}</span>
+                    </div>
+                    @endforeach
+
+                    @foreach($candidateContext['otherAssessments'] as $oa)
+                    <div class="flex items-start gap-3 p-2.5 bg-violet-50/50 rounded-lg">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-semibold text-slate-700">{{ $oa['type_label'] }}</p>
+                            <p class="text-[11px] text-slate-500">
+                                Puntaje global: <strong>{{ $oa['overall_score'] !== null ? number_format($oa['overall_score'], 1).'/100' : '—' }}</strong>
+                            </p>
+                            @if(isset($crossRef[$oa['type']]))
+                            <p class="text-[10px] text-violet-600 mt-0.5">
+                                Contrastar con: {{ implode(', ', $crossRef[$oa['type']]) }}
+                            </p>
+                            @endif
+                        </div>
+                        <span class="text-[10px] text-slate-400 flex-shrink-0 mt-0.5">{{ optional($oa['completed_at'])->format('d/m/Y') }}</span>
+                    </div>
+                    @endforeach
+                </div>
+                <p class="text-[10px] text-slate-400 mt-3">La integración entre instrumentos refuerza hipótesis pero nunca reemplaza el juicio clínico del evaluador.</p>
             </div>
         </div>
         @endif
@@ -234,7 +381,7 @@
                         {{-- Columna derecha: indicadores + calificación --}}
                         <div>
                             {{-- Variables formales a observar --}}
-                            <details class="group mb-3">
+                            <details class="group mb-2">
                                 <summary class="cursor-pointer select-none text-[11px] font-semibold text-slate-500 hover:text-slate-700 flex items-center gap-1 py-1">
                                     <svg class="w-3 h-3 transition-transform group-open:rotate-90 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -248,6 +395,33 @@
                                     </li>
                                     @endforeach
                                 </ul>
+                            </details>
+
+                            {{-- Guía de calificación BARS por campo --}}
+                            <details class="group mb-3">
+                                <summary class="cursor-pointer select-none text-[11px] font-semibold text-violet-500 hover:text-violet-700 flex items-center gap-1 py-1">
+                                    <svg class="w-3 h-3 transition-transform group-open:rotate-90 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                    Guía de interpretación (1–5)
+                                </summary>
+                                <div class="mt-2 space-y-1.5 pl-1">
+                                    @foreach(array_reverse($wBoxBars[$boxNum], true) as $bLevel => $bDesc)
+                                    @php
+                                        $bCls = match((int)$bLevel) {
+                                            5 => 'bg-emerald-100 text-emerald-700',
+                                            4 => 'bg-brand-100 text-brand-700',
+                                            3 => 'bg-amber-100 text-amber-700',
+                                            2 => 'bg-orange-100 text-orange-700',
+                                            default => 'bg-red-100 text-red-700',
+                                        };
+                                    @endphp
+                                    <div class="flex gap-2 items-start">
+                                        <span class="flex-shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded {{ $bCls }}">{{ $bLevel }}</span>
+                                        <p class="text-[11px] text-slate-600 leading-snug">{{ $bDesc }}</p>
+                                    </div>
+                                    @endforeach
+                                </div>
                             </details>
 
                             {{-- Calificación de calidad gráfica (1–5) --}}

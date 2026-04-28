@@ -132,7 +132,7 @@ class WarteggController extends Controller
         }
 
         $totalSecs = $session->started_at
-            ? now()->diffInSeconds($session->started_at)
+            ? max(0, (int) now()->diffInSeconds($session->started_at, true))
             : null;
 
         $session->update([

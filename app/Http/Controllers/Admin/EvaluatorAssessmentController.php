@@ -44,7 +44,11 @@ class EvaluatorAssessmentController extends Controller
                 ->first()
             : null;
 
-        return view('admin.assessments.form', compact('candidate', 'type', 'existing', 'warteggSession'));
+        $candidateContext = $type === 'wartegg'
+            ? $this->loadCandidateContext($candidate)
+            : null;
+
+        return view('admin.assessments.form', compact('candidate', 'type', 'existing', 'warteggSession', 'candidateContext'));
     }
 
     /** Guardar evaluación */
@@ -79,11 +83,12 @@ class EvaluatorAssessmentController extends Controller
     }
 
     /** Editar evaluación existente */
-    public function edit(EvaluatorAssessment $assessment, Request $request): View
+    public function edit(EvaluatorAssessment $assessment): View
     {
         $candidate = $assessment->candidate;
         $type      = $assessment->assessment_type;
         $existing  = $assessment;
+        $existing->load('evaluator');
 
         $warteggSession = $type === 'wartegg'
             ? WarteggSession::where('candidate_id', $candidate->id)
@@ -92,7 +97,11 @@ class EvaluatorAssessmentController extends Controller
                 ->first()
             : null;
 
-        return view('admin.assessments.form', compact('candidate', 'type', 'existing', 'warteggSession'));
+        $candidateContext = $type === 'wartegg'
+            ? $this->loadCandidateContext($candidate)
+            : null;
+
+        return view('admin.assessments.form', compact('candidate', 'type', 'existing', 'warteggSession', 'candidateContext'));
     }
 
     /** Actualizar evaluación */
@@ -117,6 +126,39 @@ class EvaluatorAssessmentController extends Controller
             : redirect()->route('admin.candidates.show', $assessment->candidate);
 
         return $back->with('success', 'Evaluación actualizada correctamente.');
+    }
+
+    /** Carga el contexto de otras pruebas del candidato para el panel de integración Wartegg. */
+    private function loadCandidateContext(Candidate $candidate): array
+    {
+        $candidate->load([
+            'assignments.test',
+            'assignments.result',
+            'evaluatorAssessments' => fn($q) => $q->where('status', 'completed'),
+        ]);
+
+        $completedTests = $candidate->assignments
+            ->filter(fn($a) => $a->status === 'completed' && $a->result && !$a->test->evaluator_scored)
+            ->map(fn($a) => [
+                'name'         => $a->test->name,
+                'test_type'    => $a->test->test_type,
+                'score'        => $a->result->total_score,
+                'max_score'    => $a->result->max_score,
+                'percentage'   => $a->result->percentage,
+                'passed'       => $a->result->passed,
+                'completed_at' => $a->completed_at,
+            ])->values();
+
+        $otherAssessments = $candidate->evaluatorAssessments
+            ->where('assessment_type', '!=', 'wartegg')
+            ->map(fn($ea) => [
+                'type'          => $ea->assessment_type,
+                'type_label'    => $ea->typeLabel(),
+                'overall_score' => $ea->overall_score,
+                'completed_at'  => $ea->completed_at,
+            ])->values();
+
+        return compact('completedTests', 'otherAssessments');
     }
 
     /**
