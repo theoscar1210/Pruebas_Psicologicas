@@ -125,7 +125,23 @@
                 {{-- Resultado o botón de acción --}}
                 <div class="flex-shrink-0">
                     @if($assignment->test->evaluator_scored)
-                        {{-- Prueba administrada por el evaluador (Wartegg, AC-SL, STAR) --}}
+                        @php
+                            $evalDone = $candidate->evaluatorAssessments
+                                ->firstWhere('assessment_type', $assignment->test->test_type);
+                        @endphp
+                        @if($evalDone)
+                        {{-- Ya fue evaluada por el evaluador --}}
+                        <div class="text-center">
+                            <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700
+                                         bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                Evaluado
+                            </span>
+                        </div>
+                        @else
+                        {{-- Pendiente de evaluación por el evaluador --}}
                         <div class="text-center">
                             <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-violet-700
                                          bg-violet-50 border border-violet-200 rounded-full px-3 py-1">
@@ -136,6 +152,7 @@
                                 Administrada por el evaluador
                             </span>
                         </div>
+                        @endif
 
                     @elseif($isCompleted && $assignment->result)
                         <div class="text-center">

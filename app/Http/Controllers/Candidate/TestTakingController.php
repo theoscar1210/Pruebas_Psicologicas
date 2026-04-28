@@ -52,7 +52,7 @@ class TestTakingController extends Controller
             return redirect()->route('candidate.access');
         }
 
-        $candidate->load(['position', 'assignments.test', 'assignments.result']);
+        $candidate->load(['position', 'assignments.test', 'assignments.result', 'evaluatorAssessments']);
 
         return view('candidate.dashboard', compact('candidate'));
     }

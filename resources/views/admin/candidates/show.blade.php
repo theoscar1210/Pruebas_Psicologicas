@@ -144,8 +144,8 @@
 
                     {{-- Wartegg --}}
                     @php $wartegg = $candidate->evaluatorAssessments->firstWhere('assessment_type', 'wartegg'); @endphp
-                    <a href="{{ route('admin.assessments.create', ['candidate' => $candidate, 'type' => 'wartegg']) }}"
-                       class="flex items-center gap-3 p-3 rounded-lg border border-slate-100 hover:border-brand-300 hover:bg-brand-50/50 transition-all group min-w-0">
+                    <a href="{{ $wartegg ? route('admin.assessments.edit', $wartegg) : route('admin.assessments.create', ['candidate' => $candidate, 'type' => 'wartegg']) }}"
+                       class="flex items-center gap-3 p-3 rounded-lg border {{ $wartegg ? 'border-violet-200 bg-violet-50/40' : 'border-slate-100' }} hover:border-brand-300 hover:bg-brand-50/50 transition-all group min-w-0">
                         <div class="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center flex-shrink-0">
                             <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
@@ -153,7 +153,14 @@
                         </div>
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-medium text-slate-800 group-hover:text-brand-700 truncate">Wartegg</p>
-                            <p class="text-xs text-slate-400 truncate">Proyectivo — 8 cajas</p>
+                            <p class="text-xs text-slate-400 truncate">
+                                @if($wartegg)
+                                    <span class="font-semibold text-slate-600">{{ $wartegg->overall_score !== null ? number_format($wartegg->overall_score, 1).'%' : '—' }}</span>
+                                    · {{ $wartegg->completed_at?->format('d/m/Y') ?? '' }}
+                                @else
+                                    Proyectivo — 8 cajas
+                                @endif
+                            </p>
                         </div>
                         <span class="flex-shrink-0 {{ $wartegg ? 'badge-success' : 'badge-neutral' }} text-xs">
                             {{ $wartegg ? 'Listo' : 'Pendiente' }}
@@ -162,8 +169,8 @@
 
                     {{-- STAR --}}
                     @php $star = $candidate->evaluatorAssessments->firstWhere('assessment_type', 'star_interview'); @endphp
-                    <a href="{{ route('admin.assessments.create', ['candidate' => $candidate, 'type' => 'star_interview']) }}"
-                       class="flex items-center gap-3 p-3 rounded-lg border border-slate-100 hover:border-brand-300 hover:bg-brand-50/50 transition-all group min-w-0">
+                    <a href="{{ $star ? route('admin.assessments.edit', $star) : route('admin.assessments.create', ['candidate' => $candidate, 'type' => 'star_interview']) }}"
+                       class="flex items-center gap-3 p-3 rounded-lg border {{ $star ? 'border-amber-200 bg-amber-50/40' : 'border-slate-100' }} hover:border-brand-300 hover:bg-brand-50/50 transition-all group min-w-0">
                         <div class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
                             <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
@@ -171,7 +178,14 @@
                         </div>
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-medium text-slate-800 group-hover:text-brand-700 truncate">Entrevista STAR</p>
-                            <p class="text-xs text-slate-400 truncate">10 competencias</p>
+                            <p class="text-xs text-slate-400 truncate">
+                                @if($star)
+                                    <span class="font-semibold text-slate-600">{{ $star->overall_score !== null ? number_format($star->overall_score, 1).'%' : '—' }}</span>
+                                    · {{ $star->completed_at?->format('d/m/Y') ?? '' }}
+                                @else
+                                    10 competencias
+                                @endif
+                            </p>
                         </div>
                         <span class="flex-shrink-0 {{ $star ? 'badge-success' : 'badge-neutral' }} text-xs">
                             {{ $star ? 'Listo' : 'Pendiente' }}
@@ -180,8 +194,8 @@
 
                     {{-- Assessment Center --}}
                     @php $ac = $candidate->evaluatorAssessments->firstWhere('assessment_type', 'assessment_center'); @endphp
-                    <a href="{{ route('admin.assessments.create', ['candidate' => $candidate, 'type' => 'assessment_center']) }}"
-                       class="flex items-center gap-3 p-3 rounded-lg border border-slate-100 hover:border-brand-300 hover:bg-brand-50/50 transition-all group min-w-0">
+                    <a href="{{ $ac ? route('admin.assessments.edit', $ac) : route('admin.assessments.create', ['candidate' => $candidate, 'type' => 'assessment_center']) }}"
+                       class="flex items-center gap-3 p-3 rounded-lg border {{ $ac ? 'border-emerald-200 bg-emerald-50/40' : 'border-slate-100' }} hover:border-brand-300 hover:bg-brand-50/50 transition-all group min-w-0">
                         <div class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
                             <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
@@ -189,7 +203,14 @@
                         </div>
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-medium text-slate-800 group-hover:text-brand-700 truncate">AC-SL Assessment Center</p>
-                            <p class="text-xs text-slate-400 truncate">8 competencias · 3 clústeres BARS</p>
+                            <p class="text-xs text-slate-400 truncate">
+                                @if($ac)
+                                    <span class="font-semibold text-slate-600">{{ $ac->overall_score !== null ? number_format($ac->overall_score, 1).'%' : '—' }}</span>
+                                    · {{ $ac->completed_at?->format('d/m/Y') ?? '' }}
+                                @else
+                                    8 competencias · 3 clústeres BARS
+                                @endif
+                            </p>
                         </div>
                         <span class="flex-shrink-0 {{ $ac ? 'badge-success' : 'badge-neutral' }} text-xs">
                             {{ $ac ? 'Listo' : 'Pendiente' }}
