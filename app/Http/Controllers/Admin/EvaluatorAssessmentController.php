@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Candidate;
 use App\Models\EvaluatorAssessment;
+use App\Models\WarteggSession;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -36,7 +37,14 @@ class EvaluatorAssessmentController extends Controller
             ->latest()
             ->first();
 
-        return view('admin.assessments.form', compact('candidate', 'type', 'existing'));
+        $warteggSession = $type === 'wartegg'
+            ? WarteggSession::where('candidate_id', $candidate->id)
+                ->where('status', 'completed')
+                ->latest()
+                ->first()
+            : null;
+
+        return view('admin.assessments.form', compact('candidate', 'type', 'existing', 'warteggSession'));
     }
 
     /** Guardar evaluación */
@@ -47,14 +55,10 @@ class EvaluatorAssessmentController extends Controller
         $validated = $request->validate([
             'assessment_type' => 'required|in:wartegg,star_interview,assessment_center',
             'scores'          => 'required|array',
-            'observations'    => 'nullable|string|max:3000',
+            'observations'    => 'nullable|string|max:5000',
         ]);
 
-        // Calcular puntuación global como promedio de los scores numéricos
-        $numericScores = array_filter($validated['scores'], 'is_numeric');
-        $overall = count($numericScores) > 0
-            ? round(array_sum($numericScores) / count($numericScores) * 20, 2) // Escala 1–5 → 0–100
-            : null;
+        $overall = $this->computeOverall($type, $validated['scores']);
 
         EvaluatorAssessment::create([
             'candidate_id'    => $candidate->id,
@@ -67,19 +71,28 @@ class EvaluatorAssessmentController extends Controller
             'completed_at'    => now(),
         ]);
 
-        return redirect()
-            ->route('admin.candidates.show', $candidate)
-            ->with('success', 'Evaluación clínica guardada correctamente.');
+        $back = $request->query('back') === 'select'
+            ? redirect()->route('admin.assessments.select', $candidate)
+            : redirect()->route('admin.candidates.show', $candidate);
+
+        return $back->with('success', 'Evaluación clínica guardada correctamente.');
     }
 
     /** Editar evaluación existente */
-    public function edit(EvaluatorAssessment $assessment): View
+    public function edit(EvaluatorAssessment $assessment, Request $request): View
     {
         $candidate = $assessment->candidate;
         $type      = $assessment->assessment_type;
         $existing  = $assessment;
 
-        return view('admin.assessments.form', compact('candidate', 'type', 'existing'));
+        $warteggSession = $type === 'wartegg'
+            ? WarteggSession::where('candidate_id', $candidate->id)
+                ->where('status', 'completed')
+                ->latest()
+                ->first()
+            : null;
+
+        return view('admin.assessments.form', compact('candidate', 'type', 'existing', 'warteggSession'));
     }
 
     /** Actualizar evaluación */
@@ -87,13 +100,10 @@ class EvaluatorAssessmentController extends Controller
     {
         $validated = $request->validate([
             'scores'       => 'required|array',
-            'observations' => 'nullable|string|max:3000',
+            'observations' => 'nullable|string|max:5000',
         ]);
 
-        $numericScores = array_filter($validated['scores'], 'is_numeric');
-        $overall = count($numericScores) > 0
-            ? round(array_sum($numericScores) / count($numericScores) * 20, 2)
-            : null;
+        $overall = $this->computeOverall($assessment->assessment_type, $validated['scores']);
 
         $assessment->update([
             'scores'        => $validated['scores'],
@@ -102,8 +112,36 @@ class EvaluatorAssessmentController extends Controller
             'completed_at'  => now(),
         ]);
 
-        return redirect()
-            ->route('admin.candidates.show', $assessment->candidate)
-            ->with('success', 'Evaluación actualizada correctamente.');
+        $back = $request->query('back') === 'select'
+            ? redirect()->route('admin.assessments.select', $assessment->candidate)
+            : redirect()->route('admin.candidates.show', $assessment->candidate);
+
+        return $back->with('success', 'Evaluación actualizada correctamente.');
+    }
+
+    /**
+     * Calcula overall_score (0–100) según el tipo de evaluación.
+     * Wartegg: promedio de las 8 dimensiones organizacionales (org_*).
+     * Otros:   promedio de todos los valores numéricos.
+     */
+    private function computeOverall(string $type, array $scores): ?float
+    {
+        if ($type === 'wartegg') {
+            $orgKeys = ['org_autoconcepto','org_gestion_emocional','org_logro','org_autoridad',
+                        'org_energia','org_analitico','org_social','org_adaptabilidad'];
+            $orgScores = array_filter(
+                array_intersect_key($scores, array_flip($orgKeys)),
+                'is_numeric'
+            );
+            if (count($orgScores) > 0) {
+                return round(array_sum($orgScores) / count($orgScores) * 20, 2);
+            }
+            // fallback: promedio de scores de caja si no hay dims org
+        }
+
+        $numeric = array_filter($scores, 'is_numeric');
+        return count($numeric) > 0
+            ? round(array_sum($numeric) / count($numeric) * 20, 2)
+            : null;
     }
 }

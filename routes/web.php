@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\TestController;
 use App\Http\Controllers\Candidate\TestTakingController;
+use App\Http\Controllers\Candidate\WarteggController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -84,6 +85,13 @@ Route::prefix('candidato')->name('candidate.')->group(function () {
         Route::post('/prueba/{assignment}/respuesta', [TestTakingController::class, 'saveAnswer'])->name('answer');
         Route::post('/prueba/{assignment}/finalizar', [TestTakingController::class, 'finish'])->name('finish');
         Route::get('/prueba/{assignment}/resultado', [TestTakingController::class, 'result'])->name('result');
+
+        // Wartegg digital
+        Route::get('/wartegg/{assignment}/instrucciones', [WarteggController::class, 'start'])->name('wartegg.start');
+        Route::get('/wartegg/{assignment}/dibujar',       [WarteggController::class, 'draw'])->name('wartegg.draw');
+        Route::post('/wartegg/{assignment}/guardar-caja', [WarteggController::class, 'saveBox'])->name('wartegg.save-box');
+        Route::post('/wartegg/{assignment}/finalizar',    [WarteggController::class, 'finish'])->name('wartegg.finish');
+        Route::get('/wartegg/{assignment}/completado',    [WarteggController::class, 'complete'])->name('wartegg.complete');
     });
 });
 

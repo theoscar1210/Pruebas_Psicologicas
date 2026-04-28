@@ -61,6 +61,11 @@ class Candidate extends Model
         return $this->hasMany(EvaluatorAssessment::class);
     }
 
+    public function warteggSessions(): HasMany
+    {
+        return $this->hasMany(WarteggSession::class);
+    }
+
     public function psychologicalReports(): HasMany
     {
         return $this->hasMany(PsychologicalReport::class);

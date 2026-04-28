@@ -76,36 +76,295 @@
 
         {{-- ══ WARTEGG ══════════════════════════════════════════════════════ --}}
         @if($type === 'wartegg')
+        @php
+        $roman   = ['I','II','III','IV','V','VI','VII','VIII'];
+        $wBoxes  = [
+            ['key'=>'box_1','label'=>'Campo I — Punto central',         'psych'=>'Yo central · Autoconcepto · Iniciativa',         'org'=>'Autoconcepto e Iniciativa',       'indicators'=>['Tamaño y elaboración del dibujo','Posición respecto al estímulo (centrado/bordes)','Seguridad del trazo (firme/tembloroso)','¿Integra el punto o lo ignora?'],'contents'=>['Figura humana','Paisaje/naturaleza','Objeto cotidiano','Geometría/abstracción','Símbolo'],'alerts'=>['Dibujo que ignora el punto','Figura muy pequeña en borde','Dibujo que encierra el punto sin integrarlo']],
+            ['key'=>'box_2','label'=>'Campo II — Línea ondulada',       'psych'=>'Afectividad · Sensibilidad emocional · Adaptación',  'org'=>'Gestión Emocional e Intel. Afectiva','indicators'=>['¿Integra la curva fluidamente?','Calidad orgánica vs. rígida del dibujo','Contenido empático (agua, camino, serpiente)','Nivel de elaboración (rico/pobre)'],'contents'=>['Agua/olas','Serpiente/animal','Camino/paisaje','Figura humana','Geometría'],'alerts'=>['Curva bloqueada o convertida en algo rígido','Dibujo muy pobre o borrado','Dibujo muy fragmentado']],
+            ['key'=>'box_3','label'=>'Campo III — Tres puntos',         'psych'=>'Nivel de aspiración · Metas · Orientación al logro',  'org'=>'Orientación al Logro y Productividad','indicators'=>['¿Respeta la diagonal ascendente?','Contenido de logro (escalera, cohete, flecha)','Pensamiento ordenado vs. disperso','¿Integra los tres puntos?'],'contents'=>['Escalera/montaña','Cohete/flecha','Geometría ordenada','Cara/figura','Sin integrar puntos'],'alerts'=>['Diagonal invertida (hacia abajo)','Puntos no integrados en el dibujo','Figura muy simplificada sin relación con los puntos']],
+            ['key'=>'box_4','label'=>'Campo IV — Cuadrado negro',       'psych'=>'Relación con la autoridad · La norma · Lo difícil',   'org'=>'Relación con la Autoridad y Normas','indicators'=>['¿Integra el cuadrado creativamente?','¿Lo amplía, minimiza o ignora?','Tono afectivo del dibujo (positivo/amenazante)','Latencia antes de comenzar'],'contents'=>['Casa/edificio','Pantalla/ventana','Piedra/base','Figura amenazante','Campo vacío/muy pobre'],'alerts'=>['Cuadrado amplificado (más grande)','Contenido destructivo (bomba, trampa)','Campo dejado en blanco','Cuadrado completamente ignorado']],
+            ['key'=>'box_5','label'=>'Campo V — Ángulo (techo)',        'psych'=>'Dinamismo · Iniciativa conductual · Energía vital',    'org'=>'Energía, Dinamismo y Proactividad','indicators'=>['Tamaño y dinamismo del dibujo','Contenido de movimiento (pájaro, avión)','Presión del trazo','¿Dibujo abierto o cerrado?'],'contents'=>['Pájaro/avión','Montaña/techo','Flecha/cohete','Figura agresiva','Geometría pequeña'],'alerts'=>['Dibujo muy pequeño o encerrado','Contenido agresivo (rayo, arma, choque)','Sin relación con el estímulo']],
+            ['key'=>'box_6','label'=>'Campo VI — Ángulo recto',         'psych'=>'Pensamiento lógico · Análisis · Integración razón-emoción','org'=>'Pensamiento Analítico y Estructurado','indicators'=>['¿Integra ambas líneas?','Contenido técnico (tabla, plano, árbol)','Simetría (rigidez vs. creatividad)','¿Ignora una línea?'],'contents'=>['Tabla/gráfico','Árbol/planta','Cruz/símbolo','Arquitectura','Figura asimétrica creativa'],'alerts'=>['Ignora una de las dos líneas','Figura perfectamente simétrica sin variación','Dibujo sin relación con las perpendiculares']],
+            ['key'=>'box_7','label'=>'Campo VII — Puntos dispersos',    'psych'=>'Vínculos afectivos · Relaciones interpersonales · Pertenencia','org'=>'Habilidades Sociales y Trabajo en Equipo','indicators'=>['¿Contenido grupal/social?','Figuras humanas (solas o en grupo)','¿Une los puntos (red, constelación)?','Calidez del dibujo'],'contents'=>['Constelación/estrellas','Grupo de personas','Lluvia/nieve','Red/mapa','Figura solitaria'],'alerts'=>['Sin ninguna figura relacional o social','Figuras humanas rígidas o amenazantes','Puntos completamente ignorados']],
+            ['key'=>'box_8','label'=>'Campo VIII — Arco abierto',       'psych'=>'Integración del yo · Apertura al mundo · Síntesis',     'org'=>'Adaptabilidad e Integración','indicators'=>['Apertura vs. cierre del dibujo','Contenido de integración (paisaje, horizonte)','¿Uso completo del campo?','Tono emocional (optimista/amenazante)'],'contents'=>['Paisaje/horizonte','Taza/cuenco','Figura humana abierta','Luna/figura cerrada','Dibujo oscuro'],'alerts'=>['Figura cerrada (arco convertido en círculo cerrado)','Contenido oscuro o amenazante','Dibujo que no usa el arco']],
+        ];
 
-        <div class="card mb-5">
+        $barsLabels = [1=>'Muy deficiente',2=>'Deficiente',3=>'Adecuado',4=>'Bueno',5=>'Muy destacado'];
+
+        $orgDimensions = [
+            ['key'=>'org_autoconcepto',      'label'=>'Autoconcepto e Iniciativa',              'campos'=>'I · V · VIII'],
+            ['key'=>'org_gestion_emocional', 'label'=>'Gestión Emocional e Inteligencia Afectiva','campos'=>'II · VII · IV'],
+            ['key'=>'org_logro',             'label'=>'Orientación al Logro y Productividad',   'campos'=>'III · VI · V'],
+            ['key'=>'org_autoridad',         'label'=>'Relación con la Autoridad y las Normas', 'campos'=>'IV · VI'],
+            ['key'=>'org_energia',           'label'=>'Energía, Dinamismo y Proactividad',      'campos'=>'V · I · III'],
+            ['key'=>'org_analitico',         'label'=>'Pensamiento Analítico y Estructurado',   'campos'=>'VI · III'],
+            ['key'=>'org_social',            'label'=>'Habilidades Sociales y Trabajo en Equipo','campos'=>'VII · II · I'],
+            ['key'=>'org_adaptabilidad',     'label'=>'Adaptabilidad e Integración',            'campos'=>'VIII · II · III'],
+        ];
+        @endphp
+
+        {{-- ── Advertencia ética ─────────────────────────────────────────── --}}
+        <div class="card border-amber-200 bg-amber-50 mb-5">
+            <div class="card-body py-3 flex items-start gap-3">
+                <svg class="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                </svg>
+                <div class="text-xs text-amber-800 leading-relaxed">
+                    <strong>Uso profesional exclusivo.</strong> Registre solo conductas directamente observadas. Las señales de alerta no son diagnósticos — deben confirmarse con otras fuentes.
+                    La interpretación proyectiva requiere formación certificada en técnicas proyectivas (Ley 1090/2006).
+                </div>
+            </div>
+        </div>
+
+        {{-- ── Variables de Secuencia (si hay sesión digital) ────────────── --}}
+        @if(isset($warteggSession) && $warteggSession)
+        @php
+            $wBoxesSorted = collect($warteggSession->boxes ?? [])->sortBy('order')->values();
+            $totalMin = $warteggSession->total_seconds ? intdiv($warteggSession->total_seconds, 60) : null;
+        @endphp
+        <div class="card mb-5 border-violet-200">
             <div class="card-body">
-                <h2 class="text-sm font-semibold text-slate-700 mb-1">Test de Wartegg — Indicadores por caja</h2>
-                <p class="text-xs text-slate-400 mb-5">Califica cada caja del 1 (muy deficiente) al 5 (muy destacado) según el dibujo del candidato. Toma en cuenta: originalidad, complejidad, integración del estímulo y contenido simbólico.</p>
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="text-xs font-bold text-violet-700 uppercase tracking-wider">Sesión digital del candidato</span>
+                    <span class="badge-success text-xs flex-shrink-0">Dibujos disponibles</span>
+                    @if($totalMin)
+                    <span class="ml-auto text-xs text-slate-400">Tiempo total: {{ $totalMin }} min</span>
+                    @endif
+                </div>
+                {{-- Secuencia de realización --}}
+                @if($wBoxesSorted->isNotEmpty())
+                <div class="mb-3">
+                    <p class="text-[11px] font-semibold text-slate-500 uppercase tracking-wide mb-2">Secuencia de realización</p>
+                    <div class="flex flex-wrap gap-1.5">
+                        @foreach($wBoxesSorted as $wb)
+                        <span class="inline-flex items-center gap-1 text-xs bg-violet-50 border border-violet-200 text-violet-700 px-2 py-0.5 rounded-full font-mono">
+                            {{ $wb['order'] ?? '?' }}° — Campo {{ $roman[($wb['number']-1)] }}
+                            @if($wb['time_seconds'] > 0)
+                            <span class="text-violet-400">({{ intdiv($wb['time_seconds'],60) }}m {{ $wb['time_seconds']%60 }}s)</span>
+                            @endif
+                        </span>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+                <p class="text-[11px] text-slate-400">
+                    Completado: {{ $warteggSession->completed_at?->format('d/m/Y H:i') }}
+                    · {{ $warteggSession->completedBoxesCount() }}/8 campos con dibujo
+                </p>
+            </div>
+        </div>
+        @endif
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    @foreach($warteggBoxes as $box)
-                    <div class="form-group p-4 border border-slate-100 rounded-xl bg-slate-50/60">
-                        <label class="form-label">{{ $box['label'] }}</label>
-                        <p class="text-[11px] text-slate-400 mb-2">{{ $box['hint'] }}</p>
-                        <div class="flex gap-2">
-                            @for($i = 1; $i <= 5; $i++)
-                            <label class="flex-1 cursor-pointer relative">
-                                <input type="radio" name="scores[{{ $box['key'] }}]" value="{{ $i }}"
-                                       {{ ($scores[$box['key']] ?? null) == $i ? 'checked' : '' }}
-                                       class="sr-only peer" required>
-                                <div class="py-2 text-center text-sm font-bold rounded-lg border-2 transition-all
-                                            border-slate-200 bg-white text-slate-400
-                                            peer-checked:border-brand-500 peer-checked:bg-brand-50 peer-checked:text-brand-700">
-                                    {{ $i }}
-                                </div>
-                            </label>
-                            @endfor
+        {{-- ══ ANÁLISIS POR CAMPO ══════════════════════════════════════════ --}}
+        <div class="space-y-4 mb-6">
+            @foreach($wBoxes as $idx => $box)
+            @php
+                $boxNum  = $idx + 1;
+                $wbData  = isset($warteggSession) ? $warteggSession->getBox($boxNum) : null;
+                $hasImg  = $wbData && !empty($wbData['drawing_data']);
+            @endphp
+            <div class="card border {{ $hasImg ? 'border-violet-100' : 'border-slate-100' }}">
+                <div class="card-body">
+
+                    {{-- Header del campo --}}
+                    <div class="flex items-start gap-3 mb-4">
+                        <span class="font-mono text-xs font-bold px-2 py-1 rounded bg-slate-100 text-slate-600 flex-shrink-0">{{ $roman[$idx] }}</span>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-semibold text-slate-800 text-sm">{{ $box['label'] }}</h3>
+                            <p class="text-xs text-slate-400">{{ $box['psych'] }}</p>
                         </div>
-                        <div class="flex justify-between text-[10px] text-slate-400 mt-1">
-                            <span>Muy deficiente</span><span>Muy destacado</span>
+                        @if($hasImg && !empty($wbData['title']))
+                        <span class="text-xs text-slate-500 italic flex-shrink-0">"{{ $wbData['title'] }}"</span>
+                        @endif
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+                        {{-- Columna izquierda: dibujo + metadata --}}
+                        <div>
+                            @if($hasImg)
+                            <div class="mb-2">
+                                <img src="{{ $wbData['drawing_data'] }}"
+                                     alt="Dibujo Campo {{ $roman[$idx] }}"
+                                     class="w-full max-w-[220px] aspect-square object-cover rounded-lg border border-violet-200 shadow-sm">
+                                <div class="flex gap-3 mt-2 text-[11px] text-slate-400">
+                                    @if($wbData['order']) <span>Orden: <strong class="text-slate-600">{{ $wbData['order'] }}°</strong></span> @endif
+                                    @if($wbData['time_seconds'] > 0)
+                                    <span>Tiempo: <strong class="text-slate-600">{{ intdiv($wbData['time_seconds'],60) }}m {{ $wbData['time_seconds']%60 }}s</strong></span>
+                                    @endif
+                                </div>
+                            </div>
+                            @else
+                            <div class="w-full max-w-[220px] aspect-square rounded-lg border-2 border-dashed border-slate-200 flex items-center justify-center mb-2 bg-slate-50">
+                                <span class="text-xs text-slate-300">Sin dibujo digital</span>
+                            </div>
+                            @endif
+
+                            {{-- Categoría de contenido --}}
+                            <div class="form-group mb-2">
+                                <label class="form-label text-[11px]">Categoría de contenido</label>
+                                <select name="scores[cat_{{ $box['key'] }}]" class="select text-xs py-1">
+                                    <option value="">— Seleccionar —</option>
+                                    @foreach($box['contents'] as $cat)
+                                    <option value="{{ Str::slug($cat) }}"
+                                        {{ ($scores['cat_'.$box['key']] ?? '') === Str::slug($cat) ? 'selected' : '' }}>
+                                        {{ $cat }}
+                                    </option>
+                                    @endforeach
+                                    <option value="otro" {{ ($scores['cat_'.$box['key']] ?? '') === 'otro' ? 'selected' : '' }}>Otro</option>
+                                </select>
+                            </div>
+
+                            {{-- Alertas observadas --}}
+                            <div class="form-group mb-0">
+                                <label class="form-label text-[11px]">Señales de alerta observadas</label>
+                                @foreach($box['alerts'] as $aIdx => $alert)
+                                <label class="flex items-start gap-2 text-xs text-slate-600 mb-1 cursor-pointer">
+                                    <input type="checkbox"
+                                           name="scores[alert_{{ $box['key'] }}_{{ $aIdx }}]"
+                                           value="1"
+                                           {{ !empty($scores['alert_'.$box['key'].'_'.$aIdx]) ? 'checked' : '' }}
+                                           class="mt-0.5 rounded flex-shrink-0">
+                                    {{ $alert }}
+                                </label>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        {{-- Columna derecha: indicadores + calificación --}}
+                        <div>
+                            {{-- Variables formales a observar --}}
+                            <details class="group mb-3">
+                                <summary class="cursor-pointer select-none text-[11px] font-semibold text-slate-500 hover:text-slate-700 flex items-center gap-1 py-1">
+                                    <svg class="w-3 h-3 transition-transform group-open:rotate-90 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                    Variables formales a observar
+                                </summary>
+                                <ul class="mt-2 space-y-1 pl-4">
+                                    @foreach($box['indicators'] as $ind)
+                                    <li class="text-xs text-slate-500 flex items-start gap-1.5">
+                                        <span class="text-slate-300 flex-shrink-0">•</span>{{ $ind }}
+                                    </li>
+                                    @endforeach
+                                </ul>
+                            </details>
+
+                            {{-- Calificación de calidad gráfica (1–5) --}}
+                            <div class="mb-3">
+                                <p class="form-label text-[11px] mb-2">Calidad gráfica integrada (1–5)</p>
+                                <div class="flex gap-1.5">
+                                    @for($i = 1; $i <= 5; $i++)
+                                    <label class="flex-1 cursor-pointer relative">
+                                        <input type="radio" name="scores[{{ $box['key'] }}]" value="{{ $i }}"
+                                               {{ ($scores[$box['key']] ?? null) == $i ? 'checked' : '' }}
+                                               class="sr-only peer">
+                                        <div class="py-1.5 text-center text-xs font-bold rounded-lg border-2 transition-all select-none
+                                                    border-slate-200 bg-white text-slate-400
+                                                    peer-checked:border-violet-500 peer-checked:bg-violet-50 peer-checked:text-violet-700">
+                                            {{ $i }}
+                                        </div>
+                                    </label>
+                                    @endfor
+                                </div>
+                                <div class="flex justify-between text-[9px] text-slate-400 mt-1">
+                                    <span>Muy deficiente</span><span>Muy destacado</span>
+                                </div>
+                            </div>
+
+                            {{-- Observaciones por campo --}}
+                            <div class="form-group mb-0">
+                                <label class="form-label text-[11px]">Observaciones de este campo</label>
+                                <textarea name="scores[obs_{{ $box['key'] }}]" rows="3"
+                                          class="textarea text-xs"
+                                          placeholder="Descripción del dibujo, conductas relevantes, aspectos a integrar en el análisis…">{{ $scores['obs_'.$box['key']] ?? '' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            @endforeach
+        </div>
+
+        {{-- ══ DIMENSIONES ORGANIZACIONALES ══════════════════════════════ --}}
+        <div class="card mb-5 border-brand-200">
+            <div class="card-body">
+                <h2 class="text-sm font-semibold text-brand-700 mb-1">Dimensiones Organizacionales WZT-SL</h2>
+                <p class="text-xs text-slate-400 mb-5">
+                    Califica cada dimensión tras integrar la información de todos los campos. Una calificación aquí
+                    requiere analizar el protocolo completo — no se infiere de un solo campo.
+                    Este puntaje determina la <strong>calificación global</strong> del test.
+                </p>
+
+                <div class="space-y-3">
+                    @foreach($orgDimensions as $dim)
+                    <div class="p-3 bg-slate-50/70 rounded-xl border border-slate-100">
+                        <div class="flex items-start justify-between gap-4 flex-wrap mb-2">
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-semibold text-slate-800">{{ $dim['label'] }}</p>
+                                <p class="text-[11px] text-slate-400">Campos principales: {{ $dim['campos'] }}</p>
+                            </div>
+                            <div class="flex gap-1.5 flex-shrink-0">
+                                @for($i = 1; $i <= 5; $i++)
+                                <label class="cursor-pointer relative">
+                                    <input type="radio" name="scores[{{ $dim['key'] }}]" value="{{ $i }}"
+                                           {{ ($scores[$dim['key']] ?? null) == $i ? 'checked' : '' }}
+                                           class="sr-only peer">
+                                    <div class="w-9 h-9 flex items-center justify-center text-sm font-bold rounded-lg border-2 transition-all select-none
+                                                border-slate-200 bg-white text-slate-400
+                                                peer-checked:border-brand-500 peer-checked:bg-brand-50 peer-checked:text-brand-700">
+                                        {{ $i }}
+                                    </div>
+                                </label>
+                                @endfor
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 mt-1">
+                            <label class="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer">
+                                <input type="radio" name="scores[fa_{{ $dim['key'] }}]" value="fortaleza"
+                                       {{ ($scores['fa_'.$dim['key']] ?? '') === 'fortaleza' ? 'checked' : '' }}>
+                                <span class="text-emerald-600 font-medium">Fortaleza</span>
+                            </label>
+                            <label class="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer">
+                                <input type="radio" name="scores[fa_{{ $dim['key'] }}]" value="area_desarrollo"
+                                       {{ ($scores['fa_'.$dim['key']] ?? '') === 'area_desarrollo' ? 'checked' : '' }}>
+                                <span class="text-amber-600 font-medium">Área de desarrollo</span>
+                            </label>
                         </div>
                     </div>
                     @endforeach
+                </div>
+            </div>
+        </div>
+
+        {{-- ══ SÍNTESIS GLOBAL ══════════════════════════════════════════════ --}}
+        <div class="card mb-5">
+            <div class="card-body">
+                <h2 class="text-sm font-semibold text-slate-700 mb-4">Síntesis Interpretativa Global</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div class="form-group mb-0">
+                        <label class="form-label">Fortalezas identificadas</label>
+                        <textarea name="scores[sintesis_fortalezas]" rows="3" class="textarea text-xs"
+                            placeholder="Recursos, fortalezas y aspectos positivos observados en el protocolo…">{{ $scores['sintesis_fortalezas'] ?? '' }}</textarea>
+                    </div>
+                    <div class="form-group mb-0">
+                        <label class="form-label">Áreas de desarrollo / Alertas</label>
+                        <textarea name="scores[sintesis_alertas]" rows="3" class="textarea text-xs"
+                            placeholder="Indicadores de alerta, áreas de desarrollo y aspectos a profundizar en entrevista…">{{ $scores['sintesis_alertas'] ?? '' }}</textarea>
+                    </div>
+                </div>
+                <div class="form-group mb-0">
+                    <label class="form-label">Recomendación para el cargo</label>
+                    <div class="flex gap-3 flex-wrap">
+                        @foreach(['recomendado'=>['Recomendado','badge-success'],'con_reservas'=>['Recomendado con reservas','badge-warning'],'no_recomendado'=>['No recomendado','badge-danger']] as $val=>[$label,$cls])
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="scores[recomendacion]" value="{{ $val }}"
+                                   {{ ($scores['recomendacion'] ?? '') === $val ? 'checked' : '' }}>
+                            <span class="{{ $cls }} text-xs">{{ $label }}</span>
+                        </label>
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </div>

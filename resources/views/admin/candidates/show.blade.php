@@ -238,7 +238,17 @@
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-2 flex-wrap">
                             <p class="font-medium text-slate-900 truncate">{{ $assignment->test->name }}</p>
-                            @if($assignment->status === 'completed')
+                            @if($assignment->test->evaluator_scored)
+                                @php
+                                    $clinicalDone = $candidate->evaluatorAssessments
+                                        ->firstWhere('assessment_type', $assignment->test->test_type);
+                                @endphp
+                                @if($clinicalDone)
+                                    <span class="badge-success flex-shrink-0">Realizada</span>
+                                @else
+                                    <span class="badge-neutral flex-shrink-0">Pendiente</span>
+                                @endif
+                            @elseif($assignment->status === 'completed')
                                 <span class="badge-success flex-shrink-0">Completada</span>
                             @elseif($assignment->status === 'in_progress')
                                 <span class="badge-warning flex-shrink-0">En progreso</span>

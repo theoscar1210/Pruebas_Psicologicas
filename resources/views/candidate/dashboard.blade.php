@@ -124,14 +124,16 @@
 
                 {{-- Resultado o botón de acción --}}
                 <div class="flex-shrink-0">
-                    @if($assignment->test->evaluator_scored)
+                    @if($assignment->test->test_type === 'wartegg')
+                        {{-- Wartegg digital: el candidato dibuja --}}
                         @php
-                            $evalDone = $candidate->evaluatorAssessments
-                                ->firstWhere('assessment_type', $assignment->test->test_type);
+                            $wSession = $candidate->warteggSessions
+                                ->firstWhere('assignment_id', $assignment->id);
+                            $wDone = $wSession && $wSession->status === 'completed';
+                            $evalDoneW = $candidate->evaluatorAssessments
+                                ->firstWhere('assessment_type', 'wartegg');
                         @endphp
-                        @if($evalDone)
-                        {{-- Ya fue evaluada por el evaluador --}}
-                        <div class="text-center">
+                        @if($evalDoneW)
                             <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700
                                          bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -139,19 +141,46 @@
                                 </svg>
                                 Evaluado
                             </span>
-                        </div>
+                        @elseif($wDone)
+                            <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-700
+                                         bg-brand-50 border border-brand-200 rounded-full px-3 py-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                Dibujos enviados
+                            </span>
                         @else
-                        {{-- Pendiente de evaluación por el evaluador --}}
-                        <div class="text-center">
-                            <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-violet-700
-                                         bg-violet-50 border border-violet-200 rounded-full px-3 py-1">
+                            <a href="{{ route('candidate.wartegg.start', $assignment) }}"
+                               class="btn-primary btn-sm">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
                                 </svg>
-                                Administrada por el evaluador
-                            </span>
-                        </div>
+                                {{ $wSession && $wSession->status === 'in_progress' ? 'Continuar' : 'Iniciar' }}
+                            </a>
+                        @endif
+                    @elseif($assignment->test->evaluator_scored)
+                        @php
+                            $evalDone = $candidate->evaluatorAssessments
+                                ->firstWhere('assessment_type', $assignment->test->test_type);
+                        @endphp
+                        @if($evalDone)
+                        <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700
+                                     bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Evaluado
+                        </span>
+                        @else
+                        <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-violet-700
+                                     bg-violet-50 border border-violet-200 rounded-full px-3 py-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                            Administrada por el evaluador
+                        </span>
                         @endif
 
                     @elseif($isCompleted && $assignment->result)
