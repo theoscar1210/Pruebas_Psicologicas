@@ -23,10 +23,10 @@
 
     <div class="mb-5">
         <h1 class="text-lg font-bold text-slate-900">Módulo 2: Escala de Actitudes</h1>
-        <p class="text-sm text-slate-500 mt-1">Indique qué tan de acuerdo está con cada afirmación. Responda con honestidad sobre cómo piensa y actúa realmente.</p>
+        <p class="text-sm text-slate-500 mt-1">Indique qué tan de acuerdo está con cada afirmación sobre su forma de trabajar. Responda con honestidad sobre cómo piensa y actúa realmente.</p>
     </div>
 
-    {{-- Leyenda de escala --}}
+    {{-- Leyenda --}}
     <div class="card border-brand-100 bg-brand-50/30 mb-6">
         <div class="card-body py-3">
             <div class="grid grid-cols-5 gap-1 text-center text-[10px] font-semibold">
@@ -51,69 +51,69 @@
         @php
         $sections = [
             ['title' => 'E1 — Empatía y Escucha Activa', 'color' => 'teal', 'items' => [
-                21 => 'Cuando un cliente está molesto, me aseguro de escucharlo completamente antes de comenzar a buscar una solución.',
-                22 => 'Me resulta fácil ponerme en el lugar del cliente y entender cómo se siente con la situación que está viviendo.',
-                23 => 'Cuando un cliente me da información confusa, prefiero actuar con lo que entendí antes que hacer demasiadas preguntas.',
-                24 => 'Considero que validar las emociones del cliente es tan importante como resolver su problema.',
-                25 => 'Me incomoda cuando los clientes se toman mucho tiempo para explicar algo que ya entendí.',
+                21 => 'Cuando un socio o invitado está molesto por un problema en el club, me aseguro de escucharlo completamente antes de buscar una solución.',
+                22 => 'Me resulta fácil ponerme en el lugar del huésped y comprender cómo se siente con la situación que vive en el club.',
+                23 => 'Cuando un socio me da información confusa sobre su solicitud, prefiero actuar con lo que entendí antes que hacer demasiadas preguntas.',
+                24 => 'Considero que validar las emociones del socio o invitado es tan importante como resolver el problema puntual.',
+                25 => 'Me incomoda cuando los socios o invitados se toman mucho tiempo para explicar algo que ya entendí.',
             ]],
-            ['title' => 'E2 — Comunicación Efectiva con el Cliente', 'color' => 'sky', 'items' => [
-                26 => 'Adapto mi forma de hablar según el perfil del cliente: no uso el mismo lenguaje con un experto que con alguien sin conocimientos técnicos.',
-                27 => 'Antes de cerrar una interacción, me aseguro de que el cliente haya entendido la información que le di.',
-                28 => 'Cuando tengo que dar malas noticias, tiendo a posponerlo o suavizarlo tanto que el mensaje pierde claridad.',
-                29 => 'Soy capaz de comunicar limitaciones o negativas de forma respetuosa sin que el cliente se sienta rechazado.',
-                30 => 'Prefiero dar respuestas rápidas aunque no sean completamente precisas, antes que hacer esperar al cliente.',
+            ['title' => 'E2 — Comunicación Efectiva con el Huésped', 'color' => 'sky', 'items' => [
+                26 => 'Adapto mi lenguaje y tono según el perfil del huésped: no me expreso igual con un socio fundador que con un invitado que llega por primera vez.',
+                27 => 'Antes de finalizar una interacción con un socio o invitado, me aseguro de que haya comprendido bien la información que le di.',
+                28 => 'Cuando debo dar una mala noticia (instalación no disponible, reserva cancelada, cobro adicional), tiendo a suavizarlo tanto que el mensaje pierde claridad.',
+                29 => 'Soy capaz de comunicar una limitación o política del club de forma respetuosa sin que el socio se sienta rechazado.',
+                30 => 'Prefiero dar respuestas rápidas aunque no sean completamente exactas, antes que hacer esperar al socio o invitado.',
             ]],
-            ['title' => 'P1 — Resolución de Problemas del Cliente', 'color' => 'violet', 'items' => [
-                31 => 'Cuando un cliente tiene un problema recurrente, busco la causa raíz en lugar de aplicar siempre el mismo parche.',
-                32 => 'Me siento cómodo tomando la iniciativa de resolver un problema aunque implique coordinar con otras áreas.',
-                33 => 'Si no tengo la solución inmediata, prefiero dar una respuesta vaga a admitir que debo investigar más.',
-                34 => 'Hago seguimiento a los casos que quedaron pendientes sin que el cliente tenga que recordármelo.',
-                35 => 'Me resulta difícil proponer alternativas cuando la solución que el cliente quiere no está disponible.',
+            ['title' => 'P1 — Resolución de Problemas del Huésped', 'color' => 'violet', 'items' => [
+                31 => 'Cuando un socio reporta un problema recurrente en alguna instalación del club, busco la causa raíz en lugar de aplicar siempre la misma solución temporal.',
+                32 => 'Me siento cómodo coordinando con otras áreas del club (mantenimiento, ama de llaves, cocina, deportes) para resolver un problema del socio.',
+                33 => 'Si no tengo la solución inmediata para un socio, prefiero dar una respuesta vaga antes que admitir que debo consultar con otra área.',
+                34 => 'Hago seguimiento a las solicitudes pendientes de socios e invitados sin que tengan que recordármelo.',
+                35 => 'Me resulta difícil proponer alternativas cuando el servicio o instalación que el socio quiere no está disponible.',
             ]],
-            ['title' => 'P2 — Manejo de Clientes Difíciles y Quejas', 'color' => 'rose', 'items' => [
-                36 => 'Cuando un cliente se comporta de forma agresiva, logro mantener la calma y el enfoque en encontrar una solución.',
-                37 => 'Soy capaz de marcar un límite respetuoso con un cliente sin deteriorar la relación ni escalar el conflicto.',
-                38 => 'Me afecta emocionalmente durante el resto del turno cuando una interacción con un cliente fue muy intensa.',
-                39 => 'Entiendo que la frustración del cliente generalmente no es personal hacia mí, aunque lo parezca.',
-                40 => 'Cuando un cliente insiste en algo que no puedo hacer, me resulta difícil mantenerme firme sin sentirme culpable.',
+            ['title' => 'P2 — Manejo de Socios e Invitados Difíciles', 'color' => 'rose', 'items' => [
+                36 => 'Cuando un socio o invitado se comporta de forma agresiva o irrespetuosa, logro mantener la calma y el enfoque en encontrar una solución.',
+                37 => 'Soy capaz de establecer un límite respetuoso con un socio que viola las normas del club sin deteriorar la relación ni escalar el conflicto.',
+                38 => 'Me afecta emocionalmente durante el resto del turno cuando tuve una interacción muy tensa con un socio o invitado.',
+                39 => 'Entiendo que la frustración de un socio frente a un problema del club generalmente no es algo personal hacia mí.',
+                40 => 'Cuando un socio insiste en algo que va en contra de las políticas del club, me resulta difícil mantenerme firme sin sentirme culpable.',
             ]],
             ['title' => 'A1 — Actitud de Servicio y Proactividad', 'color' => 'amber', 'items' => [
-                41 => 'Me siento genuinamente satisfecho cuando logro resolver bien el problema de un cliente, más allá de si es parte de mis responsabilidades formales.',
-                42 => 'Cuando noto que un cliente podría necesitar algo más que lo que pidió, se lo menciono aunque no sea mi función.',
-                43 => 'Considero que mi trabajo termina cuando resuelvo lo que el cliente solicitó, no antes ni después.',
-                44 => 'El bienestar del cliente es un motivador real para mí, no solo una exigencia del cargo.',
-                45 => 'Me resulta fácil mantener una actitud positiva con los clientes incluso cuando el día ha sido muy exigente.',
+                41 => 'Me siento genuinamente satisfecho cuando logro resolver bien el requerimiento de un socio o invitado, más allá de si era estrictamente parte de mis funciones.',
+                42 => 'Cuando noto que un socio o invitado podría necesitar algo más de lo que pidió, se lo menciono aunque no sea exactamente mi área de trabajo.',
+                43 => 'Considero que mi trabajo termina cuando entrego el servicio solicitado por el socio o invitado, no antes ni después.',
+                44 => 'El bienestar y la satisfacción del socio o invitado son un motivador real para mí en el día a día, no solo una exigencia del puesto.',
+                45 => 'Me resulta fácil mantener una actitud cálida y positiva con socios e invitados incluso cuando el turno ha sido muy exigente.',
             ]],
             ['title' => 'A2 — Tolerancia a la Presión y Regulación Emocional', 'color' => 'orange', 'items' => [
-                46 => 'Cuando cometo un error con un cliente, lo asumo, lo corrijo y sigo adelante sin que afecte la calidad de las siguientes atenciones.',
-                47 => 'En momentos de alta demanda, mantengo el mismo nivel de servicio que en momentos tranquilos.',
-                48 => 'El estrés acumulado durante un turno intenso se nota en cómo trato a los últimos clientes del día.',
-                49 => 'Tengo estrategias personales claras para recuperarme emocionalmente entre una interacción difícil y la siguiente.',
-                50 => 'Cuando hay situaciones fuera de mi control (caídas de sistema, cambios de política), me cuesta mantener una actitud positiva con los clientes.',
+                46 => 'Cuando cometo un error en la atención de un socio o invitado, lo asumo, lo corrijo y sigo adelante sin que afecte la calidad de las atenciones siguientes.',
+                47 => 'En temporadas de alta demanda (vacaciones, fines de semana largos, eventos especiales), mantengo el mismo nivel de servicio que en días tranquilos.',
+                48 => 'El cansancio acumulado durante un turno intenso en el club se nota en cómo trato a los últimos socios o invitados del día.',
+                49 => 'Tengo estrategias personales claras para recuperarme emocionalmente entre una interacción difícil con un huésped y la siguiente.',
+                50 => 'Cuando ocurren situaciones fuera de mi control en el club (cortes de luz, caída de sistemas, falta de insumos), me cuesta mantener una actitud positiva con los socios.',
             ]],
-            ['title' => 'Actitudes Generales de Servicio', 'color' => 'slate', 'items' => [
-                51 => 'Prefiero resolver problemas de clientes directamente antes que derivarlos a otro departamento siempre que sea posible.',
-                52 => 'Creo que el trato amable con el cliente depende mucho del humor con el que uno llegue al trabajo.',
-                53 => 'Me molesta cuando los clientes no leen las instrucciones o no entienden cosas que son evidentes.',
-                54 => 'Pienso que un buen servicio al cliente es responsabilidad de todos en la empresa, no solo de las áreas de atención.',
-                55 => 'Cuando estoy ocupado con un proceso administrativo, prefiero no ser interrumpido aunque un cliente necesite ayuda.',
-                56 => 'Considero que la primera impresión que da una empresa depende directamente de cómo es atendido el cliente desde el primer contacto.',
-                57 => 'Si un cliente no queda satisfecho después de mis mejores esfuerzos, lo asumo como un resultado fuera de mi control y sigo adelante.',
-                58 => 'Creo que algunos clientes simplemente son imposibles de satisfacer y lo mejor es limitarse a cumplir el procedimiento.',
-                59 => 'Me resulta natural agradecer a un cliente su paciencia cuando ha tenido que esperar, aunque no haya sido mi culpa.',
-                60 => 'Prefiero decirle a un cliente lo que necesita escuchar, aunque no sea lo que quiere oír, si con eso realmente le ayudo.',
+            ['title' => 'Actitudes Generales de Servicio en el Club', 'color' => 'slate', 'items' => [
+                51 => 'Prefiero resolver las necesidades de un socio directamente antes que derivarlo a otra área, cuando tengo la posibilidad de ayudar.',
+                52 => 'Creo que la calidez en la atención a socios e invitados depende mucho del humor con el que uno llegue al trabajo.',
+                53 => 'Me molesta cuando los socios hacen solicitudes que consideran urgentes pero que para mí son poco razonables o van contra el reglamento del club.',
+                54 => 'Creo que brindar una experiencia excepcional al socio e invitado es responsabilidad de todos los empleados del club, sin importar el área.',
+                55 => 'Cuando estoy ejecutando una tarea de mi área, prefiero no ser interrumpido aunque un socio o invitado necesite orientación.',
+                56 => 'Considero que la primera impresión que tiene un socio o invitado del club depende directamente de cómo es atendido desde el primer contacto.',
+                57 => 'Si un socio no queda satisfecho a pesar de mis mejores esfuerzos dentro de las posibilidades del club, lo asumo como un resultado fuera de mi control y sigo adelante con la misma disposición.',
+                58 => 'Creo que hay socios que simplemente son imposibles de complacer y lo mejor es limitarse a cumplir el protocolo mínimo establecido.',
+                59 => 'Me resulta natural agradecer a un socio su paciencia cuando tuvo que esperar por un servicio, aunque la demora no haya sido responsabilidad mía.',
+                60 => 'Prefiero decirle a un socio lo que necesita escuchar, aunque no sea lo que quiere oír, si con eso realmente le ayudo o lo oriento mejor.',
             ]],
         ];
 
         $colorMap = [
-            'teal'   => ['bg-teal-50',   'border-teal-200',   'text-teal-700',   'bg-teal-600'],
-            'sky'    => ['bg-sky-50',    'border-sky-200',    'text-sky-700',    'bg-sky-600'],
-            'violet' => ['bg-violet-50', 'border-violet-200', 'text-violet-700', 'bg-violet-600'],
-            'rose'   => ['bg-rose-50',   'border-rose-200',   'text-rose-700',   'bg-rose-600'],
-            'amber'  => ['bg-amber-50',  'border-amber-200',  'text-amber-700',  'bg-amber-600'],
-            'orange' => ['bg-orange-50', 'border-orange-200', 'text-orange-700', 'bg-orange-600'],
-            'slate'  => ['bg-slate-50',  'border-slate-200',  'text-slate-600',  'bg-slate-500'],
+            'teal'   => ['bg-teal-50',   'border-teal-200',   'text-teal-700'],
+            'sky'    => ['bg-sky-50',    'border-sky-200',    'text-sky-700'],
+            'violet' => ['bg-violet-50', 'border-violet-200', 'text-violet-700'],
+            'rose'   => ['bg-rose-50',   'border-rose-200',   'text-rose-700'],
+            'amber'  => ['bg-amber-50',  'border-amber-200',  'text-amber-700'],
+            'orange' => ['bg-orange-50', 'border-orange-200', 'text-orange-700'],
+            'slate'  => ['bg-slate-50',  'border-slate-200',  'text-slate-600'],
         ];
         @endphp
 

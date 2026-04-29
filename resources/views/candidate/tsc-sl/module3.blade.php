@@ -23,11 +23,11 @@
 
     <div class="mb-5">
         <h1 class="text-lg font-bold text-slate-900">Módulo 3: Escenarios Abiertos</h1>
-        <p class="text-sm text-slate-500 mt-1">Para cada situación, redacte su respuesta de la forma más completa y detallada posible. No hay extensión mínima — lo que importa es la calidad de su razonamiento y la respuesta propuesta.</p>
+        <p class="text-sm text-slate-500 mt-1">Para cada situación, describa en detalle cómo actuaría usted. No hay extensión mínima — lo que importa es la calidad de su razonamiento y la coherencia de su respuesta.</p>
     </div>
 
     <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 text-xs text-amber-800">
-        <strong>Importante:</strong> Una vez que envíe este módulo, no podrá modificar sus respuestas. Tómese el tiempo necesario para elaborar cada respuesta antes de enviar.
+        <strong>Importante:</strong> Una vez que envíe este módulo, sus respuestas no podrán modificarse. Tómese el tiempo necesario para elaborar cada respuesta antes de enviar.
     </div>
 
     <form action="{{ route('candidate.tsc-sl.module3.store', $assignment) }}" method="POST" id="form-m3">
@@ -46,17 +46,17 @@
             {{-- Escenario 1 --}}
             <div class="card border-slate-100">
                 <div class="px-5 py-3 bg-rose-50 border-b border-rose-200">
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 flex-wrap">
                         <span class="text-xs font-bold text-rose-700 uppercase tracking-wider">Escenario 1</span>
-                        <span class="text-[10px] text-rose-500 border border-rose-200 rounded-full px-2 py-0.5">Manejo de clientes difíciles · Empatía · Comunicación</span>
+                        <span class="text-[10px] text-rose-500 border border-rose-200 rounded-full px-2 py-0.5">Manejo de socia difícil · Empatía · Comunicación</span>
                     </div>
                 </div>
                 <div class="card-body">
                     <p class="text-sm text-slate-700 leading-relaxed mb-4">
-                        Usted trabaja en el área de atención al cliente de una empresa de telecomunicaciones. <strong>Laura Gómez</strong> la llama por quinta vez en el mismo mes. En llamadas anteriores se le prometió que su servicio de internet sería estabilizado en máximo 72 horas. Ya pasaron dos semanas y el problema persiste. Laura está al límite: su voz transmite agotamiento y frustración contenida. Dice: <em>"Ya no sé qué más hacer. Cada persona que me atiende me da una respuesta diferente. Siento que a nadie le importa realmente resolver esto."</em> Su sistema muestra que hay 4 tickets abiertos por el mismo problema, todos cerrados sin resolución documentada, y que el área técnica tiene un backlog de 10 días para su zona.
+                        La señora <strong>Inés Castaño</strong>, socia fundadora del club, llega a recepción visiblemente alterada. Le explica que en los últimos tres fines de semana ha llegado con sus nietos y la piscina olímpica siempre ha tenido un problema diferente: la primera vez estaba en mantenimiento no programado, la segunda el salvavidas no estaba en su puesto, y el pasado fin de semana el agua estaba fría. Hoy también hay un inconveniente: el sistema de acceso no reconoce su carné y lleva 15 minutos esperando. Dice: <em>"Llevo 20 años siendo socia de este club y nunca había vivido algo así. Ya no sé para qué pago una cuota tan alta."</em> Al revisar el sistema, usted encuentra que el carné venció hace dos días y necesita renovación, proceso que puede hacerse en el momento si la socia tiene su documento de identidad.
                     </p>
                     <p class="text-xs font-semibold text-slate-500 mb-2">Su respuesta:</p>
-                    <p class="text-xs text-slate-400 mb-3">Redacte la respuesta completa que le daría a Laura en esa llamada. Incluya cómo abre la conversación, cómo maneja su frustración, qué información le transmite sobre el estado real de su caso y qué compromiso concreto le ofrece.</p>
+                    <p class="text-xs text-slate-400 mb-3">Describa cómo abre la conversación con la señora Castaño, cómo maneja su frustración acumulada, cómo le explica la situación del carné y qué compromiso concreto le ofrece respecto a los problemas recurrentes con la piscina.</p>
                     <textarea name="m3[1]"
                               rows="7"
                               class="textarea w-full text-sm {{ $errors->has('m3.1') ? 'border-red-400' : '' }}"
@@ -72,17 +72,17 @@
             {{-- Escenario 2 --}}
             <div class="card border-slate-100">
                 <div class="px-5 py-3 bg-violet-50 border-b border-violet-200">
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 flex-wrap">
                         <span class="text-xs font-bold text-violet-700 uppercase tracking-wider">Escenario 2</span>
                         <span class="text-[10px] text-violet-500 border border-violet-200 rounded-full px-2 py-0.5">Resolución de problemas · Proactividad · Comunicación</span>
                     </div>
                 </div>
                 <div class="card-body">
                     <p class="text-sm text-slate-700 leading-relaxed mb-4">
-                        Usted trabaja en una sucursal bancaria. <strong>Ramón Torres</strong>, un señor de 68 años, llega visiblemente desorientado. Pregunta por <em>"el trámite para el dinero de mi esposa que falleció"</em>. No trae ningún papel, no sabe exactamente qué trámite necesita, y cuando usted le pregunta si tiene turno, él le dice que "no sabía que tenía que pedir turno". La sucursal tiene mucha gente, hay 40 minutos de espera para cualquier asesor, y usted está encargado del módulo de información, no de trámites.
+                        Son las 4:00 pm del sábado. Llega al club un grupo de 12 personas invitadas por el socio <strong>Mauricio Ríos</strong> para celebrar su cumpleaños. Traen torta, decoración y un pequeño equipo de sonido. Dicen haber reservado el salón social a través de alguien del área de eventos, pero esa persona no está hoy y no dejó registro escrito de ninguna reserva. El salón social está siendo usado por otro evento hasta las 7:00 pm. Usted está de turno en recepción. El socio Ríos aún no ha llegado y no contesta el teléfono.
                     </p>
                     <p class="text-xs font-semibold text-slate-500 mb-2">Su respuesta:</p>
-                    <p class="text-xs text-slate-400 mb-3">Describa paso a paso qué haría usted desde el momento en que Ramón se acerca a su módulo. Incluya cómo lo orienta, qué información le solicita, cómo gestiona la situación con el sistema de turnos y qué hace para asegurarse de que reciba la atención correcta.</p>
+                    <p class="text-xs text-slate-400 mb-3">Describa paso a paso qué haría desde el momento en que el grupo llega. ¿Cómo los recibe? ¿Qué alternativas busca? ¿Cómo gestiona la comunicación con el grupo y con el socio? ¿Qué hace para asegurarse de que la celebración pueda llevarse a cabo de la mejor manera posible?</p>
                     <textarea name="m3[2]"
                               rows="7"
                               class="textarea w-full text-sm {{ $errors->has('m3.2') ? 'border-red-400' : '' }}"
@@ -98,17 +98,17 @@
             {{-- Escenario 3 --}}
             <div class="card border-slate-100">
                 <div class="px-5 py-3 bg-orange-50 border-b border-orange-200">
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 flex-wrap">
                         <span class="text-xs font-bold text-orange-700 uppercase tracking-wider">Escenario 3</span>
                         <span class="text-[10px] text-orange-500 border border-orange-200 rounded-full px-2 py-0.5">Regulación emocional · Clientes difíciles · Empatía</span>
                     </div>
                 </div>
                 <div class="card-body">
                     <p class="text-sm text-slate-700 leading-relaxed mb-4">
-                        Son las 5:45 pm del último día hábil del mes. Su turno termina a las 6:00 pm. El sistema lleva 30 minutos lento. Usted acaba de darle a un cliente (<strong>Carlos Medina</strong>) información errónea sobre una fecha de vencimiento de su póliza: le dijo que vencía el 30, cuando en realidad vence el 25 de este mes — es decir, <strong>en 5 días</strong>. Carlos ya salió de la sucursal. Usted tiene el teléfono de Carlos porque lo registró en el sistema. Si no renueva en 5 días, perderá la cobertura. Además, hay dos clientes esperando ser atendidos y su supervisor no está disponible.
+                        Son las 7:40 pm del viernes. Su turno en el bar del club termina a las 8:00 pm. El sistema de punto de venta falló hace 20 minutos y ha estado atendiendo los consumos de forma manual. Acaba de cobrarle al socio <strong>Rafael Torres</strong> un total de $85.000 cuando el monto correcto era $58.000. El señor Torres ya se fue con su familia. Usted tiene su número de contacto porque lo registró al inicio de la noche. Si no se corrige, el cobro incorrecto aparecerá en el estado de cuenta mensual del socio. Además, hay dos mesas de invitados esperando que alguien les tome el pedido, y su compañero del turno de la noche llega a las 8:00 pm exactas.
                     </p>
                     <p class="text-xs font-semibold text-slate-500 mb-2">Su respuesta:</p>
-                    <p class="text-xs text-slate-400 mb-3">Describa exactamente qué haría en los próximos 15 minutos. ¿Cómo maneja los dos clientes en espera? ¿Cómo resuelve el error con Carlos? ¿Cómo gestiona su propio estado emocional ante el error y la presión?</p>
+                    <p class="text-xs text-slate-400 mb-3">Describa exactamente qué haría en los próximos 20 minutos. ¿Cómo prioriza las situaciones? ¿Cómo contacta al señor Torres y qué le dice? ¿Cómo gestiona a las mesas en espera? ¿Cómo maneja su propio estado emocional ante el error cometido y la presión del cierre de turno?</p>
                     <textarea name="m3[3]"
                               rows="7"
                               class="textarea w-full text-sm {{ $errors->has('m3.3') ? 'border-red-400' : '' }}"
@@ -127,8 +127,7 @@
         <div class="sticky bottom-4 mt-6">
             <div class="bg-white border border-slate-200 rounded-xl shadow-lg p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <p class="text-xs text-slate-500">Al enviar, sus respuestas quedarán registradas y no podrán modificarse.</p>
-                <button type="button" id="btn-confirm"
-                        class="btn-primary btn-sm flex-shrink-0">
+                <button type="button" id="btn-confirm" class="btn-primary btn-sm flex-shrink-0">
                     Enviar y finalizar
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
@@ -159,7 +158,6 @@
 
 <script>
 (function() {
-    // Contadores de caracteres
     [1,2,3].forEach(n => {
         const ta = document.getElementById(`sc${n}`);
         const cnt = document.getElementById(`cnt${n}`);
@@ -169,7 +167,6 @@
         }
     });
 
-    // Modal de confirmación
     const modal = document.getElementById('modal-confirm');
     document.getElementById('btn-confirm').addEventListener('click', () => modal.classList.remove('hidden'));
     document.getElementById('btn-cancel-modal').addEventListener('click', () => modal.classList.add('hidden'));

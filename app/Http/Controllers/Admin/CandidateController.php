@@ -134,7 +134,9 @@ class CandidateController extends Controller
             'position_id'  => $candidate->position_id,
             'assigned_by'  => auth()->id(),
             'status'       => 'pending',
-            'expires_at'   => $validated['expires_at'] ?? null,
+            'expires_at'   => $validated['expires_at']
+                                 ? \Carbon\Carbon::parse($validated['expires_at'])->endOfDay()
+                                 : null,
         ]);
 
         $testName = Test::find($validated['test_id'])?->name ?? 'Prueba';
