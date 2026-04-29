@@ -181,6 +181,17 @@ class EvaluatorAssessmentController extends Controller
             // fallback: promedio de scores de caja si no hay dims org
         }
 
+        if ($type === 'star_interview') {
+            $starKeys = ['L1','L2','R1','R2','R3','D1','D2','D3','P1','P2'];
+            $starScores = array_filter(
+                array_intersect_key($scores, array_flip($starKeys)),
+                'is_numeric'
+            );
+            if (count($starScores) > 0) {
+                return round(array_sum($starScores) / count($starScores) * 20, 2);
+            }
+        }
+
         $numeric = array_filter($scores, 'is_numeric');
         return count($numeric) > 0
             ? round(array_sum($numeric) / count($numeric) * 20, 2)
