@@ -186,6 +186,18 @@ class TscSlController extends Controller
             'm3.1' => 'required|string|min:50|max:3000',
             'm3.2' => 'required|string|min:50|max:3000',
             'm3.3' => 'required|string|min:50|max:3000',
+        ], [
+            'm3.1.required' => 'La respuesta al Escenario 1 es obligatoria.',
+            'm3.1.min'      => 'La respuesta al Escenario 1 debe tener al menos 50 caracteres.',
+            'm3.1.max'      => 'La respuesta al Escenario 1 no puede superar los 3000 caracteres.',
+            'm3.2.required' => 'La respuesta al Escenario 2 es obligatoria.',
+            'm3.2.min'      => 'La respuesta al Escenario 2 debe tener al menos 50 caracteres.',
+            'm3.2.max'      => 'La respuesta al Escenario 2 no puede superar los 3000 caracteres.',
+            'm3.3.required' => 'La respuesta al Escenario 3 es obligatoria.',
+            'm3.3.min'      => 'La respuesta al Escenario 3 debe tener al menos 50 caracteres.',
+            'm3.3.max'      => 'La respuesta al Escenario 3 no puede superar los 3000 caracteres.',
+            'm3.required'   => 'Debe responder los tres escenarios.',
+            'm3.size'       => 'Debe responder los tres escenarios.',
         ]);
 
         $session->update([
