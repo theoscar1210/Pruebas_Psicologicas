@@ -111,7 +111,7 @@
                         <input type="datetime-local"
                                name="expires_at"
                                value="{{ old('expires_at') }}"
-                               min="{{ now()->format('Y-m-d\TH:i') }}"
+                               min="{{ now()->format('Y-m-d') }}T00:00"
                                class="input {{ $errors->has('expires_at') ? 'border-red-400 ring-1 ring-red-400' : '' }}">
                         @error('expires_at')
                             <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
