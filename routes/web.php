@@ -8,7 +8,9 @@ use App\Http\Controllers\Admin\PsychologicalReportController;
 use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\TestController;
+use App\Http\Controllers\Admin\TscSlAdminController;
 use App\Http\Controllers\Candidate\TestTakingController;
+use App\Http\Controllers\Candidate\TscSlController;
 use App\Http\Controllers\Candidate\WarteggController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -49,6 +51,11 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         ->name('assignments.destroy');
     Route::get('perfiles', [CandidateController::class, 'perfilesIndex'])
         ->name('perfiles.index');
+
+    // TSC-SL: calificación M3 por el evaluador
+    Route::get('tsc-sl/{session}/calificar',  [TscSlAdminController::class, 'score'])->name('tsc-sl.score');
+    Route::post('tsc-sl/{session}/calificar', [TscSlAdminController::class, 'storeScore'])->name('tsc-sl.score.store');
+    Route::get('tsc-sl/{session}/resultados', [TscSlAdminController::class, 'results'])->name('tsc-sl.results');
 
     // Evaluaciones clínicas del evaluador
     Route::get('candidates/{candidate}/evaluar', [EvaluatorAssessmentController::class, 'select'])->name('assessments.select');
@@ -92,6 +99,16 @@ Route::prefix('candidato')->name('candidate.')->group(function () {
         Route::post('/wartegg/{assignment}/guardar-caja', [WarteggController::class, 'saveBox'])->name('wartegg.save-box');
         Route::post('/wartegg/{assignment}/finalizar',    [WarteggController::class, 'finish'])->name('wartegg.finish');
         Route::get('/wartegg/{assignment}/completado',    [WarteggController::class, 'complete'])->name('wartegg.complete');
+
+        // TSC-SL: Test de Servicio al Cliente
+        Route::get('/tsc-sl/{assignment}/instrucciones', [TscSlController::class, 'start'])->name('tsc-sl.start');
+        Route::get('/tsc-sl/{assignment}/modulo1',       [TscSlController::class, 'module1'])->name('tsc-sl.module1');
+        Route::post('/tsc-sl/{assignment}/modulo1',      [TscSlController::class, 'storeModule1'])->name('tsc-sl.module1.store');
+        Route::get('/tsc-sl/{assignment}/modulo2',       [TscSlController::class, 'module2'])->name('tsc-sl.module2');
+        Route::post('/tsc-sl/{assignment}/modulo2',      [TscSlController::class, 'storeModule2'])->name('tsc-sl.module2.store');
+        Route::get('/tsc-sl/{assignment}/modulo3',       [TscSlController::class, 'module3'])->name('tsc-sl.module3');
+        Route::post('/tsc-sl/{assignment}/modulo3',      [TscSlController::class, 'storeModule3'])->name('tsc-sl.module3.store');
+        Route::get('/tsc-sl/{assignment}/completado',    [TscSlController::class, 'complete'])->name('tsc-sl.complete');
     });
 });
 

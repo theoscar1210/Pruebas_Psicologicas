@@ -124,7 +124,47 @@
 
                 {{-- Resultado o botón de acción --}}
                 <div class="flex-shrink-0">
-                    @if($assignment->test->test_type === 'wartegg')
+                    @if($assignment->test->test_type === 'tsc_sl')
+                        {{-- TSC-SL: flujo de 3 módulos --}}
+                        @php
+                            $tscSession = $candidate->tscSlSessions
+                                ->firstWhere('assignment_id', $assignment->id);
+                            $tscStatus  = $tscSession?->status ?? 'pending';
+                        @endphp
+                        @if(in_array($tscStatus, ['completed','m3_submitted']))
+                            <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700
+                                         bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                {{ $tscStatus === 'completed' ? 'Evaluado' : 'Enviado' }}
+                            </span>
+                        @elseif($tscStatus === 'm2_done')
+                            <a href="{{ route('candidate.tsc-sl.module3', $assignment) }}"
+                               class="btn-warning btn-sm">
+                                Módulo 3
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        @elseif($tscStatus === 'm1_done')
+                            <a href="{{ route('candidate.tsc-sl.module2', $assignment) }}"
+                               class="btn-warning btn-sm">
+                                Módulo 2
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        @else
+                            <a href="{{ route('candidate.tsc-sl.start', $assignment) }}"
+                               class="{{ $tscSession ? 'btn-warning' : 'btn-primary' }} btn-sm">
+                                {{ $tscSession ? 'Continuar' : 'Iniciar' }}
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        @endif
+                    @elseif($assignment->test->test_type === 'wartegg')
                         {{-- Wartegg digital: el candidato dibuja --}}
                         @php
                             $wSession = $candidate->warteggSessions

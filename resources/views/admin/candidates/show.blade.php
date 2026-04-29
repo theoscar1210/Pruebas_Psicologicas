@@ -416,6 +416,88 @@
                 @endif
                 {{-- ── fin interpretación ── --}}
 
+                {{-- ── TSC-SL: estado y acciones del evaluador ── --}}
+                @if($assignment->test->test_type === 'tsc_sl')
+                @php
+                    $tscSess = $candidate->tscSlSessions->firstWhere('assignment_id', $assignment->id);
+                @endphp
+                <div class="mt-4 pt-4 border-t border-slate-100">
+                    <div class="flex items-center gap-2 mb-3">
+                        <svg class="w-3.5 h-3.5 text-teal-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        <h4 class="text-xs font-semibold text-teal-700 uppercase tracking-wider">TSC-SL — Test de Servicio al Cliente</h4>
+                    </div>
+
+                    @if(!$tscSess)
+                        <p class="text-xs text-slate-400">El candidato aún no ha iniciado esta prueba.</p>
+                    @elseif($tscSess->status === 'pending')
+                        <p class="text-xs text-slate-400">En curso — Módulo 1 (SJT) pendiente.</p>
+                    @elseif($tscSess->status === 'm1_done')
+                        <p class="text-xs text-slate-400">En curso — Módulo 1 completado · Módulo 2 pendiente.</p>
+                    @elseif($tscSess->status === 'm2_done')
+                        <p class="text-xs text-slate-400">En curso — Módulos 1 y 2 completados · Módulo 3 pendiente.</p>
+                    @elseif($tscSess->status === 'm3_submitted')
+                        <div class="flex items-center justify-between flex-wrap gap-3 bg-amber-50 border border-amber-200 rounded-lg p-3">
+                            <div>
+                                <p class="text-xs font-semibold text-amber-700">Módulo 3 enviado — pendiente de calificación</p>
+                                <p class="text-[11px] text-amber-600 mt-0.5">
+                                    M1: {{ $tscSess->m1_score ?? '—' }}/60 · M2: {{ $tscSess->m2_score ?? '—' }}/150 · Enviado: {{ $tscSess->m3_submitted_at?->format('d/m/Y H:i') }}
+                                </p>
+                            </div>
+                            <a href="{{ route('admin.tsc-sl.score', $tscSess) }}" class="btn-primary btn-sm flex-shrink-0">
+                                Calificar M3
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </div>
+                    @elseif($tscSess->status === 'completed')
+                        <div class="bg-slate-50 rounded-lg p-3">
+                            <div class="flex items-center justify-between flex-wrap gap-3 mb-3">
+                                <div class="flex items-center gap-3">
+                                    <div>
+                                        <p class="text-xs text-slate-400">Puntaje total</p>
+                                        <p class="text-2xl font-bold text-slate-900">{{ $tscSess->total_score }}<span class="text-base text-slate-400 font-normal">/225</span></p>
+                                    </div>
+                                    <span class="text-xs font-bold border rounded-xl px-3 py-1 {{ $tscSess->performanceLevelColor() }}">
+                                        {{ $tscSess->performanceLevelLabel() }}
+                                    </span>
+                                </div>
+                                <a href="{{ route('admin.tsc-sl.results', $tscSess) }}" class="btn-ghost btn-sm flex-shrink-0">
+                                    Ver resultados completos →
+                                </a>
+                            </div>
+                            <div class="grid grid-cols-3 gap-3 text-center text-xs">
+                                <div>
+                                    <p class="font-bold text-slate-800">{{ $tscSess->m1_score }}/60</p>
+                                    <p class="text-slate-400">M1 SJT</p>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-slate-800">{{ $tscSess->m2_score }}/150</p>
+                                    <p class="text-slate-400">M2 Actitudes</p>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-slate-800">{{ $tscSess->m3_score }}/15</p>
+                                    <p class="text-slate-400">M3 Escenarios</p>
+                                </div>
+                            </div>
+                            @if($tscSess->dimension_scores)
+                            <div class="mt-3 pt-3 border-t border-slate-200 grid grid-cols-2 gap-1.5 text-[11px]">
+                                @foreach(['E1'=>'Empatía','E2'=>'Comunicación','P1'=>'Resolución','P2'=>'Cl. Difíciles','A1'=>'Proactividad','A2'=>'Regulación'] as $code=>$label)
+                                <div class="flex justify-between gap-1">
+                                    <span class="text-slate-400">{{ $code }} {{ $label }}</span>
+                                    <span class="font-semibold text-slate-700">{{ $tscSess->dimension_scores[$code] ?? '—' }}</span>
+                                </div>
+                                @endforeach
+                            </div>
+                            @endif
+                        </div>
+                    @endif
+                </div>
+                {{-- ── fin TSC-SL ── --}}
+                @endif
+
             </div>
         </div>
         @empty

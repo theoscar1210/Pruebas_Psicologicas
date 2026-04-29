@@ -52,7 +52,7 @@ class TestTakingController extends Controller
             return redirect()->route('candidate.access');
         }
 
-        $candidate->load(['position', 'assignments.test', 'assignments.result', 'evaluatorAssessments', 'warteggSessions']);
+        $candidate->load(['position', 'assignments.test', 'assignments.result', 'evaluatorAssessments', 'warteggSessions', 'tscSlSessions']);
 
         return view('candidate.dashboard', compact('candidate'));
     }

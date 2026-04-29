@@ -66,6 +66,11 @@ class Candidate extends Model
         return $this->hasMany(WarteggSession::class);
     }
 
+    public function tscSlSessions(): HasMany
+    {
+        return $this->hasMany(\App\Models\TscSlSession::class);
+    }
+
     public function psychologicalReports(): HasMany
     {
         return $this->hasMany(PsychologicalReport::class);
