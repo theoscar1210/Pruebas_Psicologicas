@@ -99,6 +99,26 @@ $colorText = [
             </div>
         </div>
 
+        {{-- Gráfico radar --}}
+        @php
+        $radarPcts = [];
+        $radarLabels = [];
+        foreach ($dimMeta as $code => $meta) {
+            $radarLabels[] = $code;
+            $radarPcts[]   = $meta['max'] > 0 ? round(($dims[$code] ?? 0) / $meta['max'] * 100) : 0;
+        }
+        $radarFullLabels = array_column($dimMeta, 'label');
+        @endphp
+        <div class="card">
+            <div class="card-body">
+                <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">Mapa de competencias (% del máximo por dimensión)</h2>
+                <div class="relative h-72 sm:h-80">
+                    <canvas id="radarChart"></canvas>
+                </div>
+                <p class="text-[10px] text-slate-400 text-center mt-3">Valores expresados como porcentaje del máximo posible en cada dimensión</p>
+            </div>
+        </div>
+
         {{-- Calificación M3 --}}
         @if($session->m3_scores)
         <div class="card">
@@ -197,3 +217,64 @@ $colorText = [
 </div>
 
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+    const labels    = @json($radarLabels);
+    const fullNames = @json($radarFullLabels);
+    const data      = @json($radarPcts);
+
+    new Chart(document.getElementById('radarChart'), {
+        type: 'radar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '{{ addslashes($candidate->name) }}',
+                data: data,
+                backgroundColor: 'rgba(20, 184, 166, 0.12)',
+                borderColor: 'rgba(20, 184, 166, 0.75)',
+                pointBackgroundColor: 'rgba(20, 184, 166, 0.9)',
+                pointBorderColor: '#fff',
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                borderWidth: 2,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        stepSize: 25,
+                        color: '#94a3b8',
+                        font: { size: 9 },
+                        backdropColor: 'transparent',
+                        callback: v => v + '%',
+                    },
+                    grid: { color: 'rgba(148,163,184,0.25)' },
+                    angleLines: { color: 'rgba(148,163,184,0.35)' },
+                    pointLabels: {
+                        font: { size: 11, weight: '600' },
+                        color: '#475569',
+                    },
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        title: ctx => fullNames[ctx[0].dataIndex],
+                        label: ctx => ' ' + ctx.raw + '%',
+                    }
+                }
+            }
+        }
+    });
+})();
+</script>
+@endpush
