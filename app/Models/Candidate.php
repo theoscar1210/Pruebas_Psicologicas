@@ -71,6 +71,11 @@ class Candidate extends Model
         return $this->hasMany(\App\Models\TscSlSession::class);
     }
 
+    public function tteSlSessions(): HasMany
+    {
+        return $this->hasMany(\App\Models\TteSlSession::class);
+    }
+
     public function psychologicalReports(): HasMany
     {
         return $this->hasMany(PsychologicalReport::class);

@@ -9,8 +9,10 @@ use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\TestController;
 use App\Http\Controllers\Admin\TscSlAdminController;
+use App\Http\Controllers\Admin\TteSlAdminController;
 use App\Http\Controllers\Candidate\TestTakingController;
 use App\Http\Controllers\Candidate\TscSlController;
+use App\Http\Controllers\Candidate\TteSlController;
 use App\Http\Controllers\Candidate\WarteggController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -56,6 +58,11 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('tsc-sl/{session}/calificar',  [TscSlAdminController::class, 'score'])->name('tsc-sl.score');
     Route::post('tsc-sl/{session}/calificar', [TscSlAdminController::class, 'storeScore'])->name('tsc-sl.score.store');
     Route::get('tsc-sl/{session}/resultados', [TscSlAdminController::class, 'results'])->name('tsc-sl.results');
+
+    // TTE-SL: calificación M3 por el evaluador
+    Route::get('tte-sl/{session}/calificar',  [TteSlAdminController::class, 'score'])->name('tte-sl.score');
+    Route::post('tte-sl/{session}/calificar', [TteSlAdminController::class, 'storeScore'])->name('tte-sl.score.store');
+    Route::get('tte-sl/{session}/resultados', [TteSlAdminController::class, 'results'])->name('tte-sl.results');
 
     // Evaluaciones clínicas del evaluador
     Route::get('candidates/{candidate}/evaluar', [EvaluatorAssessmentController::class, 'select'])->name('assessments.select');
@@ -109,6 +116,16 @@ Route::prefix('candidato')->name('candidate.')->group(function () {
         Route::get('/tsc-sl/{assignment}/modulo3',       [TscSlController::class, 'module3'])->name('tsc-sl.module3');
         Route::post('/tsc-sl/{assignment}/modulo3',      [TscSlController::class, 'storeModule3'])->name('tsc-sl.module3.store');
         Route::get('/tsc-sl/{assignment}/completado',    [TscSlController::class, 'complete'])->name('tsc-sl.complete');
+
+        // TTE-SL: Test de Trabajo en Equipo
+        Route::get('/tte-sl/{assignment}/instrucciones', [TteSlController::class, 'start'])->name('tte-sl.start');
+        Route::get('/tte-sl/{assignment}/modulo1',       [TteSlController::class, 'module1'])->name('tte-sl.module1');
+        Route::post('/tte-sl/{assignment}/modulo1',      [TteSlController::class, 'storeModule1'])->name('tte-sl.module1.store');
+        Route::get('/tte-sl/{assignment}/modulo2',       [TteSlController::class, 'module2'])->name('tte-sl.module2');
+        Route::post('/tte-sl/{assignment}/modulo2',      [TteSlController::class, 'storeModule2'])->name('tte-sl.module2.store');
+        Route::get('/tte-sl/{assignment}/modulo3',       [TteSlController::class, 'module3'])->name('tte-sl.module3');
+        Route::post('/tte-sl/{assignment}/modulo3',      [TteSlController::class, 'storeModule3'])->name('tte-sl.module3.store');
+        Route::get('/tte-sl/{assignment}/completado',    [TteSlController::class, 'complete'])->name('tte-sl.complete');
     });
 });
 
