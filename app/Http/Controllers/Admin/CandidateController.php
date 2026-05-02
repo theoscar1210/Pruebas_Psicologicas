@@ -63,7 +63,7 @@ class CandidateController extends Controller
         ]);
 
         $candidate = Candidate::create(array_merge($validated, [
-            'created_by' => auth()->id(),
+            'created_by' => Auth::id(),
         ]));
 
         // Si tiene cargo, asignar automáticamente las pruebas del cargo
@@ -77,7 +77,7 @@ class CandidateController extends Controller
 
     public function show(Candidate $candidate): View
     {
-        $candidate->load(['position', 'assignments.test', 'assignments.result', 'assignments.dimensionScores', 'createdBy', 'evaluatorAssessments', 'tscSlSessions', 'tteSlSessions']);
+        $candidate->load(['position', 'assignments.test', 'assignments.result', 'assignments.dimensionScores', 'createdBy', 'evaluatorAssessments', 'tscSlSessions', 'tteSlSessions', 'consents']);
         return view('admin.candidates.show', compact('candidate'));
     }
 
@@ -132,7 +132,7 @@ class CandidateController extends Controller
             'candidate_id' => $candidate->id,
             'test_id'      => $validated['test_id'],
             'position_id'  => $candidate->position_id,
-            'assigned_by'  => auth()->id(),
+            'assigned_by'  => Auth::id(),
             'status'       => 'pending',
             'expires_at'   => $validated['expires_at']
                                  ? \Carbon\Carbon::parse($validated['expires_at'])->endOfDay()
@@ -167,7 +167,7 @@ class CandidateController extends Controller
                 'candidate_id' => $candidate->id,
                 'test_id' => $test->id,
                 'position_id' => $position->id,
-                'assigned_by' => auth()->id(),
+                'assigned_by' => Auth::id(),
                 'status' => 'pending',
             ]);
         }

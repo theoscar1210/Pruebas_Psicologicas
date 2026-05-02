@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Candidate;
 
 use App\Http\Controllers\Controller;
 use App\Models\Candidate;
+use App\Models\Consent;
 use App\Models\TestAssignment;
 use App\Models\TscSlSession;
 use App\Services\TscSlScoringService;
@@ -224,6 +225,25 @@ class TscSlController extends Controller
         }
 
         return view('candidate.tsc-sl.complete', compact('candidate', 'assignment', 'session'));
+    }
+
+    /** Registrar consentimiento y redirigir al Módulo 1 */
+    public function storeConsent(Request $request, TestAssignment $assignment): RedirectResponse
+    {
+        $candidate = $this->resolveCandidate($assignment);
+        if (!$candidate) return redirect()->route('candidate.access');
+
+        Consent::firstOrCreate(
+            ['candidate_id' => $candidate->id, 'assignment_id' => $assignment->id, 'test_type' => 'tsc_sl'],
+            [
+                'consent_version' => '1.0',
+                'ip_address'      => $request->ip(),
+                'user_agent'      => substr($request->userAgent() ?? '', 0, 500),
+                'consented_at'    => now(),
+            ]
+        );
+
+        return redirect()->route('candidate.tsc-sl.module1', $assignment);
     }
 
     // ── Helpers ────────────────────────────────────────────────────────────────

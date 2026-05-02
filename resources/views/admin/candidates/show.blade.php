@@ -136,6 +136,35 @@
             </div>
         </div>
 
+        {{-- Historial de consentimientos --}}
+        <div class="card min-w-0">
+            <div class="card-body">
+                <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Consentimientos informados</h3>
+                @if($candidate->consents->isEmpty())
+                    <p class="text-xs text-slate-400">Sin consentimientos registrados.</p>
+                @else
+                    <div class="space-y-2">
+                        @foreach($candidate->consents as $consent)
+                        <div class="rounded-lg border border-emerald-100 bg-emerald-50/50 p-2.5">
+                            <div class="flex items-start justify-between gap-2 mb-1">
+                                <span class="text-xs font-semibold text-emerald-700">{{ $consent->testTypeLabel() }}</span>
+                                <span class="text-[10px] text-slate-400 flex-shrink-0">v{{ $consent->consent_version }}</span>
+                            </div>
+                            <p class="text-[11px] text-slate-600">
+                                <svg class="w-3 h-3 inline text-emerald-500 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                {{ $consent->consented_at->format('d/m/Y H:i') }}
+                            </p>
+                            <p class="text-[10px] text-slate-400 mt-0.5 font-mono">IP: {{ $consent->ip_address }}</p>
+                        </div>
+                        @endforeach
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-2">Ley 1581/2012 · Ley 1090/2006 — registro de trazabilidad.</p>
+                @endif
+            </div>
+        </div>
+
         {{-- Evaluaciones clínicas --}}
         <div class="card min-w-0">
             <div class="card-body">

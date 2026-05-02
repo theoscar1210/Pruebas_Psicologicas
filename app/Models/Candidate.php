@@ -76,6 +76,11 @@ class Candidate extends Model
         return $this->hasMany(\App\Models\TteSlSession::class);
     }
 
+    public function consents(): HasMany
+    {
+        return $this->hasMany(\App\Models\Consent::class)->orderByDesc('consented_at');
+    }
+
     public function psychologicalReports(): HasMany
     {
         return $this->hasMany(PsychologicalReport::class);

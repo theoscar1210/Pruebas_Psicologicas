@@ -93,16 +93,19 @@
         </div>
     </div>
 
-    {{-- Botón inicio --}}
-    <a id="btn-start"
-       href="{{ route('candidate.tsc-sl.module1', $assignment) }}"
-       class="btn-primary w-full justify-center text-base py-3 opacity-40 pointer-events-none"
-       aria-disabled="true">
-        Comenzar — Módulo 1
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-        </svg>
-    </a>
+    {{-- Formulario de consentimiento --}}
+    <form method="POST" action="{{ route('candidate.tsc-sl.consent', $assignment) }}" id="form-consent">
+        @csrf
+        <button id="btn-start"
+                type="submit"
+                disabled
+                class="btn-primary w-full justify-center text-base py-3 opacity-40 cursor-not-allowed">
+            Comenzar — Módulo 1
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+        </button>
+    </form>
 
     <p class="text-center text-xs text-slate-400 mt-4">Módulo 1 de 3 · Juicio Situacional · ≈ 15–20 min</p>
 </div>
@@ -111,11 +114,11 @@
 document.getElementById('consent').addEventListener('change', function() {
     const btn = document.getElementById('btn-start');
     if (this.checked) {
-        btn.classList.remove('opacity-40','pointer-events-none');
-        btn.removeAttribute('aria-disabled');
+        btn.disabled = false;
+        btn.classList.remove('opacity-40', 'cursor-not-allowed');
     } else {
-        btn.classList.add('opacity-40','pointer-events-none');
-        btn.setAttribute('aria-disabled','true');
+        btn.disabled = true;
+        btn.classList.add('opacity-40', 'cursor-not-allowed');
     }
 });
 </script>

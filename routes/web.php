@@ -108,7 +108,8 @@ Route::prefix('candidato')->name('candidate.')->group(function () {
         Route::get('/wartegg/{assignment}/completado',    [WarteggController::class, 'complete'])->name('wartegg.complete');
 
         // TSC-SL: Test de Servicio al Cliente
-        Route::get('/tsc-sl/{assignment}/instrucciones', [TscSlController::class, 'start'])->name('tsc-sl.start');
+        Route::get('/tsc-sl/{assignment}/instrucciones',  [TscSlController::class, 'start'])->name('tsc-sl.start');
+        Route::post('/tsc-sl/{assignment}/instrucciones', [TscSlController::class, 'storeConsent'])->name('tsc-sl.consent');
         Route::get('/tsc-sl/{assignment}/modulo1',       [TscSlController::class, 'module1'])->name('tsc-sl.module1');
         Route::post('/tsc-sl/{assignment}/modulo1',      [TscSlController::class, 'storeModule1'])->name('tsc-sl.module1.store');
         Route::get('/tsc-sl/{assignment}/modulo2',       [TscSlController::class, 'module2'])->name('tsc-sl.module2');
@@ -118,7 +119,8 @@ Route::prefix('candidato')->name('candidate.')->group(function () {
         Route::get('/tsc-sl/{assignment}/completado',    [TscSlController::class, 'complete'])->name('tsc-sl.complete');
 
         // TTE-SL: Test de Trabajo en Equipo
-        Route::get('/tte-sl/{assignment}/instrucciones', [TteSlController::class, 'start'])->name('tte-sl.start');
+        Route::get('/tte-sl/{assignment}/instrucciones',  [TteSlController::class, 'start'])->name('tte-sl.start');
+        Route::post('/tte-sl/{assignment}/instrucciones', [TteSlController::class, 'storeConsent'])->name('tte-sl.consent');
         Route::get('/tte-sl/{assignment}/modulo1',       [TteSlController::class, 'module1'])->name('tte-sl.module1');
         Route::post('/tte-sl/{assignment}/modulo1',      [TteSlController::class, 'storeModule1'])->name('tte-sl.module1.store');
         Route::get('/tte-sl/{assignment}/modulo2',       [TteSlController::class, 'module2'])->name('tte-sl.module2');
