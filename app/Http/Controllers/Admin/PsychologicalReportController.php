@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Candidate;
 use App\Models\PsychologicalReport;
+use App\Services\AiNarrativeService;
 use App\Services\PsychologicalReportService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -67,6 +69,31 @@ class PsychologicalReportController extends Controller
         return redirect()
             ->route('admin.profile.show', $candidate)
             ->with('success', 'Perfil completado y recomendación guardada.');
+    }
+
+    /** Generar narrativa IA para una sección del informe */
+    public function generateNarrative(Request $request, Candidate $candidate): JsonResponse
+    {
+        $section = $request->validate([
+            'section' => 'required|in:personality,cognitive,competencies,projective,interview',
+        ])['section'];
+
+        $report = $candidate->psychologicalReports()->latest()->first();
+
+        if (!$report) {
+            return response()->json(['error' => 'Genera primero el perfil psicológico.'], 422);
+        }
+
+        try {
+            $text = app(AiNarrativeService::class)->generate($report, $candidate, $section);
+
+            $field = "narrative_{$section}";
+            $report->update([$field => $text]);
+
+            return response()->json(['text' => $text]);
+        } catch (\Throwable $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /** Exportar el perfil como PDF */

@@ -19,25 +19,34 @@ class User extends Authenticatable
         'password',
         'role',
         'is_active',
+        'two_factor_secret',
+        'two_factor_confirmed_at',
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
+        'two_factor_secret',
     ];
 
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'is_active' => 'boolean',
+            'email_verified_at'       => 'datetime',
+            'password'                => 'hashed',
+            'is_active'               => 'boolean',
+            'two_factor_confirmed_at' => 'datetime',
         ];
     }
 
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
+    }
+
+    public function hasTwoFactor(): bool
+    {
+        return !is_null($this->two_factor_confirmed_at);
     }
 
     public function isPsicologo(): bool

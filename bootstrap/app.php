@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'candidate.session' => \App\Http\Middleware\CandidateSession::class,
             'role'              => \App\Http\Middleware\EnsureUserRole::class,
+            'two-factor'        => \App\Http\Middleware\EnsureTwoFactorAuthenticated::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\TestController;
 use App\Http\Controllers\Admin\TscSlAdminController;
 use App\Http\Controllers\Admin\TteSlAdminController;
+use App\Http\Controllers\Auth\TwoFactorController;
 use App\Http\Controllers\Candidate\TestTakingController;
 use App\Http\Controllers\Candidate\TscSlController;
 use App\Http\Controllers\Candidate\TteSlController;
@@ -20,13 +21,25 @@ use Illuminate\Support\Facades\Route;
 // ── Inicio ────────────────────────────────────────────────────────────────────
 Route::get('/', fn () => redirect()->route('login'));
 
+// ── Autenticación de dos factores (2FA) ──────────────────────────────────────
+Route::middleware('guest')->group(function () {
+    Route::get('/two-factor/challenge', [TwoFactorController::class, 'challenge'])->name('two-factor.challenge');
+    Route::post('/two-factor/challenge', [TwoFactorController::class, 'verify'])->name('two-factor.verify');
+});
+
+Route::middleware(['auth', 'two-factor'])->group(function () {
+    Route::get('/two-factor/setup',   [TwoFactorController::class, 'setup'])->name('two-factor.setup');
+    Route::post('/two-factor/enable', [TwoFactorController::class, 'enable'])->name('two-factor.enable');
+    Route::post('/two-factor/disable',[TwoFactorController::class, 'disable'])->name('two-factor.disable');
+});
+
 // ── Dashboard del administrador ───────────────────────────────────────────────
 Route::get('/dashboard', DashboardController::class)
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'two-factor'])
     ->name('dashboard');
 
-// ── Panel de administración (requiere auth) ───────────────────────────────────
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+// ── Panel de administración (requiere auth + 2FA) ─────────────────────────────
+Route::middleware(['auth', 'two-factor'])->prefix('admin')->name('admin.')->group(function () {
 
     // Perfil propio — todos los roles autenticados
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -88,6 +101,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::post('candidates/{candidate}/perfil/generar', [PsychologicalReportController::class, 'generate'])->name('profile.generate');
         Route::post('candidates/{candidate}/perfil/completar', [PsychologicalReportController::class, 'complete'])->name('profile.complete');
         Route::get('candidates/{candidate}/perfil/pdf', [PsychologicalReportController::class, 'pdf'])->name('profile.pdf');
+        Route::post('candidates/{candidate}/perfil/narrativa', [PsychologicalReportController::class, 'generateNarrative'])->name('profile.narrative');
     });
 });
 

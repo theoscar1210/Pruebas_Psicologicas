@@ -20,6 +20,9 @@ class PsychologicalReport extends Model
         'wartegg_score', 'projective_observations',
         // Entrevista
         'interview_score', 'interview_competencies', 'interview_observations',
+        // Narrativas IA
+        'narrative_personality', 'narrative_cognitive', 'narrative_competencies',
+        'narrative_projective', 'narrative_interview',
         // Resultado
         'adjustment_score', 'adjustment_level',
         'labor_risks', 'recommendation', 'recommendation_notes', 'summary',

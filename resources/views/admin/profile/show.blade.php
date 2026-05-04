@@ -392,4 +392,99 @@
     </div>
 </div>
 
+{{-- ── Narrativas automáticas con IA ──────────────────────────────────────── --}}
+@if($report)
+<div class="mt-8">
+    <div class="flex items-center gap-3 mb-4">
+        <h2 class="text-base font-semibold text-slate-700">Narrativas automáticas</h2>
+        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-violet-100 text-violet-700">
+            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>
+            </svg>
+            IA — Claude
+        </span>
+        <p class="text-xs text-slate-400">Genera un borrador de cada sección; edítalo antes de incluirlo en el informe final.</p>
+    </div>
+
+    @php
+    $narrativeSections = [
+        ['key' => 'personality',  'label' => 'Personalidad',   'badge' => 'badge-purple', 'badge_text' => 'Big Five + 16PF'],
+        ['key' => 'cognitive',    'label' => 'Cognitivo',       'badge' => 'badge-info',   'badge_text' => 'Raven'],
+        ['key' => 'competencies', 'label' => 'Competencias',    'badge' => 'badge-warning','badge_text' => 'AC'],
+        ['key' => 'projective',   'label' => 'Proyectivo',      'badge' => 'badge-neutral','badge_text' => 'Wartegg'],
+        ['key' => 'interview',    'label' => 'Entrevista STAR', 'badge' => 'badge-success','badge_text' => 'STAR'],
+    ];
+    @endphp
+
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        @foreach($narrativeSections as $ns)
+        @php $narrativeField = 'narrative_' . $ns['key']; $existingText = $report->$narrativeField ?? ''; @endphp
+        <div class="card"
+             x-data="{
+                loading: false,
+                text: @js($existingText),
+                async generate() {
+                    this.loading = true;
+                    try {
+                        const res = await fetch('{{ route('admin.profile.narrative', $candidate) }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                                'Accept': 'application/json',
+                            },
+                            body: JSON.stringify({ section: '{{ $ns['key'] }}' }),
+                        });
+                        const data = await res.json();
+                        if (data.text) {
+                            this.text = data.text;
+                        } else {
+                            alert(data.error || 'Error generando narrativa.');
+                        }
+                    } catch(e) {
+                        alert('Error de conexión.');
+                    } finally {
+                        this.loading = false;
+                    }
+                }
+             }">
+            <div class="card-body">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                        <h3 class="font-semibold text-slate-700 text-sm">{{ $ns['label'] }}</h3>
+                        <span class="{{ $ns['badge'] }} text-xs">{{ $ns['badge_text'] }}</span>
+                    </div>
+                    <button type="button"
+                            @click="generate()"
+                            :disabled="loading"
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition disabled:opacity-60 disabled:cursor-not-allowed"
+                            style="background: #7C3AED;">
+                        <svg x-show="!loading" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>
+                        </svg>
+                        <svg x-show="loading" class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24" style="display:none">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                        </svg>
+                        <span x-text="loading ? 'Generando…' : (text ? 'Regenerar' : 'Generar con IA')"></span>
+                    </button>
+                </div>
+
+                <template x-if="text">
+                    <div class="bg-violet-50 border border-violet-100 rounded-xl p-3">
+                        <p class="text-sm text-slate-700 leading-relaxed" x-text="text"></p>
+                    </div>
+                </template>
+                <template x-if="!text">
+                    <p class="text-xs text-slate-400 text-center py-4 border border-dashed border-slate-200 rounded-xl">
+                        Sin narrativa generada aún
+                    </p>
+                </template>
+            </div>
+        </div>
+        @endforeach
+    </div>
+</div>
+@endif
+
 @endsection
