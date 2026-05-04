@@ -8,14 +8,15 @@ use Illuminate\Support\Facades\Http;
 
 class AiNarrativeService
 {
-    private const MODEL   = 'claude-sonnet-4-6';
+    private const MODEL      = 'llama-3.1-70b-versatile';
     private const MAX_TOKENS = 600;
+    private const ENDPOINT   = 'https://api.groq.com/openai/v1/chat/completions';
 
     private string $apiKey;
 
     public function __construct()
     {
-        $this->apiKey = config('services.anthropic.key', '');
+        $this->apiKey = config('services.groq.key', '');
     }
 
     /**
@@ -28,21 +29,23 @@ class AiNarrativeService
         $prompt = $this->buildPrompt($report, $candidate, $section);
 
         $response = Http::withHeaders([
-            'x-api-key'         => $this->apiKey,
-            'anthropic-version' => '2023-06-01',
-            'content-type'      => 'application/json',
-        ])->post('https://api.anthropic.com/v1/messages', [
+            'Authorization' => 'Bearer ' . $this->apiKey,
+            'Content-Type'  => 'application/json',
+        ])->post(self::ENDPOINT, [
             'model'      => self::MODEL,
             'max_tokens' => self::MAX_TOKENS,
-            'system'     => $this->systemPrompt(),
-            'messages'   => [['role' => 'user', 'content' => $prompt]],
+            'temperature' => 0.7,
+            'messages'   => [
+                ['role' => 'system', 'content' => $this->systemPrompt()],
+                ['role' => 'user',   'content' => $prompt],
+            ],
         ]);
 
         if (!$response->successful()) {
             throw new \RuntimeException('Error al contactar la API de IA: ' . $response->body());
         }
 
-        return trim($response->json('content.0.text', ''));
+        return trim($response->json('choices.0.message.content', ''));
     }
 
     private function systemPrompt(): string
