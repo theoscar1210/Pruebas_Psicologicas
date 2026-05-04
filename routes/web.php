@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\TestController;
 use App\Http\Controllers\Admin\TscSlAdminController;
 use App\Http\Controllers\Admin\TteSlAdminController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\TwoFactorController;
 use App\Http\Controllers\Candidate\TestTakingController;
 use App\Http\Controllers\Candidate\TscSlController;
@@ -46,8 +47,13 @@ Route::middleware(['auth', 'two-factor'])->prefix('admin')->name('admin.')->grou
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // ── Solo admin: configuración del sistema ─────────────────────────────────
+    // ── Solo admin: gestión de usuarios ──────────────────────────────────────
     Route::middleware('role:admin')->group(function () {
+        Route::resource('users', UserController::class)->except(['show']);
+    });
+
+    // ── Admin + Psicólogo: configuración de cargos y pruebas ─────────────────
+    Route::middleware('role:admin,psicologo')->group(function () {
 
         Route::resource('positions', PositionController::class);
 

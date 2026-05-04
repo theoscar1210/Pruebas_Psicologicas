@@ -204,13 +204,13 @@
     /* ── ALERTAS / FLASH ─────────────────────────────────────────────────── */
 
     .alert {
-        @apply flex items-start gap-3 rounded-card px-4 py-3.5 text-sm;
+        @apply flex items-start gap-3 rounded-card px-4 py-3.5 text-sm border-l-4;
     }
 
-    .alert-success { @apply alert bg-emerald-50 border border-emerald-200 text-emerald-800; }
-    .alert-error   { @apply alert bg-red-50     border border-red-200     text-red-800; }
-    .alert-warning { @apply alert bg-amber-50   border border-amber-200   text-amber-800; }
-    .alert-info    { @apply alert bg-brand-50   border border-brand-200   text-brand-800; }
+    .alert-success { @apply alert bg-emerald-50 border border-emerald-200 border-l-emerald-500 text-emerald-800; }
+    .alert-error   { @apply alert bg-red-50     border border-red-200     border-l-red-500     text-red-800; }
+    .alert-warning { @apply alert bg-amber-50   border border-amber-200   border-l-amber-500   text-amber-800; }
+    .alert-info    { @apply alert bg-brand-50   border border-brand-200   border-l-brand-500   text-brand-800; }
 
     /* ── TABLAS ──────────────────────────────────────────────────────────── */
 
