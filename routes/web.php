@@ -95,14 +95,17 @@ Route::prefix('candidato')->name('candidate.')->group(function () {
 
     Route::middleware('candidate.session')->group(function () {
         Route::get('/inicio', [TestTakingController::class, 'dashboard'])->name('dashboard');
+        Route::get('/prueba/{assignment}/consentimiento',  [TestTakingController::class, 'consentForm'])->name('consent');
+        Route::post('/prueba/{assignment}/consentimiento', [TestTakingController::class, 'storeConsent'])->name('consent.store');
         Route::get('/prueba/{assignment}/iniciar', [TestTakingController::class, 'start'])->name('start');
         Route::post('/prueba/{assignment}/respuesta', [TestTakingController::class, 'saveAnswer'])->name('answer');
         Route::post('/prueba/{assignment}/finalizar', [TestTakingController::class, 'finish'])->name('finish');
         Route::get('/prueba/{assignment}/resultado', [TestTakingController::class, 'result'])->name('result');
 
         // Wartegg digital
-        Route::get('/wartegg/{assignment}/instrucciones', [WarteggController::class, 'start'])->name('wartegg.start');
-        Route::get('/wartegg/{assignment}/dibujar',       [WarteggController::class, 'draw'])->name('wartegg.draw');
+        Route::get('/wartegg/{assignment}/instrucciones',  [WarteggController::class, 'start'])->name('wartegg.start');
+        Route::post('/wartegg/{assignment}/instrucciones', [WarteggController::class, 'storeConsent'])->name('wartegg.consent');
+        Route::get('/wartegg/{assignment}/dibujar',        [WarteggController::class, 'draw'])->name('wartegg.draw');
         Route::post('/wartegg/{assignment}/guardar-caja', [WarteggController::class, 'saveBox'])->name('wartegg.save-box');
         Route::post('/wartegg/{assignment}/finalizar',    [WarteggController::class, 'finish'])->name('wartegg.finish');
         Route::get('/wartegg/{assignment}/completado',    [WarteggController::class, 'complete'])->name('wartegg.complete');

@@ -80,14 +80,17 @@
     {{-- Consentimiento --}}
     <div class="card border-slate-200 mb-6">
         <div class="card-body">
-            <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Consentimiento informado</h2>
+            <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Autorización de tratamiento de datos personales</h2>
             <p class="text-xs text-slate-600 leading-relaxed">
-                Sus respuestas serán tratadas con estricta confidencialidad, utilizadas exclusivamente para el proceso de selección de personal y protegidas conforme a la <strong>Ley 1581 de 2012</strong> (Habeas Data) y el <strong>Código Deontológico del Psicólogo — Ley 1090 de 2006</strong>. La participación es voluntaria. Tiene derecho a solicitar retroalimentación orientada al desarrollo al finalizar el proceso.
+                De conformidad con la <strong>Ley 1581 de 2012</strong> y el <strong>Decreto 1377 de 2013</strong>, le informamos que <strong>{{ config('app.name') }}</strong> (Responsable del tratamiento) recopilará sus datos personales — nombre, documento de identidad, correo, teléfono, cargo aspirado y respuestas a las pruebas psicológicas — con la finalidad de <strong>evaluar sus competencias en el marco del proceso de selección de personal</strong>. Sus datos serán compartidos únicamente con el psicólogo evaluador y el área de Recursos Humanos del empleador, y se conservarán durante la vigencia del proceso y hasta por <strong>2 años</strong> después de su finalización.
+            </p>
+            <p class="text-xs text-slate-600 leading-relaxed mt-2">
+                Conforme al <strong>Código Deontológico del Psicólogo — Ley 1090 de 2006</strong>, los resultados son confidenciales e interpretados exclusivamente por un profesional autorizado. La participación es <strong>voluntaria</strong>. Como titular usted tiene derecho a <strong>conocer, actualizar, rectificar y suprimir</strong> sus datos, y a <strong>revocar esta autorización</strong> en cualquier momento escribiendo a <strong>{{ config('mail.from.address', 'contacto@menteclara.co') }}</strong>.
             </p>
             <div class="mt-3 flex items-start gap-2">
                 <input type="checkbox" id="consent" class="mt-0.5 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
                 <label for="consent" class="text-xs text-slate-700 leading-relaxed">
-                    He leído y acepto que mis respuestas sean utilizadas para el proceso de selección bajo los términos indicados.
+                    <strong>Autorizo</strong> expresamente el tratamiento de mis datos personales para el proceso de selección, conforme a la Ley 1581 de 2012 y los términos indicados.
                 </label>
             </div>
         </div>

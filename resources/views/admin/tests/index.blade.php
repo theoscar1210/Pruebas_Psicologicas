@@ -36,9 +36,24 @@
                     @endif
                 </td>
                 <td class="text-center">
-                    <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-violet-100 text-violet-700 text-xs font-bold">
-                        {{ $test->questions_count }}
-                    </span>
+                    @php
+                    $modularCounts = ['tsc_sl' => '63', 'tte_sl' => '63'];
+                    $specialLabels = ['wartegg' => '8 campos', 'star_interview' => '15 STAR'];
+                    @endphp
+                    @if(isset($modularCounts[$test->test_type]))
+                        <span class="inline-flex items-center justify-center px-2 h-7 rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold"
+                              title="Test de módulos: ítems hardcodeados en el flujo">
+                            {{ $modularCounts[$test->test_type] }}
+                        </span>
+                    @elseif(isset($specialLabels[$test->test_type]))
+                        <span class="inline-flex items-center justify-center px-2 h-7 rounded-full bg-slate-100 text-slate-500 text-xs font-medium">
+                            {{ $specialLabels[$test->test_type] }}
+                        </span>
+                    @else
+                        <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-violet-100 text-violet-700 text-xs font-bold">
+                            {{ $test->questions_count }}
+                        </span>
+                    @endif
                 </td>
                 <td class="text-center text-slate-600 text-sm">
                     {{ $test->time_limit ? $test->time_limit . ' min' : 'Sin límite' }}

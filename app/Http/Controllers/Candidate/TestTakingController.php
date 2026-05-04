@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Candidate;
 use App\Http\Controllers\Controller;
 use App\Models\Answer;
 use App\Models\Candidate;
+use App\Models\Consent;
 use App\Models\TestAssignment;
 use App\Services\TestScoringService;
 use Illuminate\Http\JsonResponse;
@@ -57,6 +58,37 @@ class TestTakingController extends Controller
         return view('candidate.dashboard', compact('candidate'));
     }
 
+    public function consentForm(TestAssignment $assignment): View|RedirectResponse
+    {
+        $candidate = $this->getSessionCandidate();
+        if (!$candidate || $assignment->candidate_id !== $candidate->id) {
+            return redirect()->route('candidate.access');
+        }
+
+        $assignment->load(['test.questions']);
+        return view('candidate.consent', compact('candidate', 'assignment'));
+    }
+
+    public function storeConsent(Request $request, TestAssignment $assignment): RedirectResponse
+    {
+        $candidate = $this->getSessionCandidate();
+        if (!$candidate || $assignment->candidate_id !== $candidate->id) {
+            return redirect()->route('candidate.access');
+        }
+
+        Consent::firstOrCreate(
+            ['candidate_id' => $candidate->id, 'assignment_id' => $assignment->id, 'test_type' => $assignment->test->test_type],
+            [
+                'consent_version' => '1.0',
+                'ip_address'      => $request->ip(),
+                'user_agent'      => substr($request->userAgent() ?? '', 0, 500),
+                'consented_at'    => now(),
+            ]
+        );
+
+        return redirect()->route('candidate.start', $assignment);
+    }
+
     /**
      * Inicia o reanuda una prueba.
      */
@@ -84,8 +116,16 @@ class TestTakingController extends Controller
                 ->with('error', 'Esta prueba ha expirado.');
         }
 
-        // Primera vez que inicia
+        // Verificar consentimiento antes de permitir iniciar
         if ($assignment->isPending()) {
+            $hasConsent = Consent::where('candidate_id', $candidate->id)
+                ->where('assignment_id', $assignment->id)
+                ->exists();
+
+            if (!$hasConsent) {
+                return redirect()->route('candidate.consent', $assignment);
+            }
+
             $assignment->update([
                 'status' => 'in_progress',
                 'started_at' => Carbon::now(),
