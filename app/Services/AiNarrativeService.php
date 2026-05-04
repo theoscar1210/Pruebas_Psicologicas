@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Http;
 
 class AiNarrativeService
 {
-    private const MODEL      = 'llama-3.1-70b-versatile';
+    private const MODEL      = 'llama-3.3-70b-versatile';
     private const MAX_TOKENS = 600;
     private const ENDPOINT   = 'https://api.groq.com/openai/v1/chat/completions';
 
