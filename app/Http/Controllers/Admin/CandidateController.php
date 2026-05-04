@@ -19,8 +19,7 @@ class CandidateController extends Controller
         $filter = $request->filter;
 
         $candidates = Candidate::with(['position', 'assignments.result'])
-            ->when($request->search, fn ($q) => $q->where('name', 'like', "%{$request->search}%")
-                ->orWhere('document_number', 'like', "%{$request->search}%"))
+            ->when($request->search, fn ($q) => $q->where('name', 'like', "%{$request->search}%"))
             ->when($request->position_id, fn ($q) => $q->where('position_id', $request->position_id))
             ->when($request->status, fn ($q) => $q->where('status', $request->status))
             ->when($filter === 'evaluacion', fn ($q) =>

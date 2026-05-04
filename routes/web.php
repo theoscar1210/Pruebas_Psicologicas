@@ -28,62 +28,66 @@ Route::get('/dashboard', DashboardController::class)
 // ── Panel de administración (requiere auth) ───────────────────────────────────
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
 
-    // Perfil
+    // Perfil propio — todos los roles autenticados
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Cargos
-    Route::resource('positions', PositionController::class);
+    // ── Solo admin: configuración del sistema ─────────────────────────────────
+    Route::middleware('role:admin')->group(function () {
 
-    // Pruebas y sus preguntas
-    Route::resource('tests', TestController::class);
-    Route::prefix('tests/{test}')->name('tests.')->group(function () {
-        Route::get('questions', [QuestionController::class, 'index'])->name('questions.index');
-        Route::post('questions', [QuestionController::class, 'store'])->name('questions.store');
-        Route::put('questions/{question}', [QuestionController::class, 'update'])->name('questions.update');
-        Route::delete('questions/{question}', [QuestionController::class, 'destroy'])->name('questions.destroy');
+        Route::resource('positions', PositionController::class);
+
+        Route::resource('tests', TestController::class);
+        Route::prefix('tests/{test}')->name('tests.')->group(function () {
+            Route::get('questions', [QuestionController::class, 'index'])->name('questions.index');
+            Route::post('questions', [QuestionController::class, 'store'])->name('questions.store');
+            Route::put('questions/{question}', [QuestionController::class, 'update'])->name('questions.update');
+            Route::delete('questions/{question}', [QuestionController::class, 'destroy'])->name('questions.destroy');
+        });
     });
 
-    // Candidatos
-    Route::resource('candidates', CandidateController::class);
-    Route::post('candidates/{candidate}/assign-test', [CandidateController::class, 'assignTest'])
-        ->name('candidates.assign-test');
-    Route::delete('assignments/{assignment}', [CandidateController::class, 'destroyAssignment'])
-        ->name('assignments.destroy');
-    Route::get('perfiles', [CandidateController::class, 'perfilesIndex'])
-        ->name('perfiles.index');
+    // ── Admin + RRHH + Psicólogo: gestión de candidatos ──────────────────────
+    Route::middleware('role:admin,psicologo,hr')->group(function () {
 
-    // TSC-SL: calificación M3 por el evaluador
-    Route::get('tsc-sl/{session}/calificar',  [TscSlAdminController::class, 'score'])->name('tsc-sl.score');
-    Route::post('tsc-sl/{session}/calificar', [TscSlAdminController::class, 'storeScore'])->name('tsc-sl.score.store');
-    Route::get('tsc-sl/{session}/resultados', [TscSlAdminController::class, 'results'])->name('tsc-sl.results');
+        Route::resource('candidates', CandidateController::class);
+        Route::post('candidates/{candidate}/assign-test', [CandidateController::class, 'assignTest'])
+            ->name('candidates.assign-test');
+        Route::delete('assignments/{assignment}', [CandidateController::class, 'destroyAssignment'])
+            ->name('assignments.destroy');
 
-    // TTE-SL: calificación M3 por el evaluador
-    Route::get('tte-sl/{session}/calificar',  [TteSlAdminController::class, 'score'])->name('tte-sl.score');
-    Route::post('tte-sl/{session}/calificar', [TteSlAdminController::class, 'storeScore'])->name('tte-sl.score.store');
-    Route::get('tte-sl/{session}/resultados', [TteSlAdminController::class, 'results'])->name('tte-sl.results');
+        Route::prefix('reportes')->name('reports.')->group(function () {
+            Route::get('/', [ReportController::class, 'index'])->name('index');
+            Route::get('candidato/{candidate}/pdf', [ReportController::class, 'candidatePdf'])->name('candidate.pdf');
+            Route::get('ranking/pdf', [ReportController::class, 'rankingPdf'])->name('ranking.pdf');
+            Route::get('exportar/excel', [ReportController::class, 'exportExcel'])->name('export.excel');
+            Route::get('ranking/excel', [ReportController::class, 'exportRankingExcel'])->name('ranking.excel');
+        });
+    });
 
-    // Evaluaciones clínicas del evaluador
-    Route::get('candidates/{candidate}/evaluar', [EvaluatorAssessmentController::class, 'select'])->name('assessments.select');
-    Route::get('candidates/{candidate}/evaluacion', [EvaluatorAssessmentController::class, 'create'])->name('assessments.create');
-    Route::post('candidates/{candidate}/evaluacion', [EvaluatorAssessmentController::class, 'store'])->name('assessments.store');
-    Route::get('evaluaciones/{assessment}/editar', [EvaluatorAssessmentController::class, 'edit'])->name('assessments.edit');
-    Route::put('evaluaciones/{assessment}', [EvaluatorAssessmentController::class, 'update'])->name('assessments.update');
+    // ── Admin + Psicólogo: evaluaciones, calificaciones y perfiles ───────────
+    Route::middleware('role:admin,psicologo')->group(function () {
 
-    // Perfil psicológico
-    Route::get('candidates/{candidate}/perfil', [PsychologicalReportController::class, 'show'])->name('profile.show');
-    Route::post('candidates/{candidate}/perfil/generar', [PsychologicalReportController::class, 'generate'])->name('profile.generate');
-    Route::post('candidates/{candidate}/perfil/completar', [PsychologicalReportController::class, 'complete'])->name('profile.complete');
-    Route::get('candidates/{candidate}/perfil/pdf', [PsychologicalReportController::class, 'pdf'])->name('profile.pdf');
+        Route::get('perfiles', [CandidateController::class, 'perfilesIndex'])->name('perfiles.index');
 
-    // Reportes
-    Route::prefix('reportes')->name('reports.')->group(function () {
-        Route::get('/', [ReportController::class, 'index'])->name('index');
-        Route::get('candidato/{candidate}/pdf', [ReportController::class, 'candidatePdf'])->name('candidate.pdf');
-        Route::get('ranking/pdf', [ReportController::class, 'rankingPdf'])->name('ranking.pdf');
-        Route::get('exportar/excel', [ReportController::class, 'exportExcel'])->name('export.excel');
-        Route::get('ranking/excel', [ReportController::class, 'exportRankingExcel'])->name('ranking.excel');
+        Route::get('tsc-sl/{session}/calificar',  [TscSlAdminController::class, 'score'])->name('tsc-sl.score');
+        Route::post('tsc-sl/{session}/calificar', [TscSlAdminController::class, 'storeScore'])->name('tsc-sl.score.store');
+        Route::get('tsc-sl/{session}/resultados', [TscSlAdminController::class, 'results'])->name('tsc-sl.results');
+
+        Route::get('tte-sl/{session}/calificar',  [TteSlAdminController::class, 'score'])->name('tte-sl.score');
+        Route::post('tte-sl/{session}/calificar', [TteSlAdminController::class, 'storeScore'])->name('tte-sl.score.store');
+        Route::get('tte-sl/{session}/resultados', [TteSlAdminController::class, 'results'])->name('tte-sl.results');
+
+        Route::get('candidates/{candidate}/evaluar', [EvaluatorAssessmentController::class, 'select'])->name('assessments.select');
+        Route::get('candidates/{candidate}/evaluacion', [EvaluatorAssessmentController::class, 'create'])->name('assessments.create');
+        Route::post('candidates/{candidate}/evaluacion', [EvaluatorAssessmentController::class, 'store'])->name('assessments.store');
+        Route::get('evaluaciones/{assessment}/editar', [EvaluatorAssessmentController::class, 'edit'])->name('assessments.edit');
+        Route::put('evaluaciones/{assessment}', [EvaluatorAssessmentController::class, 'update'])->name('assessments.update');
+
+        Route::get('candidates/{candidate}/perfil', [PsychologicalReportController::class, 'show'])->name('profile.show');
+        Route::post('candidates/{candidate}/perfil/generar', [PsychologicalReportController::class, 'generate'])->name('profile.generate');
+        Route::post('candidates/{candidate}/perfil/completar', [PsychologicalReportController::class, 'complete'])->name('profile.complete');
+        Route::get('candidates/{candidate}/perfil/pdf', [PsychologicalReportController::class, 'pdf'])->name('profile.pdf');
     });
 });
 
