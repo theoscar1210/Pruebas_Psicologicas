@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Candidate;
 
 use App\Http\Controllers\Controller;
+use App\Models\Candidate;
 use App\Models\DataDeletionRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,7 +13,7 @@ class DataDeletionController extends Controller
 {
     public function create(Request $request): View
     {
-        $candidate = $request->session()->get('candidate');
+        $candidate = Candidate::find(session('candidate_id'));
 
         $existing = DataDeletionRequest::where('candidate_id', $candidate->id)
             ->where('status', 'pending')
@@ -23,7 +24,7 @@ class DataDeletionController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $candidate = $request->session()->get('candidate');
+        $candidate = Candidate::find(session('candidate_id'));
 
         $alreadyPending = DataDeletionRequest::where('candidate_id', $candidate->id)
             ->where('status', 'pending')

@@ -112,7 +112,7 @@
         </div>
 
         <div class="mt-6 text-center">
-            <a href="javascript:history.back()" class="btn-ghost btn-sm">← Volver</a>
+            <a href="{{ route('candidate.access') }}" class="btn-ghost btn-sm">← Portal de candidatos</a>
             <p class="text-xs text-slate-400 mt-3">Superintendencia de Industria y Comercio · <a href="https://www.sic.gov.co" target="_blank" class="underline hover:text-slate-600">www.sic.gov.co</a></p>
         </div>
 
