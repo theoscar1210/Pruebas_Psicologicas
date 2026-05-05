@@ -32,12 +32,16 @@ Route::get('/politica-de-privacidad', fn () => view('privacy'))->name('privacy')
 // ── Autenticación de dos factores (2FA) ──────────────────────────────────────
 Route::middleware('guest')->group(function () {
     Route::get('/two-factor/challenge', [TwoFactorController::class, 'challenge'])->name('two-factor.challenge');
-    Route::post('/two-factor/challenge', [TwoFactorController::class, 'verify'])->name('two-factor.verify');
+    Route::post('/two-factor/challenge', [TwoFactorController::class, 'verify'])
+        ->middleware('throttle:two-factor')
+        ->name('two-factor.verify');
 });
 
 Route::middleware(['auth', 'two-factor'])->group(function () {
     Route::get('/two-factor/setup',   [TwoFactorController::class, 'setup'])->name('two-factor.setup');
-    Route::post('/two-factor/enable', [TwoFactorController::class, 'enable'])->name('two-factor.enable');
+    Route::post('/two-factor/enable', [TwoFactorController::class, 'enable'])
+        ->middleware('throttle:two-factor')
+        ->name('two-factor.enable');
     Route::post('/two-factor/disable',[TwoFactorController::class, 'disable'])->name('two-factor.disable');
 });
 
@@ -132,7 +136,9 @@ Route::middleware(['auth', 'two-factor'])->prefix('admin')->name('admin.')->grou
 // ── Portal de candidatos (acceso por código único) ────────────────────────────
 Route::prefix('candidato')->name('candidate.')->group(function () {
     Route::get('/', [TestTakingController::class, 'accessForm'])->name('access');
-    Route::post('/', [TestTakingController::class, 'access'])->name('access.post');
+    Route::post('/', [TestTakingController::class, 'access'])
+        ->middleware('throttle:candidate-access')
+        ->name('access.post');
     Route::post('/logout', [TestTakingController::class, 'logout'])->name('logout');
 
     Route::middleware('candidate.session')->group(function () {
