@@ -164,6 +164,46 @@
                                 </svg>
                             </a>
                         @endif
+                    @elseif($assignment->test->test_type === 'tsc_sl_h')
+                        {{-- TSC-SL Hospitalidad: flujo de 3 módulos --}}
+                        @php
+                            $tscHSession = $candidate->tscSlSessions
+                                ->firstWhere('assignment_id', $assignment->id);
+                            $tscHStatus  = $tscHSession?->status ?? 'pending';
+                        @endphp
+                        @if(in_array($tscHStatus, ['completed','m3_submitted']))
+                            <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700
+                                         bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                {{ $tscHStatus === 'completed' ? 'Evaluado' : 'Enviado' }}
+                            </span>
+                        @elseif($tscHStatus === 'm2_done')
+                            <a href="{{ route('candidate.tsc-sl-h.module3', $assignment) }}"
+                               class="btn-warning btn-sm">
+                                Módulo 3
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        @elseif($tscHStatus === 'm1_done')
+                            <a href="{{ route('candidate.tsc-sl-h.module2', $assignment) }}"
+                               class="btn-warning btn-sm">
+                                Módulo 2
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        @else
+                            <a href="{{ route('candidate.tsc-sl-h.start', $assignment) }}"
+                               class="{{ $tscHSession ? 'btn-warning' : 'btn-primary' }} btn-sm">
+                                {{ $tscHSession ? 'Continuar' : 'Iniciar' }}
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        @endif
                     @elseif($assignment->test->test_type === 'tte_sl')
                         {{-- TTE-SL: flujo de 3 módulos --}}
                         @php

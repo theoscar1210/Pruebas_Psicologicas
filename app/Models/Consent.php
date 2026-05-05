@@ -34,8 +34,9 @@ class Consent extends Model
     public function testTypeLabel(): string
     {
         return match ($this->test_type) {
-            'tsc_sl' => 'TSC-SL — Test de Servicio al Cliente',
-            'tte_sl' => 'TTE-SL — Test de Trabajo en Equipo',
+            'tsc_sl'   => 'TSC-SL — Test de Servicio al Cliente',
+            'tsc_sl_h' => 'TSC-SL Hospitalidad — Servicio de Mesa y F&B',
+            'tte_sl'   => 'TTE-SL — Test de Trabajo en Equipo',
             'wartegg' => 'Test de Wartegg',
             default  => strtoupper($this->test_type),
         };

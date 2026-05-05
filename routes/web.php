@@ -9,11 +9,13 @@ use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\TestController;
 use App\Http\Controllers\Admin\TscSlAdminController;
+use App\Http\Controllers\Admin\TscSlHAdminController;
 use App\Http\Controllers\Admin\TteSlAdminController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\TwoFactorController;
 use App\Http\Controllers\Candidate\TestTakingController;
 use App\Http\Controllers\Candidate\TscSlController;
+use App\Http\Controllers\Candidate\TscSlHController;
 use App\Http\Controllers\Candidate\TteSlController;
 use App\Http\Controllers\Candidate\WarteggController;
 use App\Http\Controllers\ProfileController;
@@ -93,6 +95,10 @@ Route::middleware(['auth', 'two-factor'])->prefix('admin')->name('admin.')->grou
         Route::post('tsc-sl/{session}/calificar', [TscSlAdminController::class, 'storeScore'])->name('tsc-sl.score.store');
         Route::get('tsc-sl/{session}/resultados', [TscSlAdminController::class, 'results'])->name('tsc-sl.results');
 
+        Route::get('tsc-sl-h/{session}/calificar',  [TscSlHAdminController::class, 'score'])->name('tsc-sl-h.score');
+        Route::post('tsc-sl-h/{session}/calificar', [TscSlHAdminController::class, 'storeScore'])->name('tsc-sl-h.score.store');
+        Route::get('tsc-sl-h/{session}/resultados', [TscSlHAdminController::class, 'results'])->name('tsc-sl-h.results');
+
         Route::get('tte-sl/{session}/calificar',  [TteSlAdminController::class, 'score'])->name('tte-sl.score');
         Route::post('tte-sl/{session}/calificar', [TteSlAdminController::class, 'storeScore'])->name('tte-sl.score.store');
         Route::get('tte-sl/{session}/resultados', [TteSlAdminController::class, 'results'])->name('tte-sl.results');
@@ -144,6 +150,17 @@ Route::prefix('candidato')->name('candidate.')->group(function () {
         Route::get('/tsc-sl/{assignment}/modulo3',       [TscSlController::class, 'module3'])->name('tsc-sl.module3');
         Route::post('/tsc-sl/{assignment}/modulo3',      [TscSlController::class, 'storeModule3'])->name('tsc-sl.module3.store');
         Route::get('/tsc-sl/{assignment}/completado',    [TscSlController::class, 'complete'])->name('tsc-sl.complete');
+
+        // TSC-SL Hospitalidad: Test de Servicio al Cliente — F&B / Servicio de Mesa
+        Route::get('/tsc-sl-h/{assignment}/instrucciones',  [TscSlHController::class, 'start'])->name('tsc-sl-h.start');
+        Route::post('/tsc-sl-h/{assignment}/instrucciones', [TscSlHController::class, 'storeConsent'])->name('tsc-sl-h.consent');
+        Route::get('/tsc-sl-h/{assignment}/modulo1',        [TscSlHController::class, 'module1'])->name('tsc-sl-h.module1');
+        Route::post('/tsc-sl-h/{assignment}/modulo1',       [TscSlHController::class, 'storeModule1'])->name('tsc-sl-h.module1.store');
+        Route::get('/tsc-sl-h/{assignment}/modulo2',        [TscSlHController::class, 'module2'])->name('tsc-sl-h.module2');
+        Route::post('/tsc-sl-h/{assignment}/modulo2',       [TscSlHController::class, 'storeModule2'])->name('tsc-sl-h.module2.store');
+        Route::get('/tsc-sl-h/{assignment}/modulo3',        [TscSlHController::class, 'module3'])->name('tsc-sl-h.module3');
+        Route::post('/tsc-sl-h/{assignment}/modulo3',       [TscSlHController::class, 'storeModule3'])->name('tsc-sl-h.module3.store');
+        Route::get('/tsc-sl-h/{assignment}/completado',     [TscSlHController::class, 'complete'])->name('tsc-sl-h.complete');
 
         // TTE-SL: Test de Trabajo en Equipo
         Route::get('/tte-sl/{assignment}/instrucciones',  [TteSlController::class, 'start'])->name('tte-sl.start');
