@@ -24,10 +24,7 @@ class Candidate extends Model
         'created_by',
     ];
 
-    protected $casts = [
-        'email'           => 'encrypted',
-        'document_number' => 'encrypted',
-    ];
+    protected $casts = [];
 
     protected static function boot(): void
     {

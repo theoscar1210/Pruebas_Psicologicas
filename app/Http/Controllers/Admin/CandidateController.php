@@ -54,16 +54,17 @@ class CandidateController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
+        $request->validate([
             'name'            => 'required|string|max:150',
-            'email'           => 'nullable|email|max:150|unique:candidates,email',
+            'email'           => 'nullable|email|max:150',
             'phone'           => 'nullable|string|max:20',
             'document_number' => 'nullable|string|max:20|unique:candidates,document_number',
             'position_id'     => 'nullable|exists:positions,id',
         ], [
-            'email.unique'           => 'Ya existe un candidato registrado con ese correo electrónico.',
-            'document_number.unique' => 'Ya existe un candidato registrado con ese número de documento.',
+            'document_number.unique' => 'Ya existe un candidato registrado con ese número de documento. No es posible crear un duplicado.',
         ]);
+
+        $validated = $request->only(['name', 'email', 'phone', 'document_number', 'position_id']);
 
         $candidate = Candidate::create(array_merge($validated, [
             'created_by' => Auth::id(),
@@ -92,17 +93,18 @@ class CandidateController extends Controller
 
     public function update(Request $request, Candidate $candidate): RedirectResponse
     {
-        $validated = $request->validate([
+        $request->validate([
             'name'            => 'required|string|max:150',
-            'email'           => ['nullable','email','max:150', Rule::unique('candidates','email')->ignore($candidate->id)],
+            'email'           => 'nullable|email|max:150',
             'phone'           => 'nullable|string|max:20',
-            'document_number' => ['nullable','string','max:20', Rule::unique('candidates','document_number')->ignore($candidate->id)],
+            'document_number' => ['nullable', 'string', 'max:20', Rule::unique('candidates', 'document_number')->ignore($candidate->id)],
             'position_id'     => 'nullable|exists:positions,id',
             'status'          => 'required|in:active,inactive,completed',
         ], [
-            'email.unique'           => 'Ya existe otro candidato registrado con ese correo electrónico.',
             'document_number.unique' => 'Ya existe otro candidato registrado con ese número de documento.',
         ]);
+
+        $validated = $request->only(['name', 'email', 'phone', 'document_number', 'position_id', 'status']);
 
         $candidate->update($validated);
 
