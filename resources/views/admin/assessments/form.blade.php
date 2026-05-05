@@ -53,7 +53,7 @@
     $scores = $isEdit ? ($existing->scores ?? []) : [];
 @endphp
 
-<div class="max-w-4xl">
+<div class="max-w-4xl pb-48">
 
     {{-- Información del candidato --}}
     <div class="card-info p-4 mb-5 flex items-center gap-4">

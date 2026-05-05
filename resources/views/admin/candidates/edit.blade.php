@@ -41,24 +41,26 @@
 
                     <div class="form-group">
                         <label class="form-label">Cargo</label>
-                        <select name="position_id" class="select">
-                            <option value="">— Sin cargo —</option>
-                            @foreach($positions as $position)
-                                <option value="{{ $position->id }}"
-                                    {{ old('position_id', $candidate->position_id) == $position->id ? 'selected' : '' }}>
-                                    {{ $position->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <x-form-select
+                            name="position_id"
+                            :options="$positions->map(fn($p) => ['value' => $p->id, 'label' => $p->name])->values()->toArray()"
+                            :selected="old('position_id', $candidate->position_id ?? '')"
+                            placeholder="— Sin cargo —"
+                        />
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Estado</label>
-                        <select name="status" class="select">
-                            <option value="active"    {{ old('status', $candidate->status) === 'active'    ? 'selected' : '' }}>Activo</option>
-                            <option value="completed" {{ old('status', $candidate->status) === 'completed' ? 'selected' : '' }}>Completado</option>
-                            <option value="inactive"  {{ old('status', $candidate->status) === 'inactive'  ? 'selected' : '' }}>Inactivo</option>
-                        </select>
+                        <x-form-select
+                            name="status"
+                            :options="[
+                                ['value' => 'active',    'label' => 'Activo'],
+                                ['value' => 'completed', 'label' => 'Completado'],
+                                ['value' => 'inactive',  'label' => 'Inactivo'],
+                            ]"
+                            :selected="old('status', $candidate->status)"
+                            :required="true"
+                        />
                     </div>
                 </div>
 

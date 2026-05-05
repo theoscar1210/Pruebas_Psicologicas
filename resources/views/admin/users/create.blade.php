@@ -46,12 +46,18 @@
 
                 <div class="form-group">
                     <label class="form-label">Rol <span class="form-required">*</span></label>
-                    <select name="role" required class="select {{ $errors->has('role') ? 'border-red-400' : '' }}">
-                        <option value="">— Selecciona un rol —</option>
-                        <option value="admin"     {{ old('role') === 'admin'     ? 'selected' : '' }}>Administrador</option>
-                        <option value="psicologo" {{ old('role') === 'psicologo' ? 'selected' : '' }}>Psicólogo</option>
-                        <option value="hr"        {{ old('role') === 'hr'        ? 'selected' : '' }}>Recursos Humanos</option>
-                    </select>
+                    <x-form-select
+                        name="role"
+                        :options="[
+                            ['value' => 'admin',     'label' => 'Administrador'],
+                            ['value' => 'psicologo', 'label' => 'Psicólogo'],
+                            ['value' => 'hr',        'label' => 'Recursos Humanos'],
+                        ]"
+                        :selected="old('role', '')"
+                        placeholder="— Selecciona un rol —"
+                        :required="true"
+                        :error="$errors->has('role')"
+                    />
                     @error('role')
                         <p class="form-error">{{ $message }}</p>
                     @enderror

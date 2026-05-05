@@ -45,15 +45,14 @@
 
                     <div class="form-group">
                         <label class="form-label">Cargo al que aplica</label>
-                        <select name="position_id" class="select">
-                            <option value="">— Sin cargo asignado —</option>
-                            @foreach($positions as $position)
-                                <option value="{{ $position->id }}" {{ old('position_id') == $position->id ? 'selected' : '' }}>
-                                    {{ $position->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <p class="form-hint">Al asignar un cargo, sus pruebas se asignarán automáticamente.</p>
+                        <x-form-select
+                            name="position_id"
+                            :options="$positions->map(fn($p) => ['value' => $p->id, 'label' => $p->name])->values()->toArray()"
+                            :selected="old('position_id', '')"
+                            placeholder="— Sin cargo asignado —"
+                            hint="Al asignar un cargo, sus pruebas se asignarán automáticamente."
+                        />
+                        @error('position_id') <p class="form-error">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
