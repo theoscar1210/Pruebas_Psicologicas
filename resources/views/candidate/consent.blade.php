@@ -83,7 +83,7 @@
             <div class="mt-3 flex items-start gap-2">
                 <input type="checkbox" id="consent" class="mt-0.5 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
                 <label for="consent" class="text-xs text-slate-700 leading-relaxed">
-                    <strong>Autorizo</strong> expresamente el tratamiento de mis datos personales para el proceso de selección, conforme a la Ley 1581 de 2012 y los términos indicados.
+                    <strong>Autorizo</strong> expresamente el tratamiento de mis datos personales para el proceso de selección, conforme a la Ley 1581 de 2012 y los términos indicados. Puedo consultar la <a href="{{ route('privacy') }}" target="_blank" class="underline text-brand-600 hover:text-brand-800">Política de Privacidad completa</a> en cualquier momento.
                 </label>
             </div>
         </div>

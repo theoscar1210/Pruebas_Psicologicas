@@ -147,6 +147,23 @@
                 Perfiles Psicol.
             </a>
 
+            @if(auth()->user()->isAdmin())
+            <p class="sidebar-section">Legal</p>
+            <a href="{{ route('admin.data-deletion.index') }}"
+               @click="sidebarOpen = false"
+               class="sidebar-link {{ request()->routeIs('admin.data-deletion.*') ? 'active' : '' }}">
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+                <span>Eliminación de datos</span>
+                @php $pendingCount = \App\Models\DataDeletionRequest::where('status','pending')->count(); @endphp
+                @if($pendingCount > 0)
+                <span class="ml-auto bg-red-500 text-white text-[10px] font-bold rounded-full px-1.5 py-0.5 leading-none">{{ $pendingCount }}</span>
+                @endif
+            </a>
+            @endif
+
             <p class="sidebar-section">Reportes</p>
 
             <a href="{{ route('admin.reports.index') }}"

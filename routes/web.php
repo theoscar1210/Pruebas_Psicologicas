@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\CandidateController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DataDeletionController as AdminDataDeletionController;
 use App\Http\Controllers\Admin\EvaluatorAssessmentController;
 use App\Http\Controllers\Admin\PositionController;
 use App\Http\Controllers\Admin\PsychologicalReportController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\Admin\TscSlHAdminController;
 use App\Http\Controllers\Admin\TteSlAdminController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\TwoFactorController;
+use App\Http\Controllers\Candidate\DataDeletionController as CandidateDataDeletionController;
 use App\Http\Controllers\Candidate\TestTakingController;
 use App\Http\Controllers\Candidate\TscSlController;
 use App\Http\Controllers\Candidate\TscSlHController;
@@ -23,6 +25,9 @@ use Illuminate\Support\Facades\Route;
 
 // ── Inicio ────────────────────────────────────────────────────────────────────
 Route::get('/', fn () => redirect()->route('login'));
+
+// ── Política de privacidad (pública) ─────────────────────────────────────────
+Route::get('/politica-de-privacidad', fn () => view('privacy'))->name('privacy');
 
 // ── Autenticación de dos factores (2FA) ──────────────────────────────────────
 Route::middleware('guest')->group(function () {
@@ -115,6 +120,13 @@ Route::middleware(['auth', 'two-factor'])->prefix('admin')->name('admin.')->grou
         Route::get('candidates/{candidate}/perfil/pdf', [PsychologicalReportController::class, 'pdf'])->name('profile.pdf');
         Route::post('candidates/{candidate}/perfil/narrativa', [PsychologicalReportController::class, 'generateNarrative'])->name('profile.narrative');
     });
+
+    // ── Admin: solicitudes de eliminación de datos (Ley 1581/2012) ───────────
+    Route::middleware('role:admin')->group(function () {
+        Route::get('eliminacion-datos', [AdminDataDeletionController::class, 'index'])->name('data-deletion.index');
+        Route::post('eliminacion-datos/{deletion}/aprobar', [AdminDataDeletionController::class, 'approve'])->name('data-deletion.approve');
+        Route::post('eliminacion-datos/{deletion}/rechazar', [AdminDataDeletionController::class, 'reject'])->name('data-deletion.reject');
+    });
 });
 
 // ── Portal de candidatos (acceso por código único) ────────────────────────────
@@ -172,6 +184,10 @@ Route::prefix('candidato')->name('candidate.')->group(function () {
         Route::get('/tte-sl/{assignment}/modulo3',       [TteSlController::class, 'module3'])->name('tte-sl.module3');
         Route::post('/tte-sl/{assignment}/modulo3',      [TteSlController::class, 'storeModule3'])->name('tte-sl.module3.store');
         Route::get('/tte-sl/{assignment}/completado',    [TteSlController::class, 'complete'])->name('tte-sl.complete');
+
+        // Derecho al olvido — Ley 1581/2012
+        Route::get('/eliminar-mis-datos',  [CandidateDataDeletionController::class, 'create'])->name('data-deletion');
+        Route::post('/eliminar-mis-datos', [CandidateDataDeletionController::class, 'store'])->name('data-deletion.store');
     });
 });
 
