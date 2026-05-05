@@ -150,6 +150,15 @@ class CandidateController extends Controller
         return $redirectTo->with('success', "«{$testName}» asignada correctamente a {$candidate->name}.");
     }
 
+    public function destroy(Candidate $candidate): RedirectResponse
+    {
+        $name = $candidate->name;
+        $candidate->delete();
+
+        return redirect()->route('admin.candidates.index')
+            ->with('success', "Candidato «{$name}» eliminado permanentemente.");
+    }
+
     public function destroyAssignment(TestAssignment $assignment): RedirectResponse
     {
         $candidate = $assignment->candidate;

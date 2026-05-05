@@ -18,6 +18,11 @@
         PDF
     </a>
     <a href="{{ route('admin.candidates.edit', $candidate) }}" class="btn-secondary btn-sm hidden sm:inline-flex">Editar</a>
+    <form method="POST" action="{{ route('admin.candidates.destroy', $candidate) }}"
+          onsubmit="return confirm('¿Eliminar a {{ addslashes($candidate->name) }}? Esta acción borrará todas sus pruebas, resultados y registros. No se puede deshacer.')">
+        @csrf @method('DELETE')
+        <button type="submit" class="btn-danger btn-sm">Eliminar</button>
+    </form>
     <a href="{{ route('admin.candidates.index') }}" class="btn-ghost btn-sm">← Volver</a>
 @endsection
 

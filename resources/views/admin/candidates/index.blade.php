@@ -119,6 +119,11 @@
                         @endif
                         <a href="{{ route('admin.candidates.show', $candidate) }}"
                            class="text-brand-600 hover:text-brand-800 text-xs font-medium transition-colors">Ver</a>
+                        <form method="POST" action="{{ route('admin.candidates.destroy', $candidate) }}" class="inline"
+                              onsubmit="return confirm('¿Eliminar a {{ addslashes($candidate->name) }}? Se borrarán todas sus pruebas y resultados.')">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="text-red-500 hover:text-red-700 text-xs font-medium transition-colors">Eliminar</button>
+                        </form>
                     </div>
                 </td>
             </tr>
