@@ -349,15 +349,6 @@
 
     </div>
 
-    {{-- Footer legal --}}
-    <div class="mt-10 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
-        <p>Uso confidencial · Ley 1581 de 2012 · Ley 1090 de 2006</p>
-        <div class="flex items-center gap-4">
-            <a href="{{ route('privacy') }}" target="_blank" class="hover:text-slate-600 underline">Política de privacidad</a>
-            <a href="{{ route('candidate.data-deletion') }}" class="hover:text-red-600 text-red-400">Solicitar eliminación de mis datos</a>
-        </div>
-    </div>
-
 </div>
 
 @endsection

@@ -78,5 +78,65 @@
         @yield('content')
     </main>
 
+    {{-- ── Footer legal ─────────────────────────────────────────────────── --}}
+    <footer class="mt-12 border-t border-slate-200 bg-white">
+        <div class="max-w-2xl mx-auto px-4 py-6">
+
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+
+                {{-- Marca --}}
+                <div class="flex items-center gap-2.5">
+                    <svg width="22" height="22" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0 opacity-60">
+                        <circle cx="23" cy="23" r="21" fill="#14B8A6" fill-opacity="0.15"/>
+                        <circle cx="23" cy="23" r="21" stroke="#0F766E" stroke-width="1.5"/>
+                        <line x1="9" y1="31" x2="9" y2="15" stroke="#1E293B" stroke-width="2.4" stroke-linecap="round"/>
+                        <line x1="9" y1="15" x2="17" y2="24" stroke="#1E293B" stroke-width="2.4" stroke-linecap="round"/>
+                        <line x1="17" y1="24" x2="25" y2="15" stroke="#1E293B" stroke-width="2.4" stroke-linecap="round"/>
+                        <line x1="25" y1="15" x2="25" y2="31" stroke="#1E293B" stroke-width="2.4" stroke-linecap="round"/>
+                        <path d="M39 17 C36 13 28 13 28 23 C28 33 36 33 39 29" stroke="#0F766E" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+                        <circle cx="40" cy="10" r="3" fill="#14B8A6"/>
+                    </svg>
+                    <div class="leading-tight">
+                        <p class="text-xs font-semibold text-slate-500 tracking-tight">MenteClara</p>
+                        <p class="text-[10px] text-slate-400">Evaluación Psicológica</p>
+                    </div>
+                </div>
+
+                {{-- Legal badges --}}
+                <div class="flex flex-wrap items-center justify-center gap-2">
+                    <span class="inline-flex items-center gap-1 text-[10px] font-medium text-slate-500 bg-slate-100 rounded-full px-2.5 py-1">
+                        <svg class="w-3 h-3 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                        Uso confidencial
+                    </span>
+                    <span class="inline-flex items-center text-[10px] font-medium text-slate-500 bg-slate-100 rounded-full px-2.5 py-1">
+                        Ley 1581/2012
+                    </span>
+                    <span class="inline-flex items-center text-[10px] font-medium text-slate-500 bg-slate-100 rounded-full px-2.5 py-1">
+                        Ley 1090/2006
+                    </span>
+                </div>
+
+                {{-- Links --}}
+                <div class="flex items-center gap-4 text-xs">
+                    <a href="{{ route('privacy') }}" target="_blank"
+                       class="text-slate-400 hover:text-teal-600 transition-colors font-medium">
+                        Política de privacidad
+                    </a>
+                    @hasSection('show-nav')
+                    <span class="text-slate-200">|</span>
+                    <a href="{{ route('candidate.data-deletion') }}"
+                       class="text-slate-400 hover:text-red-500 transition-colors font-medium">
+                        Eliminar mis datos
+                    </a>
+                    @endif
+                </div>
+
+            </div>
+
+        </div>
+    </footer>
+
 </body>
 </html>
