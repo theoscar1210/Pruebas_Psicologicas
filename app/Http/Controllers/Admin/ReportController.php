@@ -103,10 +103,12 @@ class ReportController extends Controller
      */
     public function exportExcel(Request $request): BinaryFileResponse
     {
-        $positionId = $request->position_id ?: null;
+        $validated = $request->validate([
+            'position_id' => 'nullable|integer|exists:positions,id',
+        ]);
 
         return Excel::download(
-            new CandidatesResultsExport($positionId),
+            new CandidatesResultsExport($validated['position_id'] ?? null),
             'resultados-candidatos-' . now()->format('Y-m-d') . '.xlsx'
         );
     }

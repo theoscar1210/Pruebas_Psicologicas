@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Candidate;
 use App\Models\PsychologicalReport;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class AiNarrativeService
 {
@@ -29,23 +30,34 @@ class AiNarrativeService
         $prompt = $this->buildPrompt($report, $candidate, $section);
 
         $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $this->apiKey,
-            'Content-Type'  => 'application/json',
-        ])->post(self::ENDPOINT, [
-            'model'      => self::MODEL,
-            'max_tokens' => self::MAX_TOKENS,
-            'temperature' => 0.7,
-            'messages'   => [
-                ['role' => 'system', 'content' => $this->systemPrompt()],
-                ['role' => 'user',   'content' => $prompt],
-            ],
-        ]);
+                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Content-Type'  => 'application/json',
+            ])
+            ->timeout(30)
+            ->retry(2, 500)
+            ->post(self::ENDPOINT, [
+                'model'       => self::MODEL,
+                'max_tokens'  => self::MAX_TOKENS,
+                'temperature' => 0.7,
+                'messages'    => [
+                    ['role' => 'system', 'content' => $this->systemPrompt()],
+                    ['role' => 'user',   'content' => $prompt],
+                ],
+            ]);
 
         if (!$response->successful()) {
-            throw new \RuntimeException('Error al contactar la API de IA: ' . $response->body());
+            Log::error('Groq API error', [
+                'status'       => $response->status(),
+                'candidate_id' => $candidate->id,
+                'section'      => $section,
+            ]);
+            throw new \RuntimeException('El servicio de generación de narrativa no está disponible temporalmente.');
         }
 
-        return trim($response->json('choices.0.message.content', ''));
+        $content = trim($response->json('choices.0.message.content', ''));
+
+        // Sanitizar respuesta del modelo antes de persistir — previene XSS en PDF/Blade
+        return strip_tags($content);
     }
 
     private function systemPrompt(): string
@@ -61,17 +73,26 @@ PROMPT;
 
     private function buildPrompt(PsychologicalReport $report, Candidate $candidate, string $section): string
     {
-        $cargo     = $candidate->position?->name ?? 'el cargo';
-        $nombre    = $candidate->name;
+        $cargo  = $candidate->position?->name ?? 'el cargo';
+
+        // Pseudónimo determinístico — el nombre real NUNCA se envía a la API externa.
+        // Se deriva del ID + APP_KEY: no reversible, consistente por candidato.
+        $nombre = $this->pseudonym($candidate->id);
 
         return match ($section) {
-            'personality'   => $this->personalityPrompt($report, $nombre, $cargo),
-            'cognitive'     => $this->cognitivePrompt($report, $nombre, $cargo),
-            'competencies'  => $this->competenciesPrompt($report, $nombre, $cargo),
-            'projective'    => $this->projectivePrompt($report, $nombre, $cargo),
-            'interview'     => $this->interviewPrompt($report, $nombre, $cargo),
-            default         => throw new \InvalidArgumentException("Sección desconocida: {$section}"),
+            'personality'  => $this->personalityPrompt($report, $nombre, $cargo),
+            'cognitive'    => $this->cognitivePrompt($report, $nombre, $cargo),
+            'competencies' => $this->competenciesPrompt($report, $nombre, $cargo),
+            'projective'   => $this->projectivePrompt($report, $nombre, $cargo),
+            'interview'    => $this->interviewPrompt($report, $nombre, $cargo),
+            default        => throw new \InvalidArgumentException("Sección desconocida: {$section}"),
         };
+    }
+
+    private function pseudonym(int $candidateId): string
+    {
+        $hash = hash('sha256', $candidateId . config('app.key'));
+        return 'Candidato ' . strtoupper(substr($hash, 0, 6));
     }
 
     private function personalityPrompt(PsychologicalReport $report, string $nombre, string $cargo): string

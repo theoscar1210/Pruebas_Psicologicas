@@ -11,6 +11,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class PsychologicalReportController extends Controller
@@ -92,7 +93,12 @@ class PsychologicalReportController extends Controller
 
             return response()->json(['text' => $text]);
         } catch (\Throwable $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            Log::error('AI narrative generation failed', [
+                'candidate_id' => $candidate->id,
+                'section'      => $section,
+                'error'        => $e->getMessage(),
+            ]);
+            return response()->json(['error' => 'No se pudo generar la narrativa. Intenta de nuevo más tarde.'], 500);
         }
     }
 

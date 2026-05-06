@@ -18,7 +18,6 @@ class Candidate extends Model
         'email',
         'phone',
         'document_number',
-        'access_code',
         'position_id',
         'status',
         'created_by',
