@@ -3,7 +3,7 @@
 
 @section('content')
 
-<div class="min-h-screen flex">
+<div class="flex flex-1">
 
     {{-- Panel izquierdo: decorativo --}}
     <div class="hidden lg:flex lg:w-1/2 bg-brand-950 flex-col justify-between p-12">

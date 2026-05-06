@@ -9,7 +9,7 @@
     <link rel="icon" href="/favicon.ico" sizes="any">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-full bg-slate-50 font-sans antialiased">
+<body class="min-h-screen flex flex-col bg-slate-50 font-sans antialiased">
 
     {{-- ── Navbar (solo en páginas internas del candidato) ──────────────── --}}
     @hasSection('show-nav')
@@ -76,64 +76,56 @@
     @endif
 
     {{-- ── Contenido ────────────────────────────────────────────────────── --}}
-    <main>
+    <main class="flex-1 flex flex-col">
         @yield('content')
     </main>
 
     {{-- ── Footer legal ─────────────────────────────────────────────────── --}}
-    <footer class="mt-12" style="background: linear-gradient(135deg, #0D3330 0%, #0F4F4A 100%);">
-        <div class="max-w-2xl mx-auto px-4 py-7">
+    <footer style="background-color: #10b981;">
+        <div class="max-w-5xl mx-auto px-6 py-4">
 
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-5">
+            <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
 
-                {{-- Marca --}}
-                <div class="flex items-center gap-2.5">
-                    <svg width="24" height="24" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0">
-                        <circle cx="23" cy="23" r="21" fill="#14B8A6" fill-opacity="0.20"/>
-                        <circle cx="23" cy="23" r="21" stroke="#14B8A6" stroke-width="1.5"/>
-                        <line x1="9" y1="31" x2="9" y2="15" stroke="#E2F8F6" stroke-width="2.4" stroke-linecap="round"/>
-                        <line x1="9" y1="15" x2="17" y2="24" stroke="#E2F8F6" stroke-width="2.4" stroke-linecap="round"/>
-                        <line x1="17" y1="24" x2="25" y2="15" stroke="#E2F8F6" stroke-width="2.4" stroke-linecap="round"/>
-                        <line x1="25" y1="15" x2="25" y2="31" stroke="#E2F8F6" stroke-width="2.4" stroke-linecap="round"/>
-                        <path d="M39 17 C36 13 28 13 28 23 C28 33 36 33 39 29" stroke="#14B8A6" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-                        <circle cx="40" cy="10" r="3" fill="#14B8A6"/>
+                {{-- Logo + Evaluación Psicológica --}}
+                <div class="flex items-center gap-2">
+                    <svg width="22" height="22" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0">
+                        <circle cx="23" cy="23" r="21" fill="rgba(255,255,255,0.15)"/>
+                        <circle cx="23" cy="23" r="21" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
+                        <line x1="9" y1="31" x2="9" y2="15" stroke="white" stroke-width="2.4" stroke-linecap="round"/>
+                        <line x1="9" y1="15" x2="17" y2="24" stroke="white" stroke-width="2.4" stroke-linecap="round"/>
+                        <line x1="17" y1="24" x2="25" y2="15" stroke="white" stroke-width="2.4" stroke-linecap="round"/>
+                        <line x1="25" y1="15" x2="25" y2="31" stroke="white" stroke-width="2.4" stroke-linecap="round"/>
+                        <path d="M39 17 C36 13 28 13 28 23 C28 33 36 33 39 29" stroke="rgba(255,255,255,0.85)" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+                        <circle cx="40" cy="10" r="3" fill="white"/>
                     </svg>
-                    <div class="leading-tight">
-                        <p class="text-sm font-bold text-white tracking-tight">MenteClara</p>
-                        <p class="text-[10px] text-teal-300/70">Evaluación Psicológica</p>
-                    </div>
+                    <span class="text-sm font-semibold text-white">Evaluación Psicológica</span>
                 </div>
 
-                {{-- Legal badges --}}
-                <div class="flex flex-wrap items-center justify-center gap-2">
-                    <span class="inline-flex items-center gap-1 text-[10px] font-medium text-teal-200 bg-white/10 rounded-full px-2.5 py-1">
-                        <svg class="w-3 h-3 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                        </svg>
-                        Uso confidencial
-                    </span>
-                    <span class="inline-flex items-center text-[10px] font-medium text-teal-200 bg-white/10 rounded-full px-2.5 py-1">
-                        Ley 1581/2012
-                    </span>
-                    <span class="inline-flex items-center text-[10px] font-medium text-teal-200 bg-white/10 rounded-full px-2.5 py-1">
-                        Ley 1090/2006
-                    </span>
-                </div>
+                <span class="text-white/30 text-xs">·</span>
+
+                {{-- Legal --}}
+                <span class="inline-flex items-center gap-1 text-xs text-white">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                    Uso confidencial
+                </span>
+                <span class="text-xs text-white">Ley 1581/2012</span>
+                <span class="text-xs text-white">Ley 1090/2006</span>
+
+                <span class="text-white/30 text-xs">·</span>
 
                 {{-- Links --}}
-                <div class="flex items-center gap-4 text-xs">
-                    <a href="{{ route('privacy') }}" target="_blank"
-                       class="text-teal-300 hover:text-white transition-colors font-medium">
-                        Política de privacidad
-                    </a>
-                    @hasSection('show-nav')
-                    <span class="text-white/20">|</span>
-                    <a href="{{ route('candidate.data-deletion') }}"
-                       class="text-teal-300/70 hover:text-red-400 transition-colors font-medium">
-                        Eliminar mis datos
-                    </a>
-                    @endif
-                </div>
+                <a href="{{ route('privacy') }}" target="_blank"
+                   class="text-xs font-semibold text-white hover:text-white/80 transition-colors">
+                    Política de privacidad
+                </a>
+                @hasSection('show-nav')
+                <a href="{{ route('candidate.data-deletion') }}"
+                   class="text-xs text-white/80 hover:text-white transition-colors">
+                    Eliminar mis datos
+                </a>
+                @endif
 
             </div>
 
