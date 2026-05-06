@@ -45,6 +45,11 @@ class ReportController extends Controller
     {
         $this->authorize('view', $candidate);
 
+        Log::info('PDF candidato descargado', [
+            'by'           => auth()->id(),
+            'candidate_id' => $candidate->id,
+        ]);
+
         $candidate->load([
             'position',
             'assignments.test',

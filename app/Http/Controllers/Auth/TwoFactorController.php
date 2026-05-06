@@ -57,7 +57,7 @@ class TwoFactorController extends Controller
         $user   = $request->user();
         $secret = Crypt::decryptString($user->two_factor_secret);
 
-        if (!$this->google2fa->verifyKey($secret, $request->code)) {
+        if (!$this->google2fa->verifyKey($secret, $request->code, 1)) {
             Log::warning('2FA enable failed: wrong code', ['user_id' => $user->id, 'ip' => $request->ip()]);
             return back()->withErrors(['code' => 'Código incorrecto. Intente de nuevo.']);
         }
@@ -112,7 +112,7 @@ class TwoFactorController extends Controller
         $user   = \App\Models\User::findOrFail($userId);
         $secret = Crypt::decryptString($user->two_factor_secret);
 
-        if (!$this->google2fa->verifyKey($secret, $request->code)) {
+        if (!$this->google2fa->verifyKey($secret, $request->code, 1)) {
             Log::warning('2FA challenge failed: wrong code', ['user_id' => $user->id, 'ip' => $request->ip()]);
             return back()->withErrors(['code' => 'Código incorrecto.']);
         }

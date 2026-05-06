@@ -122,7 +122,9 @@ Route::middleware(['auth', 'two-factor'])->prefix('admin')->name('admin.')->grou
         Route::post('candidates/{candidate}/perfil/generar', [PsychologicalReportController::class, 'generate'])->name('profile.generate');
         Route::post('candidates/{candidate}/perfil/completar', [PsychologicalReportController::class, 'complete'])->name('profile.complete');
         Route::get('candidates/{candidate}/perfil/pdf', [PsychologicalReportController::class, 'pdf'])->name('profile.pdf');
-        Route::post('candidates/{candidate}/perfil/narrativa', [PsychologicalReportController::class, 'generateNarrative'])->name('profile.narrative');
+        Route::post('candidates/{candidate}/perfil/narrativa', [PsychologicalReportController::class, 'generateNarrative'])
+            ->middleware('throttle:ai-narrative')
+            ->name('profile.narrative');
     });
 
     // ── Admin: solicitudes de eliminación de datos (Ley 1581/2012) ───────────

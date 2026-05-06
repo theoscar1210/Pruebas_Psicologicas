@@ -114,6 +114,11 @@ class PsychologicalReportController extends Controller
     {
         $this->authorize('viewReport', $candidate);
 
+        Log::info('PDF perfil psicologico descargado', [
+            'by'           => auth()->id(),
+            'candidate_id' => $candidate->id,
+        ]);
+
         $candidate->load([
             'position',
             'assignments.test',

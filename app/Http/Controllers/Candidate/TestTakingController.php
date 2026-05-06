@@ -45,6 +45,15 @@ class TestTakingController extends Controller
             return back()->withErrors(['access_code' => 'Código de acceso inválido o inactivo.']);
         }
 
+        if ($candidate->access_code_expires_at !== null && $candidate->access_code_expires_at->isPast()) {
+            Log::warning('Candidate access with expired code', [
+                'ip'           => $request->ip(),
+                'candidate_id' => $candidate->id,
+                'expired_at'   => $candidate->access_code_expires_at,
+            ]);
+            return back()->withErrors(['access_code' => 'Tu código de acceso ha expirado. Solicita uno nuevo al evaluador.']);
+        }
+
         session(['candidate_id' => $candidate->id]);
 
         return redirect()->route('candidate.dashboard');

@@ -23,16 +23,21 @@ class Candidate extends Model
         'created_by',
     ];
 
-    protected $casts = [];
+    protected $casts = [
+        'access_code_expires_at' => 'datetime',
+    ];
 
     protected static function boot(): void
     {
         parent::boot();
 
-        // Genera código único automáticamente al crear un candidato
+        // Genera código único y fecha de expiración automáticamente al crear un candidato
         static::creating(function (Candidate $candidate) {
             if (empty($candidate->access_code)) {
                 $candidate->access_code = strtoupper(Str::random(8));
+            }
+            if (empty($candidate->access_code_expires_at)) {
+                $candidate->access_code_expires_at = now()->addDays(30);
             }
         });
     }

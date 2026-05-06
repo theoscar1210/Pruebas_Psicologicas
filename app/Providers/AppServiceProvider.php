@@ -39,5 +39,11 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('two-factor', function (Request $request) {
             return Limit::perMinutes(5, 5)->by($request->ip());
         });
+
+        // Narrativa IA: máximo 10 generaciones por minuto por usuario autenticado
+        // Previene gasto descontrolado en la API de Groq
+        RateLimiter::for('ai-narrative', function (Request $request) {
+            return Limit::perMinute(10)->by($request->user()?->id ?? $request->ip());
+        });
     }
 }
