@@ -79,6 +79,8 @@ class ReportController extends Controller
      */
     public function rankingPdf(Request $request): Response
     {
+        $this->authorize('viewAny', Candidate::class);
+
         $request->validate([
             'position_id' => 'required|exists:positions,id',
         ]);
