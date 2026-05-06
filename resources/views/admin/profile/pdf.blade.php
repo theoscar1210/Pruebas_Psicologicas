@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <style>
+    {{-- safe: inlined desde archivos CSS locales del servidor, no datos de usuario --}}
     {!! file_get_contents(public_path('css/pdf/base.css')) !!}
     {!! file_get_contents(public_path('css/pdf/perfil.css')) !!}
 </style>

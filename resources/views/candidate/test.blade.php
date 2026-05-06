@@ -327,6 +327,7 @@ window.RAVEN_SAVED        = {!! json_encode($savedAnswers) !!};
             <div x-show="current === {{ $idx }}"
                  @if($idx > 0) style="display:none" @endif
                  class="raven-grid">
+                {{-- safe: SVG de ítems Raven generado por RavenRenderer a partir de datos estáticos del sistema --}}
                 {!! \App\Services\RavenRenderer::matrix($item, 90) !!}
             </div>
             @endforeach
@@ -348,6 +349,7 @@ window.RAVEN_SAVED        = {!! json_encode($savedAnswers) !!};
                         class="raven-opt"
                         :class="{ 'sel': answers[{{ $meta['qId'] }}] == {{ $optId }} }"
                         @click="selectOpt({{ $meta['qId'] }}, {{ $optId }})">
+                    {{-- safe: SVG de opción Raven generado por RavenRenderer a partir de datos estáticos del sistema --}}
                     {!! \App\Services\RavenRenderer::cellSVG($opt, 58) !!}
                     <span class="raven-opt-lbl">{{ chr(65 + $optIdx) }}</span>
                 </button>

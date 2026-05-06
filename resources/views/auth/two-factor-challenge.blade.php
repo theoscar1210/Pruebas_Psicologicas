@@ -69,8 +69,9 @@
             </div>
         </div>
 
-        <div class="w-full max-w-sm">
+        <div class="w-full max-w-sm" x-data="{ useRecovery: false }">
 
+            {{-- Cabecera dinámica --}}
             <div class="mb-8">
                 <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
                      style="background: #F0FDFA; border: 1.5px solid #99F6E4">
@@ -78,12 +79,8 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3"/>
                     </svg>
                 </div>
-                <h2 class="text-2xl font-bold text-gray-900 leading-tight tracking-tight">
-                    Verificación en dos pasos
-                </h2>
-                <p class="text-gray-500 text-sm mt-1.5">
-                    Abre tu app de autenticación y escribe el código de 6 dígitos
-                </p>
+                <h2 class="text-2xl font-bold text-gray-900 leading-tight tracking-tight" x-text="useRecovery ? 'Código de recuperación' : 'Verificación en dos pasos'"></h2>
+                <p class="text-gray-500 text-sm mt-1.5" x-text="useRecovery ? 'Ingresa uno de tus códigos de recuperación guardados' : 'Abre tu app de autenticación y escribe el código de 6 dígitos'"></p>
             </div>
 
             @if ($errors->any())
@@ -95,44 +92,58 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('two-factor.verify') }}" class="space-y-5">
+            {{-- Formulario TOTP --}}
+            <form x-show="!useRecovery" method="POST" action="{{ route('two-factor.verify') }}" class="space-y-5">
                 @csrf
-
                 <div>
-                    <label for="code" class="block text-sm font-medium text-gray-700 mb-1.5">
-                        Código de autenticación
-                    </label>
-                    <input id="code"
-                           type="text"
-                           name="code"
-                           inputmode="numeric"
-                           pattern="[0-9]{6}"
-                           maxlength="6"
-                           required
-                           autofocus
-                           autocomplete="one-time-code"
-                           placeholder="000000"
+                    <label for="code" class="block text-sm font-medium text-gray-700 mb-1.5">Código de autenticación</label>
+                    <input id="code" type="text" name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6"
+                           required autofocus autocomplete="one-time-code" placeholder="000000"
                            class="w-full px-3.5 py-3 rounded-lg border text-center text-2xl font-mono tracking-widest bg-white text-gray-900
                                   transition duration-150 focus:outline-none focus:ring-2
-                                  {{ $errors->has('code')
-                                      ? 'border-red-400 bg-red-50 focus:ring-red-400/20 focus:border-red-500'
-                                      : 'border-gray-300 hover:border-gray-400 focus:ring-brand-500/25 focus:border-brand-600' }}">
+                                  {{ $errors->has('code') ? 'border-red-400 bg-red-50 focus:ring-red-400/20' : 'border-gray-300 focus:ring-brand-500/25 focus:border-brand-600' }}">
                     @error('code')
                         <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
-
                 <button type="submit"
                         class="w-full py-2.5 px-4 rounded-lg text-sm font-semibold text-white bg-brand-700
-                               hover:bg-brand-800 active:bg-brand-900 transition duration-150
-                               focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-600 shadow-sm">
+                               hover:bg-brand-800 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-600 shadow-sm">
                     Verificar código
                 </button>
             </form>
 
-            <div class="mt-6 text-center">
-                <a href="{{ route('login') }}"
-                   class="text-sm text-gray-500 hover:text-gray-700 transition">
+            {{-- Formulario de código de recuperación --}}
+            <form x-show="useRecovery" method="POST" action="{{ route('two-factor.recovery') }}" class="space-y-5" x-cloak>
+                @csrf
+                <div>
+                    <label for="recovery_code" class="block text-sm font-medium text-gray-700 mb-1.5">Código de recuperación</label>
+                    <input id="recovery_code" type="text" name="recovery_code" maxlength="12"
+                           autocomplete="off" placeholder="XXXXX-XXXXX"
+                           class="w-full px-3.5 py-3 rounded-lg border text-center text-lg font-mono tracking-widest bg-white text-gray-900
+                                  transition duration-150 focus:outline-none focus:ring-2
+                                  {{ $errors->has('recovery_code') ? 'border-red-400 bg-red-50 focus:ring-red-400/20' : 'border-gray-300 focus:ring-brand-500/25 focus:border-brand-600' }}">
+                    @error('recovery_code')
+                        <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+                <button type="submit"
+                        class="w-full py-2.5 px-4 rounded-lg text-sm font-semibold text-white bg-amber-600
+                               hover:bg-amber-700 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 shadow-sm">
+                    Usar código de recuperación
+                </button>
+            </form>
+
+            {{-- Toggle entre modos --}}
+            <div class="mt-5 text-center">
+                <button @click="useRecovery = !useRecovery" type="button"
+                        class="text-sm text-teal-600 hover:text-teal-800 transition font-medium underline-offset-2 hover:underline">
+                    <span x-text="useRecovery ? '← Usar mi app de autenticación' : 'No tengo mi dispositivo'"></span>
+                </button>
+            </div>
+
+            <div class="mt-4 text-center">
+                <a href="{{ route('login') }}" class="text-sm text-gray-500 hover:text-gray-700 transition">
                     Volver al inicio de sesión
                 </a>
             </div>

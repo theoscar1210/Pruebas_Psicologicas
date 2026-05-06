@@ -8,11 +8,10 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-// ── Backup automatizado ───────────────────────────────────────────────────────
-// Requiere: composer require spatie/laravel-backup
-// Config:   php artisan vendor:publish --provider="Spatie\Backup\BackupServiceProvider"
-// Ajustar config/backup.php con discos, notificaciones y retención.
-//
-// Schedule::command('backup:run')->dailyAt('02:00');
-// Schedule::command('backup:clean')->dailyAt('02:30');
-// Schedule::command('backup:monitor')->dailyAt('03:00');
+// ── Backup automatizado (spatie/laravel-backup) ───────────────────────────────
+// Requiere BACKUP_ARCHIVE_PASSWORD en .env para cifrado AES-256.
+// Para S3: configurar BACKUP_S3_DISK=s3 y credenciales AWS_* en .env.
+// El cron del servidor debe ejecutar: php artisan schedule:run cada minuto.
+Schedule::command('backup:run')->dailyAt('02:00');
+Schedule::command('backup:clean')->dailyAt('02:30');
+Schedule::command('backup:monitor')->dailyAt('03:00');

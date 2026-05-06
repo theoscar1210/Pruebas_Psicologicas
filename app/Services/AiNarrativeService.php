@@ -54,10 +54,19 @@ class AiNarrativeService
             throw new \RuntimeException('El servicio de generación de narrativa no está disponible temporalmente.');
         }
 
-        $content = trim($response->json('choices.0.message.content', ''));
+        $content = strip_tags(trim($response->json('choices.0.message.content', '')));
 
-        // Sanitizar respuesta del modelo antes de persistir — previene XSS en PDF/Blade
-        return strip_tags($content);
+        // Validar respuesta antes de persistir
+        if (strlen($content) > 5000) {
+            Log::warning('Groq response exceeds max length', ['candidate_id' => $candidate->id, 'length' => strlen($content)]);
+            $content = mb_substr($content, 0, 5000);
+        }
+
+        if (empty($content)) {
+            throw new \RuntimeException('El modelo devolvió una respuesta vacía.');
+        }
+
+        return $content;
     }
 
     private function systemPrompt(): string

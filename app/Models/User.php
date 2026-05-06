@@ -27,15 +27,17 @@ class User extends Authenticatable
         'password',
         'remember_token',
         'two_factor_secret',
+        'two_factor_recovery_codes',
     ];
 
     protected function casts(): array
     {
         return [
-            'email_verified_at'       => 'datetime',
-            'password'                => 'hashed',
-            'is_active'               => 'boolean',
-            'two_factor_confirmed_at' => 'datetime',
+            'email_verified_at'          => 'datetime',
+            'password'                   => 'hashed',
+            'is_active'                  => 'boolean',
+            'two_factor_confirmed_at'    => 'datetime',
+            'two_factor_recovery_codes'  => 'array',
         ];
     }
 

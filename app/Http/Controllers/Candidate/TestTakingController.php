@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
@@ -27,8 +28,23 @@ class TestTakingController extends Controller
         return view('candidate.access');
     }
 
+    private const MAX_FAILED_ATTEMPTS = 5;
+    private const BLOCK_MINUTES       = 30;
+
     public function access(Request $request): RedirectResponse
     {
+        $ip       = $request->ip();
+        $blockKey = 'access_block_' . md5($ip);
+        $failKey  = 'access_fails_' . md5($ip);
+
+        // Verificar bloqueo activo
+        if ($blockedUntil = Cache::get($blockKey)) {
+            $remaining = (int) ceil(($blockedUntil - now()->timestamp) / 60);
+            return back()->withErrors([
+                'access_code' => "Demasiados intentos fallidos. Intenta de nuevo en {$remaining} minuto(s).",
+            ]);
+        }
+
         $request->validate([
             'access_code' => 'required|string|size:8',
         ]);
@@ -38,21 +54,40 @@ class TestTakingController extends Controller
             ->first();
 
         if (!$candidate) {
+            $fails = (int) Cache::get($failKey, 0) + 1;
+            Cache::put($failKey, $fails, now()->addMinutes(self::BLOCK_MINUTES));
+
             Log::warning('Candidate access failed', [
-                'ip'   => $request->ip(),
-                'code' => strtoupper($request->access_code),
+                'ip'       => $ip,
+                'code'     => strtoupper($request->access_code),
+                'attempts' => $fails,
             ]);
+
+            if ($fails >= self::MAX_FAILED_ATTEMPTS) {
+                $until = now()->addMinutes(self::BLOCK_MINUTES)->timestamp;
+                Cache::put($blockKey, $until, now()->addMinutes(self::BLOCK_MINUTES));
+                Cache::forget($failKey);
+                Log::warning('IP blocked for brute-force on access_code', ['ip' => $ip]);
+                return back()->withErrors([
+                    'access_code' => 'Demasiados intentos fallidos. IP bloqueada por ' . self::BLOCK_MINUTES . ' minutos.',
+                ]);
+            }
+
             return back()->withErrors(['access_code' => 'Código de acceso inválido o inactivo.']);
         }
 
         if ($candidate->access_code_expires_at !== null && $candidate->access_code_expires_at->isPast()) {
             Log::warning('Candidate access with expired code', [
-                'ip'           => $request->ip(),
+                'ip'           => $ip,
                 'candidate_id' => $candidate->id,
                 'expired_at'   => $candidate->access_code_expires_at,
             ]);
             return back()->withErrors(['access_code' => 'Tu código de acceso ha expirado. Solicita uno nuevo al evaluador.']);
         }
+
+        // Login exitoso: limpiar contadores de fallo
+        Cache::forget($failKey);
+        Cache::forget($blockKey);
 
         session(['candidate_id' => $candidate->id]);
 

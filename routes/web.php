@@ -35,14 +35,19 @@ Route::middleware('guest')->group(function () {
     Route::post('/two-factor/challenge', [TwoFactorController::class, 'verify'])
         ->middleware('throttle:two-factor')
         ->name('two-factor.verify');
+    Route::post('/two-factor/recovery', [TwoFactorController::class, 'verifyRecovery'])
+        ->middleware('throttle:two-factor')
+        ->name('two-factor.recovery');
 });
 
 Route::middleware(['auth', 'two-factor'])->group(function () {
-    Route::get('/two-factor/setup',   [TwoFactorController::class, 'setup'])->name('two-factor.setup');
-    Route::post('/two-factor/enable', [TwoFactorController::class, 'enable'])
+    Route::get('/two-factor/setup',         [TwoFactorController::class, 'setup'])->name('two-factor.setup');
+    Route::post('/two-factor/enable',       [TwoFactorController::class, 'enable'])
         ->middleware('throttle:two-factor')
         ->name('two-factor.enable');
-    Route::post('/two-factor/disable',[TwoFactorController::class, 'disable'])->name('two-factor.disable');
+    Route::post('/two-factor/disable',      [TwoFactorController::class, 'disable'])->name('two-factor.disable');
+    Route::get('/two-factor/recovery-codes',[TwoFactorController::class, 'showRecoveryCodes'])->name('two-factor.recovery-codes');
+    Route::post('/two-factor/recovery-codes/regenerate', [TwoFactorController::class, 'regenerateRecoveryCodes'])->name('two-factor.recovery-codes.regenerate');
 });
 
 // ── Dashboard del administrador ───────────────────────────────────────────────

@@ -77,7 +77,8 @@ $types = [
             <div class="flex items-start justify-between mb-4">
                 <div class="w-10 h-10 rounded-xl {{ $t['icon_bg'] }} flex items-center justify-center flex-shrink-0">
                     <svg class="w-5 h-5 {{ $t['icon_color'] }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        {!! $t['icon'] !!}
+                        {{-- safe: SVG path hardcodeado en el array $types de este archivo --}}
+                    {!! $t['icon'] !!}
                     </svg>
                 </div>
                 @if($existing)

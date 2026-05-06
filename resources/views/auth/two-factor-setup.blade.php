@@ -39,6 +39,7 @@
                     $writer = new \BaconQrCode\Writer($renderer);
                     $qrSvg = $writer->writeString($qrUrl);
                 @endphp
+                {{-- safe: SVG generado por BaconQrCode a partir de la URL TOTP interna --}}
                 {!! $qrSvg !!}
             </div>
         </div>
