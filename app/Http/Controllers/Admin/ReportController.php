@@ -61,9 +61,17 @@ class ReportController extends Controller
         $pdf = Pdf::loadView('reports.candidate-pdf', compact('candidate'))
             ->setPaper('a4', 'portrait');
 
+        $pdf->render();
+        $cpdf = $pdf->getDomPDF()->getCanvas()->get_cpdf();
+        $cpdf->addInfo('Producer', config('app.name'));
+        $cpdf->addInfo('Creator', config('app.name'));
+
         $filename = 'reporte-' . str($candidate->name)->slug() . '.pdf';
 
-        return $pdf->download($filename);
+        return response($pdf->output(), 200, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
     }
 
     /**
@@ -101,9 +109,17 @@ class ReportController extends Controller
         $pdf = Pdf::loadView('reports.ranking-pdf', compact('position', 'candidates'))
             ->setPaper('a4', 'portrait');
 
+        $pdf->render();
+        $cpdf = $pdf->getDomPDF()->getCanvas()->get_cpdf();
+        $cpdf->addInfo('Producer', config('app.name'));
+        $cpdf->addInfo('Creator', config('app.name'));
+
         $filename = 'ranking-' . str($position->name)->slug() . '.pdf';
 
-        return $pdf->download($filename);
+        return response($pdf->output(), 200, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
     }
 
     /**

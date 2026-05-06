@@ -135,8 +135,16 @@ class PsychologicalReportController extends Controller
         $pdf = Pdf::loadView('admin.profile.pdf', compact('candidate', 'report'))
             ->setPaper('a4', 'portrait');
 
+        $pdf->render();
+        $cpdf = $pdf->getDomPDF()->getCanvas()->get_cpdf();
+        $cpdf->addInfo('Producer', config('app.name'));
+        $cpdf->addInfo('Creator', config('app.name'));
+
         $filename = 'perfil-psicologico-' . str($candidate->name)->slug() . '.pdf';
 
-        return $pdf->download($filename);
+        return response($pdf->output(), 200, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
     }
 }
