@@ -26,8 +26,9 @@ class ContentSecurityPolicy
         $connectSrc = "'self'";
 
         // En desarrollo el servidor Vite corre en un puerto/origen distinto.
-        if (app()->environment('local') && Vite::isRunningHot()) {
-            $devServer   = trim(file_get_contents(public_path('hot')));
+        $hotFile = public_path('hot');
+        if (app()->environment('local') && file_exists($hotFile)) {
+            $devServer   = trim(file_get_contents($hotFile));
             $scriptSrc  .= " {$devServer}";
             $styleSrc   .= " {$devServer}";
             $connectSrc .= " {$devServer} ws: wss:";
