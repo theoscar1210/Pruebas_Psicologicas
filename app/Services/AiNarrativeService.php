@@ -95,6 +95,32 @@ PROMPT;
         return 'Candidato ' . strtoupper(substr($hash, 0, 6));
     }
 
+    // Sanitiza texto libre antes de incluirlo en el prompt.
+    // Previene prompt injection desde campos de observaciones del evaluador.
+    private function sanitizeObservation(?string $text): string
+    {
+        if (empty($text)) {
+            return 'Sin observaciones registradas.';
+        }
+
+        $text = mb_substr(trim($text), 0, 500);
+
+        $patterns = [
+            '/ignora?\s+(las?\s+)?instrucciones?\s+anteriores?/i',
+            '/ignore\s+(previous|all|prior)\s+instructions?/i',
+            '/system\s*prompt/i',
+            '/\[INST\]/i',
+            '/<<SYS>>/i',
+            '/eres\s+ahora/i',
+            '/you\s+are\s+now/i',
+            '/act\s+as/i',
+            '/HUMAN:/i',
+            '/ASSISTANT:/i',
+        ];
+
+        return preg_replace($patterns, '[REDACTED]', $text) ?? $text;
+    }
+
     private function personalityPrompt(PsychologicalReport $report, string $nombre, string $cargo): string
     {
         $bf = [
@@ -169,7 +195,7 @@ PROMPT;
     private function projectivePrompt(PsychologicalReport $report, string $nombre, string $cargo): string
     {
         $score        = round((float) $report->wartegg_score);
-        $observations = $report->projective_observations ?? 'Sin observaciones registradas.';
+        $observations = $this->sanitizeObservation($report->projective_observations);
 
         return <<<PROMPT
 Candidato: {$nombre} — Cargo aspirado: {$cargo}
@@ -186,7 +212,7 @@ PROMPT;
     private function interviewPrompt(PsychologicalReport $report, string $nombre, string $cargo): string
     {
         $score        = round((float) $report->interview_score);
-        $observations = $report->interview_observations ?? 'Sin observaciones registradas.';
+        $observations = $this->sanitizeObservation($report->interview_observations);
 
         $compLines = '';
         if (!empty($report->interview_competencies)) {

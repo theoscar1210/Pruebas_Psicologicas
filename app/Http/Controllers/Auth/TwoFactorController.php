@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use PragmaRX\Google2FA\Google2FA;
 
@@ -57,6 +58,7 @@ class TwoFactorController extends Controller
         $secret = Crypt::decryptString($user->two_factor_secret);
 
         if (!$this->google2fa->verifyKey($secret, $request->code)) {
+            Log::warning('2FA enable failed: wrong code', ['user_id' => $user->id, 'ip' => $request->ip()]);
             return back()->withErrors(['code' => 'Código incorrecto. Intente de nuevo.']);
         }
 
@@ -111,6 +113,7 @@ class TwoFactorController extends Controller
         $secret = Crypt::decryptString($user->two_factor_secret);
 
         if (!$this->google2fa->verifyKey($secret, $request->code)) {
+            Log::warning('2FA challenge failed: wrong code', ['user_id' => $user->id, 'ip' => $request->ip()]);
             return back()->withErrors(['code' => 'Código incorrecto.']);
         }
 

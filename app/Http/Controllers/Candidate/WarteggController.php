@@ -98,7 +98,7 @@ class WarteggController extends Controller
 
         $validated = $request->validate([
             'box_number'   => 'required|integer|min:1|max:8',
-            'drawing_data' => 'required|string',
+            'drawing_data' => 'required|string|max:500000',
             'title'        => 'nullable|string|max:120',
             'order'        => 'nullable|integer|min:1|max:8',
             'time_seconds' => 'nullable|integer|min:0',

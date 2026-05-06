@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Exports\Concerns\SanitizesForExcel;
 use App\Models\Candidate;
 use App\Models\Position;
 use Maatwebsite\Excel\Concerns\FromCollection;
@@ -15,6 +16,8 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class RankingExport implements FromCollection, WithHeadings, WithStyles, ShouldAutoSize, WithTitle
 {
+    use SanitizesForExcel;
+
     public function __construct(private int $positionId) {}
 
     public function title(): string
@@ -60,8 +63,8 @@ class RankingExport implements FromCollection, WithHeadings, WithStyles, ShouldA
 
         return $candidates->map(fn ($row, $i) => [
             $i + 1,
-            $row['candidate']->name,
-            $row['candidate']->document_number ?? '—',
+            $this->sanitize($row['candidate']->name),
+            $this->sanitize($row['candidate']->document_number ?? '—'),
             $row['avg_pct'],
             $row['passed'],
             $row['total_tests'],

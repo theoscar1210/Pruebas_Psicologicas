@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\TestAssignment;
+use App\Exports\Concerns\SanitizesForExcel;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -14,6 +15,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class CandidatesResultsExport implements FromCollection, WithHeadings, WithStyles, ShouldAutoSize, WithTitle
 {
+    use SanitizesForExcel;
     public function __construct(private ?int $positionId = null) {}
 
     public function title(): string
@@ -48,10 +50,10 @@ class CandidatesResultsExport implements FromCollection, WithHeadings, WithStyle
         }
 
         return $query->get()->map(fn (TestAssignment $a) => [
-            $a->candidate->name,
-            $a->candidate->document_number ?? '—',
-            $a->candidate->position?->name ?? '—',
-            $a->test->name,
+            $this->sanitize($a->candidate->name),
+            $this->sanitize($a->candidate->document_number ?? '—'),
+            $this->sanitize($a->candidate->position?->name ?? '—'),
+            $this->sanitize($a->test->name),
             'Completada',
             $a->result?->total_score ?? 0,
             $a->result?->max_score ?? 0,

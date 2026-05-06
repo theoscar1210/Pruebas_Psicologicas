@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class TestTakingController extends Controller
@@ -37,10 +38,13 @@ class TestTakingController extends Controller
             ->first();
 
         if (!$candidate) {
+            Log::warning('Candidate access failed', [
+                'ip'   => $request->ip(),
+                'code' => strtoupper($request->access_code),
+            ]);
             return back()->withErrors(['access_code' => 'Código de acceso inválido o inactivo.']);
         }
 
-        // Guardar candidato en sesión
         session(['candidate_id' => $candidate->id]);
 
         return redirect()->route('candidate.dashboard');
