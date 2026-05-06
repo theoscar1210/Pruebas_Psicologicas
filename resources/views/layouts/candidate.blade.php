@@ -83,7 +83,7 @@
     </main>
 
     {{-- ── Footer legal ─────────────────────────────────────────────────── --}}
-    <footer class="bg-emerald-500">
+    <footer class="bg-brand-950">
         <div class="max-w-5xl mx-auto px-6 py-4">
 
             <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
