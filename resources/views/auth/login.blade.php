@@ -16,8 +16,7 @@
 <div class="min-h-screen flex">
 
     {{-- ══ PANEL IZQUIERDO: Marca ══════════════════════════════════════════════ --}}
-    <div class="hidden lg:flex lg:w-3/5 flex-col justify-between relative overflow-hidden"
-         style="background: linear-gradient(155deg, #0D3330 0%, #0F766E 65%, #14B8A6 100%)">
+    <div class="hidden lg:flex lg:w-3/5 flex-col justify-between relative overflow-hidden bg-brand-950">
 
         {{-- Círculos decorativos de fondo --}}
         <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full"
