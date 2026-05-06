@@ -5,7 +5,6 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Vite;
-use Livewire\Livewire;
 use Symfony\Component\HttpFoundation\Response;
 
 class ContentSecurityPolicy
@@ -16,7 +15,7 @@ class ContentSecurityPolicy
 
         app()->instance('csp-nonce', $nonce);
         Vite::useCspNonce($nonce);
-        Livewire::nonce($nonce);
+        // Livewire 4 lee el nonce de Vite::cspNonce() automáticamente
 
         $response = $next($request);
 
