@@ -156,7 +156,7 @@
     </div>
 </div>
 
-<script>
+<script nonce="{{ app('csp-nonce') }}">
 (function() {
     [1,2,3].forEach(n => {
         const ta = document.getElementById(`sc${n}`);

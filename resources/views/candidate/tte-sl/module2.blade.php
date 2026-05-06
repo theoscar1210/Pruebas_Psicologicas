@@ -179,7 +179,7 @@
     </form>
 </div>
 
-<script>
+<script nonce="{{ app('csp-nonce') }}">
 (function() {
     const total = 40;
     const counter = document.getElementById('answered-count2');

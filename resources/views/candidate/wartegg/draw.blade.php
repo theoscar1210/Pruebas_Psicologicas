@@ -159,7 +159,7 @@
     @csrf
 </form>
 
-<script>
+<script nonce="{{ app('csp-nonce') }}">
 // ── Configuración inicial ──────────────────────────────────────────────────
 const CANVAS_RES    = 400; // resolución interna del canvas (px)
 const SAVE_URL      = "{{ route('candidate.wartegg.save-box', $assignment) }}";

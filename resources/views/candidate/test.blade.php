@@ -24,7 +24,7 @@
 
 @section('content')
 
-<script>
+<script nonce="{{ app('csp-nonce') }}">
 // ─── Alpine: modo Raven ──────────────────────────────────────────────────────
 window.ravenApp=function({ saveUrl, timeRemaining, ravenQuestions, savedAnswers, totalQuestions }) {
     return {
@@ -211,7 +211,7 @@ window.testApp=function({ assignmentId, saveUrl, timeRemaining, totalQuestions, 
      MODO RAVEN — Renderer SVG ítem a ítem
      Motor gráfico portado de raven_progressive_matrices_test.html
 ════════════════════════════════════════════════════════════════════ --}}
-<script>
+<script nonce="{{ app('csp-nonce') }}">
 window.RAVEN_QUESTIONS    = {!! json_encode($ravenMeta) !!};
 window.RAVEN_SAVED        = {!! json_encode($savedAnswers) !!};
 </script>

@@ -182,7 +182,7 @@
 
 </div>
 
-<script>
+<script nonce="{{ app('csp-nonce') }}">
 function questionForm() {
     return {
         type: 'multiple_choice',

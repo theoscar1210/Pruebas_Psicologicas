@@ -17,9 +17,6 @@ class SecurityHeaders
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()');
 
-        // CSP omitido intencionalmente: Livewire 4 + Alpine.js requieren
-        // configuración de nonces que debe hacerse de forma separada y controlada.
-
         return $response;
     }
 }

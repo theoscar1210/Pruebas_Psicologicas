@@ -109,7 +109,7 @@
     <p class="text-center text-xs text-slate-400 mt-4">Módulo 1 de 3 · Juicio Situacional · ≈ 15–20 min</p>
 </div>
 
-<script>
+<script nonce="{{ app('csp-nonce') }}">
 document.getElementById('consent').addEventListener('change', function() {
     const btn = document.getElementById('btn-start');
     if (this.checked) {

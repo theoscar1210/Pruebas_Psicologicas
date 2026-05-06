@@ -108,7 +108,7 @@
 
 </div>
 
-<script>
+<script nonce="{{ app('csp-nonce') }}">
 document.getElementById('consent').addEventListener('change', function() {
     const btn = document.getElementById('btn-start');
     btn.disabled = !this.checked;

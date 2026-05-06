@@ -310,7 +310,7 @@
     </form>
 </div>
 
-<script>
+<script nonce="{{ app('csp-nonce') }}">
 (function() {
     const total = 20;
     const counter = document.getElementById('answered-count');

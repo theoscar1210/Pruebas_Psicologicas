@@ -119,7 +119,7 @@
 </div>
 @endsection
 
-<script>
+<script nonce="{{ app('csp-nonce') }}">
 const cb = document.getElementById('consent');
 if (cb) {
     cb.addEventListener('change', function() {
