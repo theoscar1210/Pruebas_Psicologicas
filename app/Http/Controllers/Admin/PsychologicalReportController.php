@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Candidate;
-use App\Models\PsychologicalReport;
 use App\Services\AiNarrativeService;
 use App\Services\PsychologicalReportService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -23,6 +22,8 @@ class PsychologicalReportController extends Controller
     /** Mostrar el perfil psicológico de un candidato */
     public function show(Candidate $candidate): View
     {
+        $this->authorize('viewReport', $candidate);
+
         $candidate->load([
             'position',
             'assignments.test',
@@ -42,7 +43,9 @@ class PsychologicalReportController extends Controller
     /** Generar / actualizar el reporte automáticamente y mostrar formulario de cierre */
     public function generate(Candidate $candidate): RedirectResponse
     {
-        $report = $this->reportService->generate($candidate);
+        $this->authorize('viewReport', $candidate);
+
+        $this->reportService->generate($candidate);
 
         return redirect()
             ->route('admin.profile.show', $candidate)
@@ -52,6 +55,8 @@ class PsychologicalReportController extends Controller
     /** Guardar conclusiones finales del evaluador */
     public function complete(Request $request, Candidate $candidate): RedirectResponse
     {
+        $this->authorize('viewReport', $candidate);
+
         $validated = $request->validate([
             'recommendation'       => 'required|in:apto,apto_con_reservas,no_apto',
             'recommendation_notes' => 'nullable|string|max:3000',
@@ -75,6 +80,8 @@ class PsychologicalReportController extends Controller
     /** Generar narrativa IA para una sección del informe */
     public function generateNarrative(Request $request, Candidate $candidate): JsonResponse
     {
+        $this->authorize('viewReport', $candidate);
+
         $section = $request->validate([
             'section' => 'required|in:personality,cognitive,competencies,projective,interview',
         ])['section'];
@@ -105,6 +112,8 @@ class PsychologicalReportController extends Controller
     /** Exportar el perfil como PDF */
     public function pdf(Candidate $candidate): \Illuminate\Http\Response
     {
+        $this->authorize('viewReport', $candidate);
+
         $candidate->load([
             'position',
             'assignments.test',

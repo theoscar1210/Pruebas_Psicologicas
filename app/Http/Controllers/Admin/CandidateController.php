@@ -7,9 +7,10 @@ use App\Models\Candidate;
 use App\Models\Position;
 use App\Models\Test;
 use App\Models\TestAssignment;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -70,7 +71,8 @@ class CandidateController extends Controller
             'created_by' => Auth::id(),
         ]));
 
-        // Si tiene cargo, asignar automáticamente las pruebas del cargo
+        Log::info('Candidate created', ['by' => Auth::id(), 'candidate_id' => $candidate->id]);
+
         if ($candidate->position_id) {
             $this->assignPositionTests($candidate);
         }
@@ -154,7 +156,10 @@ class CandidateController extends Controller
 
     public function destroy(Candidate $candidate): RedirectResponse
     {
+        $this->authorize('delete', $candidate);
+
         $name = $candidate->name;
+        Log::warning('Candidate deleted', ['by' => Auth::id(), 'candidate_id' => $candidate->id, 'name' => $name]);
         $candidate->delete();
 
         return redirect()->route('admin.candidates.index')

@@ -11,6 +11,7 @@ use App\Models\TestAssignment;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Illuminate\View\View;
@@ -42,6 +43,8 @@ class ReportController extends Controller
      */
     public function candidatePdf(Candidate $candidate): Response
     {
+        $this->authorize('view', $candidate);
+
         $candidate->load([
             'position',
             'assignments.test',
@@ -105,6 +108,11 @@ class ReportController extends Controller
     {
         $validated = $request->validate([
             'position_id' => 'nullable|integer|exists:positions,id',
+        ]);
+
+        Log::info('Bulk Excel export', [
+            'by'          => auth()->id(),
+            'position_id' => $validated['position_id'] ?? 'all',
         ]);
 
         return Excel::download(
