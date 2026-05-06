@@ -19,11 +19,11 @@ class ContentSecurityPolicy
 
         $response = $next($request);
 
-        // Alpine.js evalúa expresiones x-data/x-on/x-init con new Function()
-        // internamente — unsafe-eval es inevitable sin migrar a @alpinejs/csp.
-        $scriptSrc  = "'self' 'nonce-{$nonce}' 'unsafe-eval'";
-        $styleSrc   = "'self' 'unsafe-inline' https://fonts.bunny.net";
-        $connectSrc = "'self'";
+        // Alpine.js requiere unsafe-eval (new Function() internamente).
+        // El nonce debe estar en style-src porque Vite lo añade también a <link>.
+        $scriptSrc  = "'self' 'nonce-{$nonce}' 'unsafe-eval' https://cdn.jsdelivr.net";
+        $styleSrc   = "'self' 'nonce-{$nonce}' 'unsafe-inline' https://fonts.bunny.net";
+        $connectSrc = "'self' https://api.groq.com";
 
         // En desarrollo el servidor Vite corre en un puerto/origen distinto.
         $hotFile = public_path('hot');
