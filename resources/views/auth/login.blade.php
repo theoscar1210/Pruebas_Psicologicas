@@ -16,43 +16,35 @@
 <div class="min-h-screen flex">
 
     {{-- ══ PANEL IZQUIERDO: Marca ══════════════════════════════════════════════ --}}
-    <div class="hidden lg:flex lg:w-3/5 flex-col justify-between relative overflow-hidden"
-         style="background: linear-gradient(155deg, #0D3330 0%, #0F766E 65%, #14B8A6 100%)">
+    <div class="login-panel-left hidden lg:flex lg:w-3/5 flex-col justify-between relative overflow-hidden">
 
         {{-- Círculos decorativos de fondo --}}
-        <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full"
-             style="background: rgba(255,255,255,0.04)"></div>
-        <div class="absolute top-1/3 -right-16 w-64 h-64 rounded-full"
-             style="background: rgba(255,255,255,0.03)"></div>
-        <div class="absolute -bottom-20 -left-20 w-80 h-80 rounded-full"
-             style="background: rgba(255,255,255,0.04)"></div>
-        <div class="absolute bottom-1/4 right-10 w-40 h-40 rounded-full"
-             style="background: rgba(255,255,255,0.03)"></div>
+        <div class="login-decor-sm absolute -top-24 -right-24 w-96 h-96 rounded-full"></div>
+        <div class="login-decor-xs absolute top-1/3 -right-16 w-64 h-64 rounded-full"></div>
+        <div class="login-decor-sm absolute -bottom-20 -left-20 w-80 h-80 rounded-full"></div>
+        <div class="login-decor-xs absolute bottom-1/4 right-10 w-40 h-40 rounded-full"></div>
 
         {{-- Patrón de puntos sutil --}}
-        <div class="absolute inset-0 opacity-10"
-             style="background-image: radial-gradient(circle, rgba(255,255,255,0.35) 1px, transparent 1px); background-size: 28px 28px;"></div>
+        <div class="login-dot-pattern absolute inset-0 opacity-10"></div>
 
         {{-- Logo superior --}}
         <div class="relative z-10 p-10 flex items-center gap-4">
-            <div class="w-11 h-11 rounded-full flex items-center justify-center font-bold text-sm tracking-tight"
-                 style="background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); color: #ffffff">
+            <div class="login-logo-circle w-11 h-11 rounded-full flex items-center justify-center font-bold text-sm tracking-tight">
                 MC
             </div>
             <div>
-                <div class="font-bold text-xl leading-none" style="color: #ffffff; letter-spacing: -0.3px">MenteClara</div>
-                <div class="text-xs mt-0.5 tracking-wide" style="color: rgba(94,234,212,0.9)">by Emma Naranjo</div>
+                <div class="login-brand-name font-bold text-xl leading-none">MenteClara</div>
+                <div class="login-brand-sub text-xs mt-0.5 tracking-wide">by Emma Naranjo</div>
             </div>
         </div>
 
         {{-- Contenido central --}}
         <div class="relative z-10 px-10 pb-4">
-            <h1 class="font-extrabold leading-none mb-5" style="font-size: 46px; color: #ffffff; letter-spacing: -1.5px; line-height: 1.05">
+            <h1 class="login-hero-h1 font-extrabold leading-none mb-5">
                 Evalúa.<br>Descubre.<br>Decide.
             </h1>
 
-            <p class="text-base leading-relaxed mb-10 max-w-xs"
-               style="color: rgba(204,251,241,0.85)">
+            <p class="login-hero-desc text-base leading-relaxed mb-10 max-w-xs">
                 Sistema profesional de evaluación psicológica para procesos de selección de talento humano.
             </p>
 
@@ -64,15 +56,14 @@
                     ['Reportes PDF profesionales', 'Exporta y comparte resultados de forma confidencial'],
                 ] as [$titulo, $desc])
                 <div class="flex items-start gap-3.5">
-                    <div class="mt-0.5 w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-                         style="background: rgba(94,234,212,0.2); border: 1px solid rgba(94,234,212,0.4)">
+                    <div class="login-feat-dot mt-0.5 w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0">
                         <svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 10 8">
                             <path d="M1 4l2.5 2.5L9 1" stroke="#5EEAD4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </div>
                     <div>
-                        <div class="text-sm font-semibold leading-tight" style="color: #ffffff">{{ $titulo }}</div>
-                        <div class="text-xs mt-0.5 leading-snug" style="color: rgba(204,251,241,0.65)">{{ $desc }}</div>
+                        <div class="login-feat-title text-sm font-semibold leading-tight">{{ $titulo }}</div>
+                        <div class="login-feat-desc text-xs mt-0.5 leading-snug">{{ $desc }}</div>
                     </div>
                 </div>
                 @endforeach
@@ -81,8 +72,8 @@
 
         {{-- Footer panel izquierdo --}}
         <div class="relative z-10 px-10 pb-8">
-            <div class="border-t pt-5" style="border-color: rgba(255,255,255,0.1)">
-                <p class="text-xs italic" style="color: rgba(204,251,241,0.5)">
+            <div class="login-divider border-t pt-5">
+                <p class="login-quote text-xs italic">
                     "Donde el talento encuentra su medida"
                 </p>
             </div>
@@ -94,13 +85,12 @@
 
         {{-- Logo visible solo en móvil --}}
         <div class="lg:hidden flex items-center gap-3 mb-10">
-            <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm"
-                 style="border: 2px solid #0F766E; background: #F0FDFA; color: #0F766E">
+            <div class="login-mob-circle w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm">
                 MC
             </div>
             <div>
-                <div class="font-bold text-lg leading-none" style="color: #0D3330">MenteClara</div>
-                <div class="text-xs mt-0.5 tracking-wide" style="color: #0D9488">by Emma Naranjo</div>
+                <div class="login-mob-brand font-bold text-lg leading-none">MenteClara</div>
+                <div class="login-mob-sub text-xs mt-0.5 tracking-wide">by Emma Naranjo</div>
             </div>
         </div>
 

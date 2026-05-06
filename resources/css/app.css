@@ -349,6 +349,35 @@
     .divider {
         @apply border-t border-slate-100 my-5;
     }
+
+    /* ── LOGIN PANEL IZQUIERDO ────────────────────────────────────────────── */
+
+    .login-panel-left {
+        background: linear-gradient(155deg, #0D3330 0%, #0F766E 65%, #14B8A6 100%);
+    }
+    .login-decor-sm    { background: rgba(255,255,255,0.04); }
+    .login-decor-xs    { background: rgba(255,255,255,0.03); }
+    .login-dot-pattern {
+        background-image: radial-gradient(circle, rgba(255,255,255,0.35) 1px, transparent 1px);
+        background-size: 28px 28px;
+    }
+    .login-logo-circle {
+        background: rgba(255,255,255,0.15);
+        border: 1.5px solid rgba(255,255,255,0.3);
+        color: #fff;
+    }
+    .login-brand-name  { color: #fff; letter-spacing: -0.3px; }
+    .login-brand-sub   { color: rgba(94,234,212,0.9); }
+    .login-hero-h1     { font-size: 46px; color: #fff; letter-spacing: -1.5px; line-height: 1.05; }
+    .login-hero-desc   { color: rgba(204,251,241,0.85); }
+    .login-feat-dot    { background: rgba(94,234,212,0.2); border: 1px solid rgba(94,234,212,0.4); }
+    .login-feat-title  { color: #fff; }
+    .login-feat-desc   { color: rgba(204,251,241,0.65); }
+    .login-divider     { border-color: rgba(255,255,255,0.1); }
+    .login-quote       { color: rgba(204,251,241,0.5); }
+    .login-mob-circle  { border: 2px solid #0F766E; background: #F0FDFA; color: #0F766E; }
+    .login-mob-brand   { color: #0D3330; }
+    .login-mob-sub     { color: #0D9488; }
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
