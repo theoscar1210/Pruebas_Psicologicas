@@ -183,7 +183,15 @@ PROMPT;
     private function competenciesPrompt(PsychologicalReport $report, string $nombre, string $cargo): string
     {
         if (empty($report->competency_scores)) {
-            return "Candidato: {$nombre} — Cargo: {$cargo}\n\nNo hay datos de competencias disponibles aún.";
+            return <<<PROMPT
+Candidato: {$nombre} — Cargo aspirado: {$cargo}
+
+Puntuaciones de competencias (Assessment Center): No se han registrado puntuaciones aún.
+
+Redacta un párrafo breve indicando que la evaluación de competencias conductuales está pendiente
+para este candidato y que el perfil de competencias será completado una vez se realice el
+Assessment Center correspondiente.
+PROMPT;
         }
 
         $lines = collect($report->competency_scores)
