@@ -12,7 +12,7 @@
             <form action="{{ route('admin.candidates.update', $candidate) }}" method="POST" class="space-y-5">
                 @csrf @method('PUT')
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="col-span-2 form-group">
                         <label class="form-label">Nombre completo <span class="form-required">*</span></label>
                         <input type="text" name="name" value="{{ old('name', $candidate->name) }}" required

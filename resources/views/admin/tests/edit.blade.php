@@ -37,7 +37,7 @@
                               class="textarea">{{ old('instructions', $test->instructions) }}</textarea>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="form-group">
                         <label class="form-label">Tiempo límite (minutos)</label>
                         <input type="number" name="time_limit" value="{{ old('time_limit', $test->time_limit) }}"

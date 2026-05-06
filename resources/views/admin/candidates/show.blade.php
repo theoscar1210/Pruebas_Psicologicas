@@ -11,19 +11,29 @@
         <span class="hidden sm:inline">Perfil Psicológico</span>
         <span class="sm:hidden">Perfil</span>
     </a>
-    <a href="{{ route('admin.reports.candidate.pdf', $candidate) }}" class="btn-danger btn-sm">
+    <a href="{{ route('admin.reports.candidate.pdf', $candidate) }}" class="btn-secondary btn-sm" title="Descargar PDF">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
         </svg>
-        PDF
+        <span class="hidden sm:inline">PDF</span>
     </a>
     <a href="{{ route('admin.candidates.edit', $candidate) }}" class="btn-secondary btn-sm hidden sm:inline-flex">Editar</a>
     <form method="POST" action="{{ route('admin.candidates.destroy', $candidate) }}"
           onsubmit="return confirm('¿Eliminar a {{ addslashes($candidate->name) }}? Esta acción borrará todas sus pruebas, resultados y registros. No se puede deshacer.')">
         @csrf @method('DELETE')
-        <button type="submit" class="btn-danger btn-sm">Eliminar</button>
+        <button type="submit" class="btn-danger btn-sm" title="Eliminar candidato">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+            <span class="hidden sm:inline">Eliminar</span>
+        </button>
     </form>
-    <a href="{{ route('admin.candidates.index') }}" class="btn-ghost btn-sm">← Volver</a>
+    <a href="{{ route('admin.candidates.index') }}" class="btn-ghost btn-sm" title="Volver a lista">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        <span class="hidden sm:inline">Volver</span>
+    </a>
 @endsection
 
 @section('content')

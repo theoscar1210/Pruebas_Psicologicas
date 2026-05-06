@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Panel') — {{ config('app.name') }}</title>
+    <link rel="icon" href="/images/isotipo.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon.ico" sizes="any">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="h-full bg-slate-50 font-sans antialiased">
@@ -210,7 +212,7 @@
     <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
 
         {{-- Topbar --}}
-        <header class="bg-white border-b border-slate-100 px-4 lg:px-6 py-4 flex items-center gap-3 flex-shrink-0">
+        <header class="bg-white border-b border-slate-100 px-4 lg:px-6 py-3 lg:py-4 flex items-center gap-2 flex-shrink-0 min-w-0">
             {{-- Hamburger (solo en móvil) --}}
             <button @click="sidebarOpen = true"
                     class="lg:hidden p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors flex-shrink-0">
@@ -219,10 +221,10 @@
                 </svg>
             </button>
 
-            <h1 class="flex-1 text-[15px] font-semibold text-slate-900 truncate">
+            <h1 class="flex-1 min-w-0 text-[15px] font-semibold text-slate-900 truncate">
                 @yield('header', 'Panel de Administración')
             </h1>
-            <div class="flex items-center gap-2 flex-shrink-0">
+            <div class="flex items-center gap-1 flex-shrink-0 flex-wrap justify-end">
                 @yield('header-actions')
             </div>
         </header>

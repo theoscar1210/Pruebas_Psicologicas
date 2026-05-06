@@ -1281,7 +1281,7 @@
             <div class="card-body">
                 <h2 class="text-sm font-semibold text-slate-700 mb-1">AC-SL — Escala BARS de Calificación (1–5)</h2>
                 <p class="text-xs text-slate-400 mb-4">Califica el puntaje final integrado por competencia. Registra únicamente conductas directamente observadas — nunca rasgos inferidos.</p>
-                <div class="grid grid-cols-5 gap-2 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-5 gap-2 text-xs">
                     <div class="p-2 bg-red-50 rounded-lg text-center">
                         <strong class="block text-red-700 mb-1">1 — No demostrado</strong>
                         <span class="text-red-600/80">No se observaron conductas que evidencien la competencia.</span>

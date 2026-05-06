@@ -24,7 +24,7 @@
                 </div>
                 @endif
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="col-span-2 form-group">
                         <label class="form-label">Nombre completo <span class="form-required">*</span></label>
                         <input type="text" name="name" value="{{ old('name') }}" required

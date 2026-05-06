@@ -34,7 +34,7 @@
                               class="textarea">{{ old('instructions') }}</textarea>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="form-group">
                         <label class="form-label">
                             Tiempo límite (minutos)
