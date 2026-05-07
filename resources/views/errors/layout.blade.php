@@ -16,18 +16,17 @@
 
     {{-- Logo --}}
     <div class="flex items-center justify-center gap-3 mb-10">
-        <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm"
-             style="border: 2px solid #0F766E; background: #F0FDFA; color: #0F766E">MC</div>
+        <div class="login-mob-circle w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm">MC</div>
         <div class="text-left">
-            <div class="font-bold text-base leading-none" style="color: #0D3330">MenteClara</div>
-            <div class="text-xs tracking-wide" style="color: #0D9488">by Emma Naranjo</div>
+            <div class="login-mob-brand font-bold text-base leading-none">MenteClara</div>
+            <div class="login-mob-sub text-xs tracking-wide">by Emma Naranjo</div>
         </div>
     </div>
 
     {{-- Icono y código --}}
     <div class="mb-6">
         @yield('icon')
-        <p class="text-7xl font-extrabold tracking-tight mt-4" style="color: #0F766E; opacity: 0.15">
+        <p class="text-7xl font-extrabold tracking-tight mt-4 text-brand-700 opacity-15">
             @yield('code')
         </p>
     </div>
@@ -37,11 +36,10 @@
     <p class="text-slate-500 text-sm leading-relaxed mb-8">@yield('description')</p>
 
     {{-- Acciones --}}
-    <div class="flex items-center justify-center gap-3 flex-wrap">
+    <div class="flex items-center justify-center gap-3 flex-wrap" x-data>
         @auth
             <a href="{{ route('dashboard') }}"
-               class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition"
-               style="background: #0F766E;">
+               class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-brand-700 hover:bg-brand-800 transition">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0h6"/>
                 </svg>
@@ -49,13 +47,12 @@
             </a>
         @else
             <a href="{{ route('login') }}"
-               class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition"
-               style="background: #0F766E;">
+               class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-brand-700 hover:bg-brand-800 transition">
                 Iniciar sesión
             </a>
         @endauth
 
-        <button onclick="history.back()"
+        <button @click="history.back()"
                 class="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-600 bg-white border border-slate-200 hover:border-slate-300 transition">
             Volver atrás
         </button>
