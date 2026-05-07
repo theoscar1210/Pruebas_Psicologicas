@@ -282,14 +282,14 @@
 
         {{-- Entrevista STAR --}}
         @if($star)
-        <div class="card">
-            <div class="card-body">
-                <div class="flex items-center justify-between mb-3">
+        <div class="card flex flex-col max-h-[520px]">
+            <div class="card-body flex flex-col min-h-0">
+                <div class="flex items-center justify-between mb-3 flex-shrink-0">
                     <h3 class="font-semibold text-slate-700 text-sm">Entrevista STAR</h3>
                     <span class="text-lg font-bold text-brand-700">{{ number_format($star->overall_score, 0) }}/100</span>
                 </div>
                 @if($star->scores)
-                <div class="space-y-1.5">
+                <div class="space-y-1.5 flex-shrink-0">
                     @php $starLabels = ['trabajo_equipo'=>'Trabajo equipo','liderazgo'=>'Liderazgo','resolucion_problemas'=>'Resolución','orientacion_cliente'=>'Cliente','adaptabilidad'=>'Adaptabilidad','comunicacion'=>'Comunicación','iniciativa'=>'Iniciativa','manejo_estres'=>'Estrés','etica_integridad'=>'Ética','planificacion'=>'Planificación']; @endphp
                     @foreach($star->scores as $key => $val)
                     <div class="flex items-center gap-2 text-xs">
@@ -305,7 +305,9 @@
                 </div>
                 @endif
                 @if($star->observations)
-                    <p class="text-xs text-slate-500 mt-3 leading-relaxed border-t border-slate-100 pt-3">{{ $star->observations }}</p>
+                <div class="mt-3 border-t border-slate-100 pt-3 overflow-y-auto flex-1 min-h-0">
+                    <p class="text-xs text-slate-500 leading-relaxed whitespace-pre-wrap">{{ $star->observations }}</p>
+                </div>
                 @endif
             </div>
         </div>
