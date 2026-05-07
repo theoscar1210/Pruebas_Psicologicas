@@ -104,7 +104,7 @@
                                 <span class="font-bold text-slate-800">{{ number_format($val, 0) }}%</span>
                             </div>
                             <div class="progress-track h-2">
-                                <div class="progress-bar {{ $dim['color'] }} h-2" style="width: {{ $val }}%"></div>
+                                <div class="progress-bar {{ $dim['color'] }} h-2" x-data :style="{ width: '{{ $val }}%' }"></div>
                             </div>
                         </div>
                         @endforeach
@@ -126,7 +126,7 @@
                         <span class="text-slate-500 truncate">{{ $pf16Names[$key] ?? $key }}</span>
                         <div class="flex items-center gap-1.5">
                             <div class="w-12 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                <div class="h-1.5 bg-brand-500 rounded-full" style="width: {{ min(100, $score) }}%"></div>
+                                <div class="h-1.5 bg-brand-500 rounded-full" x-data :style="{ width: '{{ min(100, $score) }}%' }"></div>
                             </div>
                             <span class="font-semibold text-slate-700 w-6 text-right">{{ number_format($score, 0) }}</span>
                         </div>
@@ -195,7 +195,7 @@
                                 <span class="font-semibold">{{ $setScore->raw_score }} / {{ $ravenAssignment->test->questions->where('category', $setScore->dimension_key)->count() }}</span>
                             </div>
                             <div class="progress-track h-1.5">
-                                <div class="progress-bar bg-brand-500 h-1.5" style="width: {{ $setScore->normalized_score }}%"></div>
+                                <div class="progress-bar bg-brand-500 h-1.5" x-data :style="{ width: '{{ $setScore->normalized_score }}%' }"></div>
                             </div>
                         </div>
                         @endforeach
@@ -230,7 +230,7 @@
                             <span class="font-bold text-slate-800">{{ number_format($score, 0) }}%</span>
                         </div>
                         <div class="progress-track h-2">
-                            <div class="progress-bar bg-amber-500 h-2" style="width: {{ $score }}%"></div>
+                            <div class="progress-bar bg-amber-500 h-2" x-data :style="{ width: '{{ $score }}%' }"></div>
                         </div>
                     </div>
                     @endforeach
@@ -457,12 +457,11 @@
                     <button type="button"
                             @click="generate()"
                             :disabled="loading"
-                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition disabled:opacity-60 disabled:cursor-not-allowed"
-                            style="background: #7C3AED;">
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-violet-600 hover:bg-violet-700 transition disabled:opacity-60 disabled:cursor-not-allowed">
                         <svg x-show="!loading" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>
                         </svg>
-                        <svg x-show="loading" class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24" style="display:none">
+                        <svg x-show="loading" x-cloak class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                         </svg>

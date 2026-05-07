@@ -390,7 +390,7 @@
                             </div>
                         </div>
                         <div class="w-full bg-slate-200 rounded-full h-1.5 mb-2 overflow-hidden">
-                            <div class="{{ $ravenBarColor }} h-1.5 rounded-full transition-all" style="width: {{ ($ravenScore / 20) * 100 }}%"></div>
+                            <div class="{{ $ravenBarColor }} h-1.5 rounded-full transition-all" x-data :style="{ width: '{{ ($ravenScore / 20) * 100 }}%' }"></div>
                         </div>
                         <p class="text-xs text-slate-500 mb-1 leading-relaxed">{{ $ravenDesc }}</p>
                         <p class="text-xs text-slate-400">Percentil aproximado: <span class="font-medium text-slate-600">{{ $ravenPct }}</span></p>
@@ -440,7 +440,7 @@
                                         default    => 'bg-red-400',
                                     };
                                 @endphp
-                                <div class="{{ $barColor }} h-1.5 rounded-full transition-all" style="width: {{ $pct }}%"></div>
+                                <div class="{{ $barColor }} h-1.5 rounded-full transition-all" x-data :style="{ width: '{{ $pct }}%' }"></div>
                             </div>
                             <p class="text-xs text-slate-500 leading-relaxed">{{ $dim->interpretation }}</p>
                         </div>

@@ -91,7 +91,7 @@ $colorText = [
                             <span class="text-sm font-bold text-slate-800">{{ $score }}<span class="text-slate-400 font-normal"> / {{ $meta['max'] }}</span></span>
                         </div>
                         <div class="progress-track h-2">
-                            <div class="progress-bar {{ $bg }}" style="width: {{ $pct }}%"></div>
+                            <div class="progress-bar {{ $bg }}" x-data :style="{ width: '{{ $pct }}%' }"></div>
                         </div>
                     </div>
                     @endforeach
