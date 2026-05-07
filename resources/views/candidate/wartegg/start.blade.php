@@ -36,7 +36,7 @@
     {{-- Instrucciones --}}
     <div class="card mb-6">
         <div class="card-body space-y-4">
-            <h2 class="font-semibold text-slate-800 text-sm uppercase tracking-wider text-slate-400">Instrucciones</h2>
+            <h2 class="font-semibold text-sm uppercase tracking-wider text-slate-400">Instrucciones</h2>
 
             <div class="space-y-3">
                 @foreach([
@@ -70,6 +70,42 @@
     </div>
 
     {{-- Consentimiento informado --}}
+    @if($session->status === 'pending')
+    <div x-data="{ agreed: false }">
+        <div class="card border-slate-200 mb-6">
+            <div class="card-body">
+                <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Autorización de tratamiento de datos personales</h2>
+                <p class="text-xs text-slate-600 leading-relaxed">
+                    De conformidad con la <strong>Ley 1581 de 2012</strong> y el <strong>Decreto 1377 de 2013</strong>, le informamos que <strong>{{ config('app.name') }}</strong> (Responsable del tratamiento) recopilará sus datos personales — nombre, documento de identidad y producciones gráficas (dibujos del Test de Wartegg) — con la finalidad de <strong>evaluar indicadores psicológicos en el marco del proceso de selección de personal</strong>. Sus datos serán compartidos únicamente con el psicólogo evaluador y el área de Recursos Humanos del empleador, y se conservarán durante la vigencia del proceso y hasta por <strong>2 años</strong> después de su finalización.
+                </p>
+                <p class="text-xs text-slate-600 leading-relaxed mt-2">
+                    Conforme al <strong>Código Deontológico del Psicólogo — Ley 1090 de 2006</strong>, los resultados serán interpretados exclusivamente por un psicólogo organizacional certificado. La participación es <strong>voluntaria</strong>. Como titular usted tiene derecho a <strong>conocer, actualizar, rectificar y suprimir</strong> sus datos, y a <strong>revocar esta autorización</strong> en cualquier momento escribiendo a <strong>{{ config('mail.from.address', 'contacto@menteclara.co') }}</strong>.
+                </p>
+                <div class="mt-3 flex items-start gap-2">
+                    <input type="checkbox" id="consent" x-model="agreed"
+                           class="mt-0.5 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+                    <label for="consent" class="text-xs text-slate-700 leading-relaxed">
+                        <strong>Autorizo</strong> expresamente el tratamiento de mis datos personales para el proceso de selección, conforme a la Ley 1581 de 2012 y los términos indicados.
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <form method="POST" action="{{ route('candidate.wartegg.consent', $assignment) }}">
+            @csrf
+            <button type="submit"
+                    :disabled="!agreed"
+                    :class="agreed ? '' : 'opacity-40 cursor-not-allowed'"
+                    class="btn-primary w-full justify-center text-base py-3">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                </svg>
+                Comenzar el test
+            </button>
+        </form>
+    </div>
+    @else
     <div class="card border-slate-200 mb-6">
         <div class="card-body">
             <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Autorización de tratamiento de datos personales</h2>
@@ -79,29 +115,9 @@
             <p class="text-xs text-slate-600 leading-relaxed mt-2">
                 Conforme al <strong>Código Deontológico del Psicólogo — Ley 1090 de 2006</strong>, los resultados serán interpretados exclusivamente por un psicólogo organizacional certificado. La participación es <strong>voluntaria</strong>. Como titular usted tiene derecho a <strong>conocer, actualizar, rectificar y suprimir</strong> sus datos, y a <strong>revocar esta autorización</strong> en cualquier momento escribiendo a <strong>{{ config('mail.from.address', 'contacto@menteclara.co') }}</strong>.
             </p>
-            <div class="mt-3 flex items-start gap-2">
-                <input type="checkbox" id="consent" class="mt-0.5 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
-                <label for="consent" class="text-xs text-slate-700 leading-relaxed">
-                    <strong>Autorizo</strong> expresamente el tratamiento de mis datos personales para el proceso de selección, conforme a la Ley 1581 de 2012 y los términos indicados.
-                </label>
-            </div>
         </div>
     </div>
 
-    {{-- Formulario de consentimiento --}}
-    @if($session->status === 'pending')
-    <form method="POST" action="{{ route('candidate.wartegg.consent', $assignment) }}" id="form-consent">
-        @csrf
-        <button id="btn-start" type="submit" disabled
-                class="btn-primary w-full justify-center text-base py-3 opacity-40 cursor-not-allowed">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-            </svg>
-            Comenzar el test
-        </button>
-    </form>
-    @else
     <a href="{{ route('candidate.wartegg.draw', $assignment) }}"
        class="btn-primary w-full justify-center text-base py-3">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
