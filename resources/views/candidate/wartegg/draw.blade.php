@@ -2,13 +2,15 @@
 @section('title', 'Test de Wartegg — Dibujar')
 
 @section('content')
-<style>
+<style nonce="{{ app('csp-nonce') }}">
     body { overflow: hidden; }
     #wzt-app { height: 100dvh; display: flex; flex-direction: column; background: #f1f5f9; }
     #canvas-area { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 8px; }
     #canvas-wrapper { position: relative; background: white; box-shadow: 0 4px 24px rgba(0,0,0,.12); border-radius: 8px; }
     #stimulus-canvas, #drawing-canvas { position: absolute; top: 0; left: 0; border-radius: 8px; }
-    #drawing-canvas { touch-action: none; }
+    #drawing-canvas { touch-action: none; cursor: crosshair; }
+    .wzt-topbar    { background: white; border-bottom: 1px solid #e2e8f0; padding: 8px 12px; flex-shrink: 0; }
+    .wzt-bottombar { background: white; border-top:    1px solid #e2e8f0; padding: 8px 12px; flex-shrink: 0; }
     .box-btn { width: 36px; height: 36px; border-radius: 8px; border: 2px solid #e2e8f0; background: white;
                font-size: 10px; font-weight: 700; cursor: pointer; transition: all .15s; position: relative;
                display: flex; align-items: center; justify-content: center; color: #94a3b8; font-family: monospace; }
@@ -24,18 +26,22 @@
     .size-btn { width: 32px; height: 32px; border-radius: 8px; border: 2px solid #e2e8f0; background: white;
                 cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; }
     .size-btn.active { border-color: #7c3aed; background: #ede9fe; }
+    .sz-dot-sm { width: 3px;  height: 3px;  background: #1e293b; border-radius: 50%; }
+    .sz-dot-md { width: 6px;  height: 6px;  background: #1e293b; border-radius: 50%; }
+    .sz-dot-lg { width: 10px; height: 10px; background: #1e293b; border-radius: 50%; }
+    .btn-violet { background: #7c3aed; color: white; }
 </style>
 
-<div id="wzt-app">
+<div id="wzt-app" x-data>
 
     {{-- ── Barra superior: navegación entre cajas ────────────────────────── --}}
-    <div style="background:white; border-bottom:1px solid #e2e8f0; padding: 8px 12px; flex-shrink:0;">
+    <div class="wzt-topbar">
         <div class="flex items-center gap-2 overflow-x-auto scrollbar-none">
             {{-- Logo compacto --}}
             <span class="text-xs font-bold text-violet-700 mr-1 flex-shrink-0">WZT</span>
             <div class="flex items-center gap-1.5 flex-shrink-0">
                 @foreach(['I','II','III','IV','V','VI','VII','VIII'] as $i => $roman)
-                <button class="box-btn" id="box-btn-{{ $i+1 }}" onclick="switchBox({{ $i+1 }})">
+                <button class="box-btn" id="box-btn-{{ $i+1 }}" @click="switchBox({{ $i+1 }})">
                     {{ $roman }}
                     <span class="done-dot hidden" id="done-dot-{{ $i+1 }}"></span>
                 </button>
@@ -55,12 +61,12 @@
     <div id="canvas-area">
         <div id="canvas-wrapper">
             <canvas id="stimulus-canvas"></canvas>
-            <canvas id="drawing-canvas" style="cursor: crosshair;"></canvas>
+            <canvas id="drawing-canvas"></canvas>
         </div>
     </div>
 
     {{-- ── Barra inferior: título + herramientas ─────────────────────────── --}}
-    <div style="background:white; border-top:1px solid #e2e8f0; padding: 8px 12px; flex-shrink:0;">
+    <div class="wzt-bottombar">
 
         {{-- Título del dibujo --}}
         <div class="flex items-center gap-2 mb-2">
@@ -68,7 +74,7 @@
             <input type="text" id="title-input" maxlength="100"
                    placeholder="Escribe un título breve para este dibujo…"
                    class="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-violet-400"
-                   onchange="saveTitleMemory()">
+                   @change="saveTitleMemory()">
         </div>
 
         {{-- Herramientas + navegación --}}
@@ -76,19 +82,19 @@
 
             {{-- Herramientas de dibujo --}}
             <div class="flex items-center gap-1.5">
-                <button class="tool-btn active" id="btn-pencil" onclick="setMode('draw')" title="Lápiz">
+                <button class="tool-btn active" id="btn-pencil" @click="setMode('draw')" title="Lápiz">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
                     </svg>
                 </button>
-                <button class="tool-btn" id="btn-eraser" onclick="setMode('erase')" title="Borrador">
+                <button class="tool-btn" id="btn-eraser" @click="setMode('erase')" title="Borrador">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                     </svg>
                 </button>
-                <button class="tool-btn" onclick="undo()" title="Deshacer (Ctrl+Z)">
+                <button class="tool-btn" @click="undo()" title="Deshacer (Ctrl+Z)">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
@@ -98,14 +104,14 @@
 
             {{-- Tamaño de trazo --}}
             <div class="flex items-center gap-1 border border-slate-200 rounded-lg p-1">
-                <button class="size-btn active" id="sz-1" onclick="setSize(2)" title="Trazo fino">
-                    <div style="width:3px;height:3px;background:#1e293b;border-radius:50%"></div>
+                <button class="size-btn active" id="sz-1" @click="setSize(2)" title="Trazo fino">
+                    <div class="sz-dot-sm"></div>
                 </button>
-                <button class="size-btn" id="sz-2" onclick="setSize(5)" title="Trazo medio">
-                    <div style="width:6px;height:6px;background:#1e293b;border-radius:50%"></div>
+                <button class="size-btn" id="sz-2" @click="setSize(5)" title="Trazo medio">
+                    <div class="sz-dot-md"></div>
                 </button>
-                <button class="size-btn" id="sz-3" onclick="setSize(10)" title="Trazo grueso">
-                    <div style="width:10px;height:10px;background:#1e293b;border-radius:50%"></div>
+                <button class="size-btn" id="sz-3" @click="setSize(10)" title="Trazo grueso">
+                    <div class="sz-dot-lg"></div>
                 </button>
             </div>
 
@@ -113,12 +119,11 @@
 
             {{-- Navegación entre cajas --}}
             <div class="flex items-center gap-2">
-                <button onclick="prevBox()" class="text-xs text-slate-500 hover:text-slate-700 px-3 py-1.5 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
+                <button @click="prevBox()" class="text-xs text-slate-500 hover:text-slate-700 px-3 py-1.5 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
                     ← Anterior
                 </button>
-                <button id="btn-next" onclick="nextOrFinish()"
-                        class="text-sm font-semibold px-4 py-1.5 rounded-lg transition-colors"
-                        style="background:#7c3aed; color:white">
+                <button id="btn-next" @click="nextOrFinish()"
+                        class="btn-violet text-sm font-semibold px-4 py-1.5 rounded-lg transition-colors">
                     Siguiente →
                 </button>
             </div>
@@ -140,12 +145,11 @@
                 Una vez enviado, no podrás modificar tus dibujos.
             </p>
             <div class="flex gap-3">
-                <button onclick="hideModal()" class="flex-1 py-2 text-sm text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors">
+                <button @click="hideModal()" class="flex-1 py-2 text-sm text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors">
                     Volver a dibujar
                 </button>
-                <button onclick="submitTest()" id="btn-confirm-finish"
-                        class="flex-1 py-2 text-sm font-semibold text-white rounded-xl transition-colors"
-                        style="background:#7c3aed">
+                <button @click="submitTest()" id="btn-confirm-finish"
+                        class="btn-violet flex-1 py-2 text-sm font-semibold rounded-xl transition-colors">
                     Enviar test
                 </button>
             </div>
