@@ -280,39 +280,6 @@
         </div>
         @endif
 
-        {{-- Entrevista STAR --}}
-        @if($star)
-        <div class="card">
-            <div class="card-body">
-                <div class="flex items-center justify-between mb-3">
-                    <h3 class="font-semibold text-slate-700 text-sm">Entrevista STAR</h3>
-                    <span class="text-lg font-bold text-brand-700">{{ number_format($star->overall_score, 0) }}/100</span>
-                </div>
-                @if($star->scores)
-                <div class="space-y-1.5">
-                    @php $starLabels = ['trabajo_equipo'=>'Trabajo equipo','liderazgo'=>'Liderazgo','resolucion_problemas'=>'Resolución','orientacion_cliente'=>'Cliente','adaptabilidad'=>'Adaptabilidad','comunicacion'=>'Comunicación','iniciativa'=>'Iniciativa','manejo_estres'=>'Estrés','etica_integridad'=>'Ética','planificacion'=>'Planificación']; @endphp
-                    @foreach($star->scores as $key => $val)
-                    <div class="flex items-center gap-2 text-xs">
-                        <span class="text-slate-500 w-24 truncate">{{ $starLabels[$key] ?? $key }}</span>
-                        <div class="flex gap-0.5 flex-1">
-                            @for($s = 1; $s <= 5; $s++)
-                            <div class="flex-1 h-3 rounded-sm {{ $s <= $val ? 'bg-brand-500' : 'bg-slate-100' }}"></div>
-                            @endfor
-                        </div>
-                        <span class="font-bold text-slate-700 w-4 text-right">{{ $val }}</span>
-                    </div>
-                    @endforeach
-                </div>
-                @endif
-                @if($star->observations)
-                <div class="mt-3 border-t border-slate-100 pt-3 max-h-40 overflow-y-auto">
-                    <p class="text-xs text-slate-500 leading-relaxed break-words">{{ $star->observations }}</p>
-                </div>
-                @endif
-            </div>
-        </div>
-        @endif
-
         {{-- Recomendación final --}}
         @if($report)
         <div class="card">
@@ -393,6 +360,79 @@
 
     </div>
 </div>
+
+{{-- ── Entrevista STAR — ancho completo ───────────────────────────────────── --}}
+@if($star)
+<div class="mt-6 card">
+    <div class="card-body">
+
+        {{-- Encabezado --}}
+        <div class="flex items-center justify-between mb-5">
+            <div class="flex items-center gap-3">
+                <h2 class="text-base font-semibold text-slate-700">Entrevista STAR</h2>
+                <span class="badge-success">Entrevista conductual</span>
+            </div>
+            <div class="text-right">
+                <span class="text-2xl font-bold text-brand-700">{{ number_format($star->overall_score, 0) }}</span>
+                <span class="text-sm text-slate-400 ml-0.5">/100</span>
+                @if($star->completed_at)
+                    <p class="text-xs text-slate-400 mt-0.5">{{ $star->completed_at->format('d/m/Y') }} · {{ $star->evaluator?->name }}</p>
+                @endif
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+            {{-- Competencias evaluadas --}}
+            @if($star->scores)
+            <div>
+                <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-3">Competencias evaluadas</p>
+                @php
+                $starLabels = [
+                    'trabajo_equipo'      => 'Trabajo en equipo',
+                    'liderazgo'           => 'Liderazgo',
+                    'resolucion_problemas'=> 'Resolución de problemas',
+                    'orientacion_cliente' => 'Orientación al cliente',
+                    'adaptabilidad'       => 'Adaptabilidad',
+                    'comunicacion'        => 'Comunicación',
+                    'iniciativa'          => 'Iniciativa',
+                    'manejo_estres'       => 'Manejo del estrés',
+                    'etica_integridad'    => 'Ética e integridad',
+                    'planificacion'       => 'Planificación',
+                ];
+                @endphp
+                <div class="space-y-2.5">
+                    @foreach($star->scores as $key => $val)
+                    <div class="flex items-center gap-3 text-xs">
+                        <span class="text-slate-600 font-medium w-40 flex-shrink-0">{{ $starLabels[$key] ?? ucfirst(str_replace('_', ' ', $key)) }}</span>
+                        <div class="flex gap-1 flex-1">
+                            @for($s = 1; $s <= 5; $s++)
+                            <div class="flex-1 h-4 rounded {{ $s <= $val ? 'bg-brand-500' : 'bg-slate-100' }}"></div>
+                            @endfor
+                        </div>
+                        <span class="font-bold text-slate-700 w-8 text-right flex-shrink-0">{{ $val }}/5</span>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
+            {{-- Observaciones --}}
+            @if($star->observations)
+            <div>
+                <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-3">Observaciones del evaluador</p>
+                <p class="text-sm text-slate-600 leading-relaxed break-words">{{ $star->observations }}</p>
+            </div>
+            @elseif(!$star->scores)
+            <div class="flex items-center justify-center py-6 text-slate-400 text-sm">
+                Sin datos registrados
+            </div>
+            @endif
+
+        </div>
+    </div>
+</div>
+@endif
 
 {{-- ── Narrativas automáticas con IA ──────────────────────────────────────── --}}
 @if($report)
