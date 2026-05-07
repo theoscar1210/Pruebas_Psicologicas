@@ -404,13 +404,13 @@
                 <div class="space-y-2.5">
                     @foreach($star->scores as $key => $val)
                     <div class="flex items-center gap-3 text-xs">
-                        <span class="text-slate-600 font-medium w-40 flex-shrink-0">{{ $starLabels[$key] ?? ucfirst(str_replace('_', ' ', $key)) }}</span>
+                        <span class="text-slate-600 font-medium flex-shrink-0">{{ $starLabels[$key] ?? ucfirst(str_replace('_', ' ', $key)) }}</span>
                         <div class="flex gap-1 flex-1">
                             @for($s = 1; $s <= 5; $s++)
                             <div class="flex-1 h-4 rounded {{ $s <= $val ? 'bg-brand-500' : 'bg-slate-100' }}"></div>
                             @endfor
                         </div>
-                        <span class="font-bold text-slate-700 w-8 text-right flex-shrink-0">{{ $val }}/5</span>
+                        <span class="font-bold text-slate-700 flex-shrink-0">{{ $val }}/5</span>
                     </div>
                     @endforeach
                 </div>
