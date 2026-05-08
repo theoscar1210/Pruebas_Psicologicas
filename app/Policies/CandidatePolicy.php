@@ -33,9 +33,9 @@ class CandidatePolicy
         return $user->role === 'admin';
     }
 
-    // Acceso al perfil psicológico completo: admin y psicólogo únicamente
+    // Acceso al perfil psicológico: admin y psicólogo (completo); hr (solo PDF del informe IA)
     public function viewReport(User $user, Candidate $candidate): bool
     {
-        return in_array($user->role, ['admin', 'psicologo']);
+        return in_array($user->role, ['admin', 'psicologo', 'hr']);
     }
 }
