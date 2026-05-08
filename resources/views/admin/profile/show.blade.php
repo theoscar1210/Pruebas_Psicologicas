@@ -403,15 +403,18 @@
                 @endphp
                 <div class="space-y-2.5">
                     @foreach($star->scores as $key => $val)
+                    @php $numVal = is_numeric($val) ? (int)$val : null; @endphp
+                    @if($numVal !== null && $numVal >= 1 && $numVal <= 5)
                     <div class="flex items-center gap-3 text-xs">
                         <span class="text-slate-600 font-medium w-36 shrink-0 truncate">{{ $starLabels[$key] ?? ucfirst(str_replace('_', ' ', $key)) }}</span>
                         <div class="flex gap-1 flex-1">
                             @for($s = 1; $s <= 5; $s++)
-                            <div class="flex-1 h-4 rounded {{ $s <= $val ? 'bg-brand-500' : 'bg-slate-100' }}"></div>
+                            <div class="flex-1 h-4 rounded {{ $s <= $numVal ? 'bg-brand-500' : 'bg-slate-100' }}"></div>
                             @endfor
                         </div>
-                        <span class="font-bold text-slate-700 shrink-0 w-8 text-right">{{ $val }}/5</span>
+                        <span class="font-bold text-slate-700 shrink-0 w-8 text-right">{{ $numVal }}/5</span>
                     </div>
+                    @endif
                     @endforeach
                 </div>
             </div>
