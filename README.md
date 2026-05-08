@@ -1,59 +1,198 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# MenteClara — Sistema de Evaluación Psicológica
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+> **"Donde el talento encuentra su medida"**  
+> Plataforma web para la administración, calificación e interpretación de pruebas psicológicas orientadas a la selección de personal.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Descripción general
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+MenteClara es una aplicación Laravel diseñada para equipos de psicología y recursos humanos que necesitan gestionar procesos de evaluación de candidatos de forma centralizada, segura y con soporte de inteligencia artificial. Permite aplicar pruebas estandarizadas en línea, calificarlas automáticamente o de forma manual, generar perfiles psicológicos y exportar informes en PDF.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## Funcionalidades principales
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- **Portal del candidato** — acceso mediante código único, sin necesidad de registro
+- **8 tipos de pruebas** psicométricas (personalidad, cognitivas, competencias, proyectivas)
+- **Calificación automática** para pruebas de selección múltiple y escala Likert
+- **Calificación manual** por el evaluador para entrevista STAR, Wartegg y Assessment Center
+- **Dibujo digital Wartegg** sobre lienzo canvas en el navegador
+- **Perfil psicológico unificado** que consolida todos los resultados de un candidato
+- **Narrativas IA por sección** generadas con Groq (Llama 3.3-70B)
+- **Informe psicológico completo con IA** con recomendación automática (Apto / Apto con reservas / No apto)
+- **Exportación PDF** de informes individuales y reportes masivos
+- **Exportación Excel** para análisis de RRHH
+- **Autenticación con 2FA** (TOTP) para todos los usuarios del panel
+- **Solicitud de eliminación de datos** conforme a la Ley 1581/2012 (habeas data)
+- **Gestión de roles** con tres niveles de acceso diferenciados
+- **Backups automáticos** cifrados con AES-256
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## Tecnologías
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+| Capa | Tecnología |
+|---|---|
+| Backend | PHP 8.2+, Laravel 12 |
+| Frontend | Blade, Tailwind CSS 3, Alpine.js 3, Chart.js 4 |
+| Base de datos | SQLite (desarrollo) / MySQL (producción) |
+| Generación PDF | barryvdh/laravel-dompdf |
+| Exportación Excel | maatwebsite/excel |
+| 2FA | pragmarx/google2fa + bacon/bacon-qr-code |
+| IA generativa | Groq API — `llama-3.3-70b-versatile` |
+| Backups | spatie/laravel-backup (S3 opcional) |
+| Build | Vite 7 |
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## Roles de usuario
 
-## Contributing
+| Rol | Descripción |
+|---|---|
+| `admin` | Acceso completo. Gestiona usuarios, cargos, pruebas, candidatos y solicitudes de eliminación. |
+| `psicologo` | Configura pruebas, evalúa candidatos, genera perfiles y narrativas con IA. |
+| `hr` | Recursos Humanos. Consulta candidatos y descarga el Informe Psicológico Completo en PDF. |
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## Pruebas psicológicas incluidas
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+| Prueba | Módulo | Calificación |
+|---|---|---|
+| Big Five IPIP-50 | Personalidad | Automática — 5 dimensiones OCEAN |
+| 16PF-SL | Personalidad | Automática — 16 factores |
+| Matrices de Raven (MPR-SL) | Cognitivo | Automática — 20 ítems, 3 sets |
+| Assessment Center (AC-SL) | Competencias | Evaluador — escala BARS 1-5 |
+| Wartegg (Proyectivo) | Proyectivo | Evaluador — 8 campos de dibujo |
+| TSC-SL — Servicio al cliente | Competencias | Mixta — 3 módulos |
+| TSC-SL-H — Hospitalidad | Competencias | Mixta — 3 módulos |
+| TTE-SL — Trabajo en equipo | Competencias | Mixta — 3 módulos |
+| Entrevista STAR | Entrevista | Evaluador — 10 competencias conductuales |
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Requisitos previos
 
-## License
+- PHP 8.2 o superior con extensiones: `pdo`, `mbstring`, `openssl`, `gd`, `fileinfo`, `zip`
+- Composer 2
+- Node.js 18+ y npm
+- MySQL 8+ (producción) o SQLite (desarrollo)
+- Cuenta en [console.groq.com](https://console.groq.com) para obtener la API key de IA (gratuita)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+## Instalación
+
+```bash
+# 1. Clonar el repositorio
+git clone <url-del-repositorio> menteclara
+cd menteclara
+
+# 2. Instalar dependencias PHP
+composer install
+
+# 3. Instalar dependencias frontend
+npm install
+
+# 4. Configurar el entorno
+cp .env.example .env
+php artisan key:generate
+
+# 5. Configurar la base de datos en .env y ejecutar migraciones
+php artisan migrate --seed
+
+# 6. Compilar assets
+npm run build
+
+# 7. Enlace de almacenamiento público
+php artisan storage:link
+```
+
+---
+
+## Variables de entorno principales
+
+```dotenv
+APP_NAME="MenteClara"
+APP_URL=https://tu-dominio.com
+
+# Base de datos (producción)
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=menteclara
+DB_USERNAME=usuario
+DB_PASSWORD=contraseña_segura
+
+# IA — Groq (requerida para narrativas e informes automáticos)
+# Obtén tu clave gratuita en https://console.groq.com
+GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxxxxxx
+
+# Backups cifrados (obligatorio en producción)
+BACKUP_ARCHIVE_PASSWORD=contraseña_larga_y_segura
+
+# Sesiones seguras (producción)
+SESSION_ENCRYPT=true
+SESSION_SECURE_COOKIE=true
+SESSION_LIFETIME=120
+```
+
+---
+
+## Inteligencia artificial
+
+El sistema usa la API de **Groq** con el modelo `llama-3.3-70b-versatile` para dos funcionalidades:
+
+**Narrativas por sección** — genera un párrafo interpretativo para cada módulo del perfil (personalidad, cognitivo, competencias, proyectivo, entrevista STAR). Se accede desde el panel del psicólogo en la vista de perfil del candidato.
+
+**Informe psicológico completo** — analiza la totalidad del perfil y produce un informe estructurado de 7 secciones con una recomendación final: **APTO**, **APTO CON RESERVAS** o **NO APTO**. El informe se guarda en la base de datos y es exportable a PDF.
+
+> **Privacidad:** el servicio nunca envía el nombre real del candidato a la API externa. Se utiliza un seudónimo generado con SHA-256 (`candidateId + APP_KEY`). Las observaciones del evaluador se sanitizan para prevenir inyección de prompts.
+
+---
+
+## Portal del candidato
+
+Los candidatos acceden en `https://tu-dominio.com/candidato` ingresando el código de acceso que les proporciona el equipo de RRHH. El flujo es:
+
+```
+Código de acceso → Consentimiento informado → Prueba → Resultado
+```
+
+Cada prueba tiene su propio flujo adaptado. El candidato puede solicitar la eliminación de sus datos desde `/candidato/eliminar-mis-datos`.
+
+---
+
+## Comandos útiles
+
+```bash
+# Desarrollo local
+php artisan serve
+npm run dev
+
+# Ejecutar backup manualmente
+php artisan backup:run
+
+# Limpiar caché de vistas y configuración
+php artisan optimize:clear
+```
+
+---
+
+## Cumplimiento legal
+
+- **Ley 1581/2012** — Protección de datos personales (Colombia)
+- **Ley 1090/2006** — Código deontológico del psicólogo colombiano
+- Consentimiento informado registrado con marca de tiempo e IP por cada prueba
+- Flujo de eliminación de datos con aprobación del administrador
+- Backups cifrados con contraseña AES-256
+- Sesiones cifradas en base de datos
+- Auditoría de acceso a informes en logs del sistema
+
+---
+
+## Créditos
+
+Desarrollado para **MenteClara** · Emma Naranjo  
+Sistema de evaluación psicológica para procesos de selección de personal.
