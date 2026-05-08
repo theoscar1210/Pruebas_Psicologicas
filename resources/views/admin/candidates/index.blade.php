@@ -14,7 +14,7 @@
 
 @section('content')
 
-@if($filter === 'evaluacion')
+@if($filter === 'evaluacion' && auth()->user()->role !== 'hr')
 <div class="card-info p-4 mb-4">
     <div class="flex items-center gap-2 text-brand-700 text-sm">
         <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -111,7 +111,7 @@
                 </td>
                 <td class="text-right">
                     <div class="flex items-center justify-end gap-3">
-                        @if($filter === 'evaluacion')
+                        @if($filter === 'evaluacion' && auth()->user()->role !== 'hr')
                         <a href="{{ route('admin.assessments.select', $candidate) }}"
                            class="text-emerald-600 hover:text-emerald-800 text-xs font-medium transition-colors">
                             {{ $candidate->evaluatorAssessments->isNotEmpty() ? '+ Evaluación' : 'Evaluar' }}
@@ -119,11 +119,13 @@
                         @endif
                         <a href="{{ route('admin.candidates.show', $candidate) }}"
                            class="text-brand-600 hover:text-brand-800 text-xs font-medium transition-colors">Ver</a>
+                        @if(auth()->user()->role !== 'hr')
                         <form method="POST" action="{{ route('admin.candidates.destroy', $candidate) }}" class="inline"
                               onsubmit="return confirm('¿Eliminar a {{ addslashes($candidate->name) }}? Se borrarán todas sus pruebas y resultados.')">
                             @csrf @method('DELETE')
                             <button type="submit" class="text-red-500 hover:text-red-700 text-xs font-medium transition-colors">Eliminar</button>
                         </form>
+                        @endif
                     </div>
                 </td>
             </tr>

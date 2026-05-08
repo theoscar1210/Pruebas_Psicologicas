@@ -127,6 +127,7 @@
                 Candidatos
             </a>
 
+            @if(auth()->user()->role !== 'hr')
             <p class="sidebar-section">Evaluaciones</p>
 
             <a href="{{ route('admin.candidates.index', ['filter' => 'evaluacion']) }}"
@@ -138,6 +139,7 @@
                 </svg>
                 Eval. Clínicas
             </a>
+            @endif
 
             <a href="{{ route('admin.perfiles.index') }}"
                @click="sidebarOpen = false"

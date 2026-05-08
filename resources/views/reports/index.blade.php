@@ -183,10 +183,12 @@
 
 </div>
 
+@if(auth()->user()->role !== 'hr')
 <div class="mt-6 card-info p-4 text-sm text-brand-700">
     <strong>Tip:</strong> También puedes descargar el PDF individual de cada candidato desde
     <a href="{{ route('admin.candidates.index') }}" class="underline font-medium">la vista de candidatos</a>
     → Ver detalle → botón PDF.
 </div>
+@endif
 
 @endsection

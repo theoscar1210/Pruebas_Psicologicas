@@ -4,24 +4,36 @@
 @section('header', 'Perfil Psicológico')
 
 @section('header-actions')
-    @if($report?->isCompleted())
-        <a href="{{ route('admin.profile.pdf', $candidate) }}" class="btn-danger btn-sm">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-            </svg>
-            Exportar PDF
-        </a>
+    @if(auth()->user()->role === 'hr')
+        @if($report?->ai_full_report)
+            <a href="{{ route('admin.profile.pdf', $candidate) }}" class="btn-danger btn-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                </svg>
+                Descargar PDF
+            </a>
+        @endif
+        <a href="{{ route('admin.candidates.show', $candidate) }}" class="btn-ghost btn-sm">← Candidato</a>
+    @else
+        @if($report?->isCompleted())
+            <a href="{{ route('admin.profile.pdf', $candidate) }}" class="btn-danger btn-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                </svg>
+                Exportar PDF
+            </a>
+        @endif
+        <form method="POST" action="{{ route('admin.profile.generate', $candidate) }}" class="inline">
+            @csrf
+            <button type="submit" class="btn-secondary btn-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                Generar / Actualizar perfil
+            </button>
+        </form>
+        <a href="{{ route('admin.candidates.show', $candidate) }}" class="btn-ghost btn-sm">← Candidato</a>
     @endif
-    <form method="POST" action="{{ route('admin.profile.generate', $candidate) }}" class="inline">
-        @csrf
-        <button type="submit" class="btn-secondary btn-sm">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-            </svg>
-            Generar / Actualizar perfil
-        </button>
-    </form>
-    <a href="{{ route('admin.candidates.show', $candidate) }}" class="btn-ghost btn-sm">← Candidato</a>
 @endsection
 
 @section('content')
@@ -82,6 +94,7 @@
     </div>
 </div>
 
+@if(auth()->user()->role !== 'hr')
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
     {{-- ════ COLUMNA IZQUIERDA ════════════════════════════════════════════ --}}
@@ -362,7 +375,7 @@
 </div>
 
 {{-- ── Entrevista STAR — ancho completo ───────────────────────────────────── --}}
-@if($star)
+@if($star && auth()->user()->role !== 'hr')
 <div class="mt-6 card">
     <div class="card-body">
 
@@ -438,7 +451,7 @@
 @endif
 
 {{-- ── Narrativas automáticas con IA ──────────────────────────────────────── --}}
-@if($report)
+@if($report && auth()->user()->role !== 'hr')
 <div class="mt-8">
     <div class="flex items-center gap-3 mb-4">
         <h2 class="text-base font-semibold text-slate-700">Narrativas automáticas</h2>
@@ -530,6 +543,8 @@
     </div>
 </div>
 @endif
+
+@endif {{-- /role !== hr --}}
 
 {{-- ── Informe Completo con IA ─────────────────────────────────────────────── --}}
 @if($report)
