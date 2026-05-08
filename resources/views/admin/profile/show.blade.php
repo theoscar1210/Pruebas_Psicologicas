@@ -577,6 +577,13 @@
              if (this.recommendation === 'apto_con_reservas') return 'APTO CON RESERVAS';
              if (this.recommendation === 'no_apto') return 'NO APTO';
              return '—';
+         },
+         mdToHtml(text) {
+             if (!text) return '';
+             return text
+                 .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                 .replace(/\*\*(.*?)\*\*/gs, '<strong>$1</strong>')
+                 .replace(/\n/g, '<br>');
          }
      }">
 
@@ -625,7 +632,7 @@
                         </div>
                         <p class="text-xs text-slate-400" x-text="'Generado el ' + generatedAt"></p>
                     </div>
-                    <div class="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap" x-text="report"></div>
+                    <div class="text-sm text-slate-700 leading-relaxed" x-html="mdToHtml(report)"></div>
                 </div>
             </template>
             <template x-if="!report">
