@@ -130,6 +130,9 @@ Route::middleware(['auth', 'two-factor'])->prefix('admin')->name('admin.')->grou
         Route::post('candidates/{candidate}/perfil/narrativa', [PsychologicalReportController::class, 'generateNarrative'])
             ->middleware('throttle:ai-narrative')
             ->name('profile.narrative');
+        Route::post('candidates/{candidate}/perfil/informe-ia', [PsychologicalReportController::class, 'generateFullReport'])
+            ->middleware('throttle:ai-narrative')
+            ->name('profile.full-report');
     });
 
     // ── Admin: solicitudes de eliminación de datos (Ley 1581/2012) ───────────

@@ -204,6 +204,36 @@
     </div>
     @endif
 
+    {{-- ══ INFORME COMPLETO IA ═══════════════════════════════════════════════════ --}}
+    @if($report?->ai_full_report)
+    <div class="tarjeta">
+        <div class="titulo-seccion">Informe Psicológico Completo — Análisis IA</div>
+        @if($report->ai_full_report_recommendation)
+        @php
+            $aiRecClass = match($report->ai_full_report_recommendation) {
+                'apto'              => 'rec-apto',
+                'apto_con_reservas' => 'rec-reservas',
+                'no_apto'           => 'rec-no-apto',
+                default             => '',
+            };
+            $aiRecLabel = match($report->ai_full_report_recommendation) {
+                'apto'              => 'APTO',
+                'apto_con_reservas' => 'APTO CON RESERVAS',
+                'no_apto'           => 'NO APTO',
+                default             => '—',
+            };
+        @endphp
+        <div style="margin-bottom:8px">
+            <span class="badge-recomendacion {{ $aiRecClass }}">{{ $aiRecLabel }}</span>
+            @if($report->ai_full_report_at)
+            <span style="font-size:8px;color:#94a3b8;margin-left:8px">Generado el {{ $report->ai_full_report_at->format('d/m/Y H:i') }}</span>
+            @endif
+        </div>
+        @endif
+        <p style="font-size:9px;color:#475569;line-height:1.7;white-space:pre-wrap">{{ $report->ai_full_report }}</p>
+    </div>
+    @endif
+
     {{-- ══ PIE DE PÁGINA ════════════════════════════════════════════════════════ --}}
     <div class="footer">
         <div class="footer-izquierda">MenteClara · <em>Donde el talento encuentra su medida</em></div>

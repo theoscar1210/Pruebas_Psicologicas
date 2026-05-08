@@ -20,9 +20,11 @@ class PsychologicalReport extends Model
         'wartegg_score', 'projective_observations',
         // Entrevista
         'interview_score', 'interview_competencies', 'interview_observations',
-        // Narrativas IA
+        // Narrativas IA por sección
         'narrative_personality', 'narrative_cognitive', 'narrative_competencies',
         'narrative_projective', 'narrative_interview',
+        // Informe IA completo
+        'ai_full_report', 'ai_full_report_recommendation', 'ai_full_report_at',
         // Resultado
         'adjustment_score', 'adjustment_level',
         'labor_risks', 'recommendation', 'recommendation_notes', 'summary',
@@ -45,6 +47,7 @@ class PsychologicalReport extends Model
         'adjustment_score'      => 'decimal:2',
         'labor_risks'           => 'array',
         'completed_at'          => 'datetime',
+        'ai_full_report_at'     => 'datetime',
     ];
 
     public function candidate(): BelongsTo

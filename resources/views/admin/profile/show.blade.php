@@ -531,4 +531,114 @@
 </div>
 @endif
 
+{{-- ── Informe Completo con IA ─────────────────────────────────────────────── --}}
+@if($report)
+<div class="mt-8"
+     x-data="{
+         loading: false,
+         report: @js($report->ai_full_report ?? ''),
+         recommendation: @js($report->ai_full_report_recommendation ?? ''),
+         generatedAt: @js($report->ai_full_report_at?->format('d/m/Y H:i') ?? ''),
+         async generate() {
+             if (!confirm('¿Generar el informe completo con IA? Este proceso toma ~15 segundos.')) return;
+             this.loading = true;
+             try {
+                 const res = await fetch('{{ route('admin.profile.full-report', $candidate) }}', {
+                     method: 'POST',
+                     headers: {
+                         'Content-Type': 'application/json',
+                         'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                         'Accept': 'application/json',
+                     },
+                     body: JSON.stringify({}),
+                 });
+                 const data = await res.json();
+                 if (data.report) {
+                     this.report = data.report;
+                     this.recommendation = data.recommendation;
+                     this.generatedAt = new Date().toLocaleString('es-CO', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+                 } else {
+                     alert(data.error || 'Error al generar el informe.');
+                 }
+             } catch(e) {
+                 alert('Error de conexión.');
+             } finally {
+                 this.loading = false;
+             }
+         },
+         recColor() {
+             if (this.recommendation === 'apto') return 'text-emerald-700 bg-emerald-50 border-emerald-300';
+             if (this.recommendation === 'apto_con_reservas') return 'text-amber-700 bg-amber-50 border-amber-300';
+             if (this.recommendation === 'no_apto') return 'text-red-700 bg-red-50 border-red-300';
+             return 'text-slate-600 bg-slate-50 border-slate-200';
+         },
+         recLabel() {
+             if (this.recommendation === 'apto') return 'APTO';
+             if (this.recommendation === 'apto_con_reservas') return 'APTO CON RESERVAS';
+             if (this.recommendation === 'no_apto') return 'NO APTO';
+             return '—';
+         }
+     }">
+
+    <div class="flex items-center justify-between flex-wrap gap-3 mb-4">
+        <div class="flex items-center gap-3">
+            <h2 class="text-base font-semibold text-slate-700">Informe Psicológico Completo</h2>
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-violet-100 text-violet-700">
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>
+                </svg>
+                IA — Groq
+            </span>
+        </div>
+        <div class="flex items-center gap-2">
+            <a href="{{ route('admin.profile.pdf', $candidate) }}"
+               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-red-600 hover:bg-red-700 transition">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                </svg>
+                Exportar PDF
+            </a>
+            <button type="button"
+                    @click="generate()"
+                    :disabled="loading"
+                    class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-semibold text-white bg-violet-600 hover:bg-violet-700 transition disabled:opacity-60 disabled:cursor-not-allowed">
+                <svg x-show="!loading" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>
+                </svg>
+                <svg x-show="loading" x-cloak class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                </svg>
+                <span x-text="loading ? 'Generando informe…' : (report ? 'Regenerar Informe IA' : 'Generar Informe con IA')"></span>
+            </button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <template x-if="report">
+                <div>
+                    <div class="flex items-center justify-between flex-wrap gap-3 mb-5 pb-4 border-b border-slate-100">
+                        <div>
+                            <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Recomendación IA</p>
+                            <div class="inline-block px-5 py-2 rounded-xl border-2 font-bold text-lg" :class="recColor()" x-text="recLabel()"></div>
+                        </div>
+                        <p class="text-xs text-slate-400" x-text="'Generado el ' + generatedAt"></p>
+                    </div>
+                    <div class="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap" x-text="report"></div>
+                </div>
+            </template>
+            <template x-if="!report">
+                <div class="py-12 text-center">
+                    <svg class="w-10 h-10 text-slate-200 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"/>
+                    </svg>
+                    <p class="text-sm text-slate-400">Sin informe generado. Presiona <strong>Generar Informe con IA</strong> para crear un análisis integral del candidato con recomendación automática.</p>
+                </div>
+            </template>
+        </div>
+    </div>
+</div>
+@endif
+
 @endsection

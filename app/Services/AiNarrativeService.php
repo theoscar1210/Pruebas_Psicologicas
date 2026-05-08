@@ -21,6 +21,60 @@ class AiNarrativeService
     }
 
     /**
+     * Generate a comprehensive AI full report for the entire psychological profile.
+     * Returns ['report' => string, 'recommendation' => 'apto'|'apto_con_reservas'|'no_apto'].
+     */
+    public function generateFullReport(PsychologicalReport $report, Candidate $candidate): array
+    {
+        $prompt = $this->fullReportPrompt($report, $candidate);
+
+        $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Content-Type'  => 'application/json',
+            ])
+            ->timeout(60)
+            ->retry(2, 800)
+            ->post(self::ENDPOINT, [
+                'model'       => self::MODEL,
+                'max_tokens'  => 1800,
+                'temperature' => 0.65,
+                'messages'    => [
+                    ['role' => 'system', 'content' => $this->fullReportSystemPrompt()],
+                    ['role' => 'user',   'content' => $prompt],
+                ],
+            ]);
+
+        if (!$response->successful()) {
+            Log::error('Groq full report error', [
+                'status'       => $response->status(),
+                'candidate_id' => $candidate->id,
+            ]);
+            throw new \RuntimeException('El servicio de generación de informe no está disponible.');
+        }
+
+        $content = strip_tags(trim($response->json('choices.0.message.content', '')));
+
+        if (empty($content)) {
+            throw new \RuntimeException('El modelo devolvió una respuesta vacía.');
+        }
+
+        // Extraer la recomendación de la última línea con el marcador
+        $recommendation = 'apto_con_reservas';
+        if (preg_match('/RECOMENDACIÓN_FINAL:\s*(APTO_CON_RESERVAS|NO_APTO|APTO)/i', $content, $m)) {
+            $recommendation = strtolower($m[1]);
+        }
+
+        // Limpiar el marcador del texto visible
+        $reportText = trim(preg_replace('/\n*RECOMENDACIÓN_FINAL:.*$/i', '', $content));
+
+        if (strlen($reportText) > 8000) {
+            $reportText = mb_substr($reportText, 0, 8000);
+        }
+
+        return ['report' => $reportText, 'recommendation' => $recommendation];
+    }
+
+    /**
      * Generate a narrative paragraph for one report section.
      *
      * @param  string  $section  personality|cognitive|competencies|projective|interview
@@ -248,6 +302,110 @@ Entrevista por competencias (metodología STAR):
 
 Redacta un párrafo narrativo sobre el desempeño del candidato en la entrevista por competencias,
 interpretando su nivel de desarrollo conductual y su idoneidad para el cargo.
+PROMPT;
+    }
+
+    private function fullReportSystemPrompt(): string
+    {
+        return <<<'PROMPT'
+Eres un psicólogo organizacional experto en evaluación de selección de personal.
+Redacta informes técnicos, objetivos y profesionales en español colombiano formal.
+Usa terminología psicológica apropiada. Integra todos los datos del perfil de forma coherente.
+Interpreta cualitativamente; no repitas los números de forma literal.
+Nunca inventes datos que no estén en el contexto. Sé claro en la recomendación final.
+Al final del informe escribe EXACTAMENTE en una línea separada:
+RECOMENDACIÓN_FINAL: APTO  o  RECOMENDACIÓN_FINAL: APTO_CON_RESERVAS  o  RECOMENDACIÓN_FINAL: NO_APTO
+PROMPT;
+    }
+
+    private function fullReportPrompt(PsychologicalReport $report, Candidate $candidate): string
+    {
+        $cargo  = $candidate->position?->name ?? 'el cargo';
+        $nombre = $this->pseudonym($candidate->id);
+
+        // ── Personalidad ─────────────────────────────────────────────────────
+        $bfSection = 'No evaluado.';
+        if ($report->bf_openness !== null) {
+            $bfSection = implode(', ', [
+                'Apertura ' . round((float)$report->bf_openness) . '%',
+                'Responsabilidad ' . round((float)$report->bf_conscientiousness) . '%',
+                'Extraversión ' . round((float)$report->bf_extraversion) . '%',
+                'Amabilidad ' . round((float)$report->bf_agreeableness) . '%',
+                'Neuroticismo ' . round((float)$report->bf_neuroticism) . '%',
+            ]);
+        }
+
+        // ── Cognitivo ────────────────────────────────────────────────────────
+        $cogSection = 'No evaluado.';
+        if ($report->cognitive_score !== null) {
+            $cogSection = round((float)$report->cognitive_score) . '/100'
+                . ' — Nivel: ' . ($report->cognitive_level ?? 'N/D')
+                . ' — Percentil: ' . ($report->cognitive_percentile ?? 'N/D');
+        }
+
+        // ── Competencias ─────────────────────────────────────────────────────
+        $compSection = 'No evaluado.';
+        if (!empty($report->competency_scores)) {
+            $compSection = collect($report->competency_scores)
+                ->filter(fn($v) => is_numeric($v))
+                ->map(fn($v, $k) => "{$k}: " . round((float)$v) . '%')
+                ->implode(', ');
+        }
+
+        // ── Proyectivo ───────────────────────────────────────────────────────
+        $projScore = $report->wartegg_score !== null ? round((float)$report->wartegg_score) . '/100' : 'N/D';
+        $projObs   = $this->sanitizeObservation($report->projective_observations);
+
+        // ── Entrevista ───────────────────────────────────────────────────────
+        $intScore = $report->interview_score !== null ? round((float)$report->interview_score) . '/100' : 'N/D';
+        $intObs   = $this->sanitizeObservation($report->interview_observations);
+        $intComp  = '';
+        if (!empty($report->interview_competencies)) {
+            $intComp = ' Competencias STAR: ' . collect($report->interview_competencies)
+                ->filter(fn($v) => is_numeric($v))
+                ->map(fn($v, $k) => "{$k}: " . round((float)$v))
+                ->implode(', ') . '.';
+        }
+
+        // ── Riesgos y narrativas previas ─────────────────────────────────────
+        $risks = '';
+        if (!empty($report->labor_risks)) {
+            $risks = "\nRiesgos identificados: " . implode(', ', $report->labor_risks) . '.';
+        }
+
+        $narratives = '';
+        foreach (['narrative_personality', 'narrative_cognitive', 'narrative_competencies', 'narrative_projective', 'narrative_interview'] as $field) {
+            if (!empty($report->$field)) {
+                $label = str_replace(['narrative_', '_'], ['', ' '], $field);
+                $narratives .= "\n[Narrativa {$label}]: " . mb_substr($report->$field, 0, 300) . '…';
+            }
+        }
+
+        return <<<PROMPT
+DATOS DEL CANDIDATO
+Pseudónimo: {$nombre} | Cargo aspirado: {$cargo}
+
+PERSONALIDAD (Big Five): {$bfSection}
+COGNITIVO (Raven): {$cogSection}
+COMPETENCIAS (AC): {$compSection}
+PROYECTIVO (Wartegg): Puntuación {$projScore}. Observaciones: {$projObs}
+ENTREVISTA STAR: Puntuación {$intScore}.{$intComp} Observaciones: {$intObs}{$risks}
+{$narratives}
+
+---
+Redacta un INFORME PSICOLÓGICO INTEGRAL (500-700 palabras) con las siguientes secciones:
+1. Presentación del candidato y contexto de la evaluación
+2. Perfil de personalidad y estilo conductual
+3. Capacidad cognitiva y potencial de aprendizaje
+4. Competencias laborales y desempeño en entrevista
+5. Indicadores proyectivos y dinámica emocional
+6. Fortalezas clave y áreas de desarrollo
+7. Ajuste al cargo y recomendación
+
+Al final escribe en una línea separada:
+RECOMENDACIÓN_FINAL: APTO  (si cumple el perfil)
+RECOMENDACIÓN_FINAL: APTO_CON_RESERVAS  (si cumple con observaciones)
+RECOMENDACIÓN_FINAL: NO_APTO  (si no cumple el perfil)
 PROMPT;
     }
 }

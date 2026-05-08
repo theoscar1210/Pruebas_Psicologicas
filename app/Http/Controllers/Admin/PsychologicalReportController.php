@@ -109,6 +109,36 @@ class PsychologicalReportController extends Controller
         }
     }
 
+    /** Generar informe completo con IA */
+    public function generateFullReport(Request $request, Candidate $candidate): JsonResponse
+    {
+        $this->authorize('viewReport', $candidate);
+
+        $report = $candidate->psychologicalReports()->latest()->first();
+
+        if (!$report) {
+            return response()->json(['error' => 'Genera primero el perfil psicológico.'], 422);
+        }
+
+        try {
+            $result = app(AiNarrativeService::class)->generateFullReport($report, $candidate);
+
+            $report->update([
+                'ai_full_report'                => $result['report'],
+                'ai_full_report_recommendation' => $result['recommendation'],
+                'ai_full_report_at'             => now(),
+            ]);
+
+            return response()->json($result);
+        } catch (\Throwable $e) {
+            Log::error('AI full report generation failed', [
+                'candidate_id' => $candidate->id,
+                'error'        => $e->getMessage(),
+            ]);
+            return response()->json(['error' => 'No se pudo generar el informe. Intenta de nuevo más tarde.'], 500);
+        }
+    }
+
     /** Exportar el perfil como PDF */
     public function pdf(Candidate $candidate): \Illuminate\Http\Response
     {
