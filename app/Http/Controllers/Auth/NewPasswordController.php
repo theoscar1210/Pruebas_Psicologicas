@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
@@ -47,6 +48,14 @@ class NewPasswordController extends Controller
                     'password' => Hash::make($request->password),
                     'remember_token' => Str::random(60),
                 ])->save();
+
+                // Login temporal para poder llamar logoutOtherDevices,
+                // que invalida todas las demás sesiones activas del usuario.
+                // Luego se cierra esta sesión para que el usuario inicie sesión
+                // manualmente con la nueva contraseña.
+                Auth::login($user);
+                Auth::logoutOtherDevices($request->password);
+                Auth::logout();
 
                 event(new PasswordReset($user));
             }
