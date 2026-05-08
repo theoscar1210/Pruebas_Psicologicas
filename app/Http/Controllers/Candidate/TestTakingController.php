@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class TestTakingController extends Controller
@@ -199,10 +200,16 @@ class TestTakingController extends Controller
         }
 
         $validated = $request->validate([
-            'question_id' => 'required|exists:questions,id',
-            'question_option_id' => 'nullable|exists:question_options,id',
-            'text_answer' => 'nullable|string|max:2000',
-            'time_remaining' => 'nullable|integer|min:0',
+            'question_id' => [
+                'required',
+                Rule::exists('questions', 'id')->where('test_id', $assignment->test_id),
+            ],
+            'question_option_id' => [
+                'nullable',
+                Rule::exists('question_options', 'id')->where('question_id', $request->input('question_id')),
+            ],
+            'text_answer'    => 'nullable|string|max:2000',
+            'time_remaining' => 'nullable|integer|min:0|max:86400',
         ]);
 
         Answer::updateOrCreate(
