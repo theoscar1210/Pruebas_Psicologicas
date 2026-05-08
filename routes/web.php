@@ -126,13 +126,17 @@ Route::middleware(['auth', 'two-factor'])->prefix('admin')->name('admin.')->grou
         Route::get('candidates/{candidate}/perfil', [PsychologicalReportController::class, 'show'])->name('profile.show');
         Route::post('candidates/{candidate}/perfil/generar', [PsychologicalReportController::class, 'generate'])->name('profile.generate');
         Route::post('candidates/{candidate}/perfil/completar', [PsychologicalReportController::class, 'complete'])->name('profile.complete');
-        Route::get('candidates/{candidate}/perfil/pdf', [PsychologicalReportController::class, 'pdf'])->name('profile.pdf');
         Route::post('candidates/{candidate}/perfil/narrativa', [PsychologicalReportController::class, 'generateNarrative'])
             ->middleware('throttle:ai-narrative')
             ->name('profile.narrative');
         Route::post('candidates/{candidate}/perfil/informe-ia', [PsychologicalReportController::class, 'generateFullReport'])
             ->middleware('throttle:ai-narrative')
             ->name('profile.full-report');
+    });
+
+    // ── PDF del informe psicológico: accesible también para RRHH ─────────────
+    Route::middleware('role:admin,psicologo,hr')->group(function () {
+        Route::get('candidates/{candidate}/perfil/pdf', [PsychologicalReportController::class, 'pdf'])->name('profile.pdf');
     });
 
     // ── Admin: solicitudes de eliminación de datos (Ley 1581/2012) ───────────
